@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-const counterStore = useCounter()
+import { useTestCounter } from '~/stores/counter'
+
+const counterStore = useTestCounter()
 
 // 解构
 const { counter } = storeToRefs(counterStore)

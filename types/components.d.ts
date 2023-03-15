@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AppProvider: typeof import('./../src/components/app-provider/index.vue')['default']
     HelloWorld: typeof import('./../src/components/HelloWorld.vue')['default']
+    NButton: typeof import('naive-ui')['NButton']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
     NLoadingBarProvider: typeof import('naive-ui')['NLoadingBarProvider']

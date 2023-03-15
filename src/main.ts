@@ -14,6 +14,6 @@ meta.name = 'naive-ui-style'
 document.head.appendChild(meta)
 
 const app = createApp(App)
-app.use(pinia)
 app.use(router)
+app.use(pinia)
 createApp(App).mount('#app')

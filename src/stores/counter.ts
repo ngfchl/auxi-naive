@@ -1,4 +1,4 @@
-export const useCounter = defineStore('counter', () => {
+export const useTestCounter = defineStore('counter', () => {
   const counter = ref(0)
 
   const increment = () => {
