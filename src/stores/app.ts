@@ -1,7 +1,8 @@
-import { reactive } from 'vue'
 import { layoutThemeConfig } from '~/config/layout-theme'
+
 export const useAppStore = defineStore('app', () => {
-  const layout = reactive(layoutThemeConfig)
+  const defaultTheme = import.meta.env.DEV ? layoutThemeConfig : useLayoutTheme()
+  const layout = reactive(unref(defaultTheme))
 
   return {
     layout,
