@@ -25,9 +25,6 @@ const { layout } = storeToRefs(appStore)
     v-if="layout.layout === 'top'"
     :logo="layout.logo"
     :title="layout.title"
-    :show-sider-trigger="layout.showSiderTrigger"
-    :sider-collapsed-width="layout.siderCollapsedWidth"
-    :sider-width="layout.siderWidth"
   >
     <template #headerRight>
       用户菜单

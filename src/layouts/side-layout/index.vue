@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LayoutContent, LayoutSider, Logo, Title } from '../common'
+import { LayoutBase, LayoutContent, LayoutSider, Logo, Title } from '../common'
 
 const props = withDefaults(defineProps<{
   headerHeight?: number
@@ -36,7 +36,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       </div>
       <slot name="menu" />
     </LayoutSider>
-    <n-layout>
+    <LayoutBase>
       <n-layout-header
         class="pro-admin-mix-header flex justify-between items-center px-4"
       >
@@ -56,7 +56,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       >
         <slot />
       </LayoutContent>
-    </n-layout>
+    </LayoutBase>
   </n-layout>
 </template>
 
