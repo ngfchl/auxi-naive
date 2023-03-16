@@ -34,6 +34,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
         <Logo :src="logo" :size="30" />
         <Title v-if="!collapsed" :title="title" :size="18" />
       </div>
+      <slot name="menu" />
     </LayoutSider>
     <n-layout>
       <n-layout-header
