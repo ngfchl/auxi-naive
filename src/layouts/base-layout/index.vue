@@ -2,52 +2,65 @@
 import MixLayout from '../mix-layout/index.vue'
 import SideLayout from '../side-layout/index.vue'
 import TopLayout from '../top-layout/index.vue'
+import MobileLayout from '../mobile-layout/index.vue'
+import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
 const appStore = useAppStore()
-const { layout } = storeToRefs(appStore)
+const { layout, visible, toggleVisible, toggleCollapsed } = storeToRefs(appStore)
+const { isMobile, isPad } = useQueryBreakPoints()
 </script>
 
 <template>
-  <MixLayout
-    v-if="layout.layout === 'mix'"
-    :logo="layout.logo"
-    :title="layout.title"
-    :show-sider-trigger="layout.showSiderTrigger"
-    :sider-collapsed-width="layout.siderCollapsedWidth"
-    :sider-width="layout.siderWidth"
-  >
-    <template #headerRight>
-      用户菜单
-    </template>
-    <router-view />
-  </MixLayout>
-  <TopLayout
-    v-if="layout.layout === 'top'"
+  <MobileLayout
+    v-if="isMobile"
+    v-model:visible="visible"
     :logo="layout.logo"
     :title="layout.title"
   >
-    <template #headerRight>
-      用户菜单
-    </template>
     <router-view />
-  </TopLayout>
-  <SideLayout
-    v-if="layout.layout === 'side'"
-    v-model:collapsed="layout.collapsed"
-    :logo="layout.logo"
-    :title="layout.title"
-    :show-sider-trigger="layout.showSiderTrigger"
-    :sider-collapsed-width="layout.siderCollapsedWidth"
-    :sider-width="layout.siderWidth"
-  >
-    <template #headerRight>
-      用户菜单
-    </template>
-    <template #menu>
-      菜单栏
-    </template>
-    <router-view />
-  </SideLayout>
+  </MobileLayout>
+  <template v-else>
+    <MixLayout
+      v-if="layout.layout === 'mix'"
+      :logo="layout.logo"
+      :title="layout.title"
+      :show-sider-trigger="layout.showSiderTrigger"
+      :sider-collapsed-width="layout.siderCollapsedWidth"
+      :sider-width="layout.siderWidth"
+    >
+      <template #headerRight>
+        用户菜单
+      </template>
+      <router-view />
+    </MixLayout>
+    <TopLayout
+      v-if="layout.layout === 'top'"
+      :logo="layout.logo"
+      :title="layout.title"
+    >
+      <template #headerRight>
+        用户菜单
+      </template>
+      <router-view />
+    </TopLayout>
+    <SideLayout
+      v-if="layout.layout === 'side'"
+      v-model:collapsed="layout.collapsed"
+      :logo="layout.logo"
+      :title="layout.title"
+      :show-sider-trigger="layout.showSiderTrigger"
+      :sider-collapsed-width="layout.siderCollapsedWidth"
+      :sider-width="layout.siderWidth"
+    >
+      <template #headerRight>
+        用户菜单
+      </template>
+      <template #menu>
+        菜单栏
+      </template>
+      <router-view />
+    </SideLayout>
+  </template>
 </template>
 
 <style scoped>
