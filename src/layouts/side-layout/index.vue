@@ -19,31 +19,34 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
 </script>
 
 <template>
-  <n-layout class="h-screen">
-    <n-layout-header
-      inverted
-      class="pro-admin-mix-header flex justify-between items-center px-4"
+  <n-layout class="h-screen" has-sider>
+    <LayoutSider
+      :inverted="inverted"
+      :show-trigger="showSiderTrigger" :width="siderWidth"
+      :collapsed-width="siderCollapsedWidth"
     >
-      <div class="flex items-center">
-        <Logo :src="logo" />
-        <Title :title="title" />
+      <div class="flex items-center justify-center p-3">
+        <Logo :src="logo" :size="30" />
+        <Title :title="title" :size="18" />
       </div>
-      <slot name="headerRight">
-        <div>
-          右侧
-        </div>
-      </slot>
-    </n-layout-header>
-    <n-layout has-sider>
-      <LayoutSider
-        :show-trigger="showSiderTrigger" :width="siderWidth"
-        :collapsed-width="siderCollapsedWidth"
-        class="pro-admin-mix-content"
+    </LayoutSider>
+    <n-layout>
+      <n-layout-header
+        class="pro-admin-mix-header flex justify-between items-center px-4"
       >
-        菜单栏
-      </LayoutSider>
+        <slot name="headerLeft">
+          <div>
+            左侧
+          </div>
+        </slot>
+        <slot name="headerRight">
+          <div>
+            右侧
+          </div>
+        </slot>
+      </n-layout-header>
       <LayoutContent
-        position="absolute"
+        class="pro-admin-mix-content"
       >
         <slot />
       </LayoutContent>
@@ -52,10 +55,11 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
 </template>
 
 <style scoped>
-.pro-admin-mix-header{
+.pro-admin-mix-header {
   height: v-bind(headerHeightVar);
 }
-.pro-admin-mix-content{
+
+.pro-admin-mix-content {
   height: v-bind(contentHeightVar);
 }
 </style>
