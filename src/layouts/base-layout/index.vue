@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MixLayout from '../mix-layout/index.vue'
 import SideLayout from '../side-layout/index.vue'
+import TopLayout from '../top-layout/index.vue'
 
 const appStore = useAppStore()
 const { layout } = storeToRefs(appStore)
@@ -20,6 +21,19 @@ const { layout } = storeToRefs(appStore)
     </template>
     <router-view />
   </MixLayout>
+  <TopLayout
+    v-if="layout.layout === 'top'"
+    :logo="layout.logo"
+    :title="layout.title"
+    :show-sider-trigger="layout.showSiderTrigger"
+    :sider-collapsed-width="layout.siderCollapsedWidth"
+    :sider-width="layout.siderWidth"
+  >
+    <template #headerRight>
+      用户菜单
+    </template>
+    <router-view />
+  </TopLayout>
   <SideLayout
     v-if="layout.layout === 'side'"
     v-model:collapsed="layout.collapsed"
@@ -31,6 +45,9 @@ const { layout } = storeToRefs(appStore)
   >
     <template #headerRight>
       用户菜单
+    </template>
+    <template #menu>
+      菜单栏
     </template>
     <router-view />
   </SideLayout>
