@@ -22,6 +22,7 @@ const { layout } = storeToRefs(appStore)
   </MixLayout>
   <SideLayout
     v-if="layout.layout === 'side'"
+    v-model:collapsed="layout.collapsed"
     :logo="layout.logo"
     :title="layout.title"
     :show-sider-trigger="layout.showSiderTrigger"

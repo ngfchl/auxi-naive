@@ -14,7 +14,7 @@ const titleStyleVar = computed<CSSProperties>(() => ({
 </script>
 
 <template>
-  <span v-if="title" :style="titleStyleVar" class="ml-2">
+  <span v-if="title" :style="titleStyleVar" class="ml-2 truncate">
     {{ title }}
   </span>
 </template>

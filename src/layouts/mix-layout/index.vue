@@ -12,8 +12,9 @@ const props = withDefaults(defineProps<{
 }>(), {
   headerHeight: 48,
   inverted: false,
+  collapsed: false,
 })
-
+defineEmits(['update:collapsed'])
 const headerHeightVar = computed(() => `${props.headerHeight}px`)
 const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
 </script>
@@ -36,9 +37,12 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
     </n-layout-header>
     <n-layout has-sider>
       <LayoutSider
-        :show-trigger="showSiderTrigger" :width="siderWidth"
+        :show-trigger="showSiderTrigger"
+        :collapsed="collapsed"
+        :width="siderWidth"
         :collapsed-width="siderCollapsedWidth"
         class="pro-admin-mix-content"
+        @update:collapsed="($event) => $emit('update:collapsed', $event)"
       >
         菜单栏
       </LayoutSider>

@@ -9,11 +9,13 @@ const props = withDefaults(defineProps<{
   siderCollapsedWidth?: number
   showSiderTrigger?: boolean | 'bar' | 'arrow-circle'
   inverted?: boolean
+  collapsed?: boolean
 }>(), {
   headerHeight: 48,
   inverted: false,
+  collapsed: false,
 })
-
+defineEmits(['update:collapsed'])
 const headerHeightVar = computed(() => `${props.headerHeight}px`)
 const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
 </script>
@@ -22,12 +24,15 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
   <n-layout class="h-screen" has-sider>
     <LayoutSider
       :inverted="inverted"
-      :show-trigger="showSiderTrigger" :width="siderWidth"
+      :collapsed="collapsed"
+      :show-trigger="showSiderTrigger"
+      :width="siderWidth"
       :collapsed-width="siderCollapsedWidth"
+      @update:collapsed="($event) => $emit('update:collapsed', $event)"
     >
-      <div class="flex items-center justify-center p-3">
+      <div class="flex items-center justify-center mt-3">
         <Logo :src="logo" :size="30" />
-        <Title :title="title" :size="18" />
+        <Title v-if="!collapsed" :title="title" :size="18" />
       </div>
     </LayoutSider>
     <n-layout>

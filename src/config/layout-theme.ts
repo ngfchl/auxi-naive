@@ -7,7 +7,8 @@ export interface LayoutTheme {
   siderWidth: number
   siderCollapsedWidth: number
   showSiderTrigger: boolean | 'bar' | 'arrow-circle'
-  inverted?: boolean
+  inverted: boolean
+  collapsed: boolean
 }
 export const layoutThemeConfig: LayoutTheme = {
   title: 'Naive admin Pro',
@@ -17,5 +18,6 @@ export const layoutThemeConfig: LayoutTheme = {
   siderCollapsedWidth: 48,
   showSiderTrigger: 'bar',
   inverted: false,
+  collapsed: false,
   logo,
 }
