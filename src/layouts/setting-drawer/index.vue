@@ -11,7 +11,9 @@ const props = withDefaults(defineProps<{
   drawerWidth: 300,
   layout: 'top',
 })
+defineEmits(['update:layout'])
 let show = $ref(false)
+
 const cssVar = computed(() => {
   return {
     '--pro-admin-float-top': `${props.floatTop}px`,
@@ -57,7 +59,11 @@ const onShow = (value: boolean) => {
           <template v-for="item in layouts" :key="item.layout">
             <n-tooltip placement="bottom" trigger="hover">
               <template #trigger>
-                <CheckBoxLayout :layout="item.layout" :checked="item.layout === layout" />
+                <CheckBoxLayout
+                  :layout="item.layout"
+                  :checked="item.layout === layout"
+                  @click="() => $emit('update:layout', item.layout)"
+                />
               </template>
               <span>{{ item.title }}</span>
             </n-tooltip>

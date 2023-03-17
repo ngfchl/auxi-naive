@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{
   checked: true,
 })
 
-const headerClasss = computed(() => {
+const headerClass = computed(() => {
   if (props.layout === 'mix' || props.layout === 'top') {
     return [
       'bg-[var(--inverted-color)]',
@@ -45,10 +45,10 @@ const siderClasss = computed(() => {
   <n-space class="p-3">
     <n-el
       tag="div"
-      class="inline-block relative w-44px h-36px b-rd-2px overflow-hidden bg-[var(--pro-admin-layout-content-bg)] shadow-[var(--pro-admin-layout-box-shadow)]"
+      class="cursor-pointer inline-block relative w-44px h-36px b-rd-2px overflow-hidden bg-[var(--pro-admin-layout-content-bg)] shadow-[var(--pro-admin-layout-box-shadow)]"
     >
       <div
-        :class="headerClasss"
+        :class="headerClass"
         class="h-25% absolute top-0 w-100%"
       />
       <div

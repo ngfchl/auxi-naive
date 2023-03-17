@@ -74,7 +74,11 @@ watchEffect(() => {
       <router-view />
     </SideLayout>
   </template>
-  <SettingDrawer :drawer-width="300" :float-top="240" />
+  <SettingDrawer
+    v-model:layout="layout.layout"
+    :drawer-width="300"
+    :float-top="240"
+  />
 </template>
 
 <style scoped>
