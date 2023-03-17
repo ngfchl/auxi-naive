@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { Checkbox } from '@vicons/ionicons5'
 const props = withDefaults(defineProps<{
   layout?: 'mix' | 'side' | 'top'
   inverted?: boolean
+  checked?: boolean
 }>(), {
   inverted: false,
   layout: 'top',
+  checked: true,
 })
 
 const headerClasss = computed(() => {
@@ -53,6 +56,11 @@ const siderClasss = computed(() => {
         :class="siderClasss"
         class="w-30% absolute left-0 h-100%"
       />
+      <div v-if="checked" class="absolute bottom--1 right-1">
+        <n-icon color="#0e7a0d" depth="1.0" size="20">
+          <Checkbox />
+        </n-icon>
+      </div>
     </n-el>
   </n-space>
 </template>

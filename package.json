@@ -25,6 +25,7 @@
     "@types/node": "^18.15.3",
     "@unocss/reset": "^0.50.4",
     "@vicons/antd": "^0.12.0",
+    "@vicons/ionicons5": "^0.12.0",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/runtime-core": "^3.2.47",
     "eslint": "^8.36.0",
