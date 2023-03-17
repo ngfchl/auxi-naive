@@ -13,33 +13,40 @@ const props = withDefaults(defineProps<{
 })
 
 const headerClass = computed(() => {
-  if (props.layout === 'mix' || props.layout === 'top') {
-    return [
-      'bg-[var(--inverted-color)]',
-    ]
+  if (props.inverted) {
+    if (props.layout === 'mix' || props.layout === 'top') {
+      return [
+        'bg-[var(--inverted-color)]',
+      ]
+    }
+    if (props.layout === 'side') {
+      return [
+        'bg-[var(--inverted-color)]',
+        'ml-32%',
+        'w-68%',
+      ]
+    }
   }
-  if (props.layout === 'side') {
-    return [
-      'bg-[var(--base-color)]',
-    ]
-  }
+  return [
+    'bg-neutral-200',
+  ]
 })
 
 const siderClass = computed(() => {
   if (props.layout === 'mix') {
     return [
-      'h-75%',
-      'bg-white',
+      'h-73%',
       'bottom-0',
+      'mt-5px',
+      props.inverted ? 'bg-[var(--inverted-color)]' : 'bg-neutral-200',
     ]
   }
   if (props.layout === 'side') {
     return [
       'h-100%',
-      `bg-[var(${props.inverted ? '--inverted-color' : '--base-color'})]`,
+        `bg-[var(${props.inverted ? '--inverted-color' : 'neutral-200'})]`,
     ]
   }
-  return []
 })
 </script>
 
@@ -58,7 +65,7 @@ const siderClass = computed(() => {
           <div
             v-if="layout !== 'top'"
             :class="siderClass"
-            class="w-30% absolute left-0 h-100%"
+            class="w-30% absolute left-0 h-100"
           />
           <div v-if="checked" class="absolute bottom--1 right-1">
             <n-icon color="#0e7a0d" depth="1.0" size="20">

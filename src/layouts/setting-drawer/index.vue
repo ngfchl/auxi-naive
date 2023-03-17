@@ -6,7 +6,7 @@ const props = withDefaults(defineProps<{
   floatTop: number | string
   drawerWidth: number | string
   layout?: 'side' | 'mix' | 'top'
-  layoutStyle?: 'light' | 'dark'
+  layoutStyle?: 'light' | 'inverted'
 }>(), {
   floatTop: 240,
   drawerWidth: 300,
@@ -87,6 +87,7 @@ const onShow = (value: boolean) => {
               :layout="item.key"
               :checked="item.key === layout"
               :title="item.title"
+              :inverted="layoutStyle === 'inverted'"
               @click="() => $emit('update:layout', item.key)"
             />
           </template>
