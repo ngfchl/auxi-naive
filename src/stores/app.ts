@@ -1,3 +1,5 @@
+import { darkTheme } from 'naive-ui'
+import type { LayoutTheme } from '~/config/layout-theme'
 import { layoutThemeConfig } from '~/config/layout-theme'
 
 export const useAppStore = defineStore('app', () => {
@@ -10,7 +12,15 @@ export const useAppStore = defineStore('app', () => {
   const toggleCollapsed = (value: boolean) => {
     layout.collapsed = value
   }
+  const updateLayoutStyle = (value: LayoutTheme['layoutStyle']) => {
+    layout.layoutStyle = value
+  }
+  const layoutTheme = computed(() => {
+    if (layout.layoutStyle === 'dark') return darkTheme
+    return undefined
+  })
+
   return {
-    layout, visible, toggleVisible, toggleCollapsed,
+    layout, visible, toggleVisible, toggleCollapsed, layoutTheme, updateLayoutStyle,
   }
 })

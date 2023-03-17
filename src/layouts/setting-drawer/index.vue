@@ -6,7 +6,7 @@ const props = withDefaults(defineProps<{
   floatTop: number | string
   drawerWidth: number | string
   layout?: 'side' | 'mix' | 'top'
-  layoutStyle?: 'light' | 'inverted'
+  layoutStyle?: 'light' | 'inverted' | 'dark'
 }>(), {
   floatTop: 240,
   drawerWidth: 300,
@@ -40,7 +40,12 @@ const layoutStyles = ref([{
   id: 'inverted',
   key: props.layout,
   inverted: true,
-  title: '反转色',
+  title: '反色',
+}, {
+  id: 'dark',
+  key: props.layout,
+  inverted: true,
+  title: '暗色',
 }])
 const onShow = (value: boolean) => {
   show = value
