@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@vicons/antd'
-import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent } from '../common'
+import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutHeader } from '../common'
 
 const props = withDefaults(defineProps<{
   headerHeight?: number
@@ -28,7 +27,7 @@ const onShowMenu = () => {
 
 <template>
   <LayoutBase class="h-screen">
-    <n-layout-header
+    <LayoutHeader
       :inverted="headerInverted"
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
@@ -42,7 +41,7 @@ const onShowMenu = () => {
           右侧
         </div>
       </slot>
-    </n-layout-header>
+    </LayoutHeader>
     <LayoutContent class="pro-admin-mix-content ">
       <slot />
     </LayoutContent>

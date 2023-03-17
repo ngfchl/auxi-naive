@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent } from '../common'
+import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutHeader } from '../common'
 
 const props = withDefaults(defineProps<{
   headerHeight?: number
@@ -17,7 +17,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
 
 <template>
   <LayoutBase class="h-screen">
-    <n-layout-header
+    <LayoutHeader
       :inverted="inverted"
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
@@ -30,7 +30,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
           右侧
         </div>
       </slot>
-    </n-layout-header>
+    </LayoutHeader>
     <LayoutContent class="pro-admin-mix-content ">
       <slot />
     </LayoutContent>

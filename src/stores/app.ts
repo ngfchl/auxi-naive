@@ -1,4 +1,4 @@
-import { darkTheme } from 'naive-ui'
+import { darkTheme } from '~/config/dark-theme'
 import type { LayoutTheme } from '~/config/layout-theme'
 import { layoutThemeConfig } from '~/config/layout-theme'
 

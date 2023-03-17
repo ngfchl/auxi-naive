@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@mistjs/eslint-config-vue': ^0.0.3
+  '@types/lodash-es': ^4.17.7
   '@types/node': ^18.15.3
   '@unocss/reset': ^0.50.4
   '@vicons/antd': ^0.12.0
@@ -12,6 +13,7 @@ specifiers:
   eslint: ^8.36.0
   husky: ^8.0.3
   lint-staged: ^13.2.0
+  lodash-es: ^4.17.21
   naive-ui: ^2.34.3
   pinia: ^2.0.33
   typescript: ^4.9.3
@@ -33,6 +35,7 @@ dependencies:
 
 devDependencies:
   '@mistjs/eslint-config-vue': registry.npmmirror.com/@mistjs/eslint-config-vue/0.0.3_vgl77cfdswitgr47lm5swmv43m
+  '@types/lodash-es': registry.npmmirror.com/@types/lodash-es/4.17.7
   '@types/node': registry.npmmirror.com/@types/node/18.15.3
   '@unocss/reset': registry.npmmirror.com/@unocss/reset/0.50.4
   '@vicons/antd': registry.npmmirror.com/@vicons/antd/0.12.0
@@ -42,6 +45,7 @@ devDependencies:
   eslint: registry.npmmirror.com/eslint/8.36.0
   husky: registry.npmmirror.com/husky/8.0.3
   lint-staged: registry.npmmirror.com/lint-staged/13.2.0
+  lodash-es: registry.npmmirror.com/lodash-es/4.17.21
   naive-ui: registry.npmmirror.com/naive-ui/2.34.3_vue@3.2.47
   typescript: registry.npmmirror.com/typescript/4.9.5
   unocss: registry.npmmirror.com/unocss/0.50.4_vite@4.1.4
