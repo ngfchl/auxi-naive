@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LayoutContent, LayoutSider, Logo, Title } from '../common'
+import { HeaderLogo, HeaderTitle, LayoutContent, LayoutSider } from '../common'
 
 const props = withDefaults(defineProps<{
   headerHeight?: number
@@ -27,8 +27,8 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
       <div class="flex items-center">
-        <Logo :src="logo" />
-        <Title :title="title" />
+        <HeaderLogo :src="logo" />
+        <HeaderTitle :title="title" />
       </div>
       <slot name="headerRight">
         <div>

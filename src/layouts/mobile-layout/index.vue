@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@vicons/antd'
-import { LayoutBase, LayoutContent, Logo, Title } from '../common'
+import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent } from '../common'
 
 const props = withDefaults(defineProps<{
   headerHeight?: number
@@ -57,8 +57,8 @@ const onShowMenu = () => {
     <n-drawer-content body-content-style="padding:0;">
       <n-layout-header :inverted="drawerInverted" class="h-100%">
         <div v-if="logoVisible" class="h-48px flex justify-center items-center b-b">
-          <Logo :src="logo" :size="24" />
-          <Title :title="title" :size="18" />
+          <HeaderLogo :src="logo" :size="24" />
+          <HeaderTitle :title="title" :size="18" />
         </div>
         《斯通纳》是美国作家约翰·威廉姆斯在 1965 年出版的小说。
       </n-layout-header>

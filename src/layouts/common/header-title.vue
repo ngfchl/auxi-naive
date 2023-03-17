@@ -2,7 +2,7 @@
 import type { CSSProperties } from 'vue'
 
 const props = withDefaults(defineProps<{
-  title: string
+  title: string | undefined
   size?: number
 }>(), {
   size: 24,

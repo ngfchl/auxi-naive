@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LayoutBase, LayoutContent, LayoutSider, Logo, Title } from '../common'
+import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutSider } from '../common'
 
 const props = withDefaults(defineProps<{
   headerHeight?: number
@@ -31,8 +31,8 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       @update:collapsed="($event) => $emit('update:collapsed', $event)"
     >
       <div class="flex items-center justify-center mt-3">
-        <Logo :src="logo" :size="30" />
-        <Title v-if="!collapsed" :title="title" :size="18" />
+        <HeaderLogo :src="logo" :size="30" />
+        <HeaderTitle v-if="!collapsed" :title="title" :size="18" />
       </div>
       <slot name="menu" />
     </LayoutSider>
