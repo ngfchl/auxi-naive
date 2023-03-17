@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Checkbox } from '@vicons/ionicons5'
+import type { VNodeChild } from '@vue/runtime-core'
 const props = withDefaults(defineProps<{
   layout?: 'mix' | 'side' | 'top'
   inverted?: boolean
   checked?: boolean
+  title?: string | (() => VNodeChild)
 }>(), {
   inverted: false,
   layout: 'top',
@@ -23,7 +25,7 @@ const headerClass = computed(() => {
   }
 })
 
-const siderClasss = computed(() => {
+const siderClass = computed(() => {
   if (props.layout === 'mix') {
     return [
       'h-75%',
@@ -43,25 +45,30 @@ const siderClasss = computed(() => {
 
 <template>
   <n-space class="p-3">
-    <n-el
-      tag="div"
-      class="cursor-pointer inline-block relative w-44px h-36px b-rd-2px overflow-hidden bg-[var(--pro-admin-layout-content-bg)] shadow-[var(--pro-admin-layout-box-shadow)]"
-    >
-      <div
-        :class="headerClass"
-        class="h-25% absolute top-0 w-100%"
-      />
-      <div
-        v-if="layout !== 'top'"
-        :class="siderClasss"
-        class="w-30% absolute left-0 h-100%"
-      />
-      <div v-if="checked" class="absolute bottom--1 right-1">
-        <n-icon color="#0e7a0d" depth="1.0" size="20">
-          <Checkbox />
-        </n-icon>
-      </div>
-    </n-el>
+    <n-tooltip placement="bottom" trigger="hover">
+      <template #trigger>
+        <n-el
+          tag="div"
+          class="cursor-pointer inline-block relative w-44px h-36px b-rd-2px overflow-hidden bg-[var(--pro-admin-layout-content-bg)] shadow-[var(--pro-admin-layout-box-shadow)]"
+        >
+          <div
+            :class="headerClass"
+            class="h-25% absolute top-0 w-100%"
+          />
+          <div
+            v-if="layout !== 'top'"
+            :class="siderClass"
+            class="w-30% absolute left-0 h-100%"
+          />
+          <div v-if="checked" class="absolute bottom--1 right-1">
+            <n-icon color="#0e7a0d" depth="1.0" size="20">
+              <Checkbox />
+            </n-icon>
+          </div>
+        </n-el>
+      </template>
+      {{ typeof title === 'function' ? title() : title }}
+    </n-tooltip>
   </n-space>
 </template>
 

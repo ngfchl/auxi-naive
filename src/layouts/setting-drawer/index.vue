@@ -21,13 +21,13 @@ const cssVar = computed(() => {
   }
 })
 const layouts = ref([{
-  layout: 'mix',
+  key: 'mix',
   title: '混合布局',
 }, {
-  layout: 'top',
+  key: 'top',
   title: '顶栏布局',
 }, {
-  layout: 'side',
+  key: 'side',
   title: '侧边布局',
 }])
 const onShow = (value: boolean) => {
@@ -56,17 +56,13 @@ const onShow = (value: boolean) => {
     <n-drawer-content title="主题">
       <n-space>
         <Container title="导航模式">
-          <template v-for="item in layouts" :key="item.layout">
-            <n-tooltip placement="bottom" trigger="hover">
-              <template #trigger>
-                <CheckBoxLayout
-                  :layout="item.layout"
-                  :checked="item.layout === layout"
-                  @click="() => $emit('update:layout', item.layout)"
-                />
-              </template>
-              <span>{{ item.title }}</span>
-            </n-tooltip>
+          <template v-for="item in layouts" :key="item.key">
+            <CheckBoxLayout
+              :layout="item.key"
+              :checked="item.key === layout"
+              :title="item.title"
+              @click="() => $emit('update:layout', item.key)"
+            />
           </template>
         </Container>
       </n-space>
