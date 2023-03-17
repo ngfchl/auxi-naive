@@ -3,7 +3,7 @@ import CheckBoxLayout from '~/layouts/setting-drawer/checkbox-layout.vue'
 </script>
 
 <template>
-  <div>
+  <div class="flex gap-0 justify-center">
     <CheckBoxLayout layout="top" />
     <CheckBoxLayout layout="mix" />
     <CheckBoxLayout layout="side" />

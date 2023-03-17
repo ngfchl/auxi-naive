@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
+import CheckBoxLayout from './checkbox-layout.vue'
+import Container from './container.vue'
 const props = withDefaults(defineProps<{
   floatTop: number | string
   drawerWidth: number | string
+  layout?: 'side' | 'mix' | 'top'
 }>(), {
   floatTop: 240,
   drawerWidth: 300,
+  layout: 'top',
 })
 let show = $ref(false)
 const cssVar = computed(() => {
@@ -14,6 +18,16 @@ const cssVar = computed(() => {
     '--pro-admin-drawer-width': `${props.drawerWidth}px`,
   }
 })
+const layouts = ref([{
+  layout: 'mix',
+  title: '混合布局',
+}, {
+  layout: 'top',
+  title: '顶栏布局',
+}, {
+  layout: 'side',
+  title: '侧边布局',
+}])
 const onShow = (value: boolean) => {
   show = value
 }
@@ -37,8 +51,19 @@ const onShow = (value: boolean) => {
     </div>
   </teleport>
   <n-drawer v-model:show="show" :width="drawerWidth">
-    <n-drawer-content title="主题切换">
-      主题
+    <n-drawer-content title="主题">
+      <n-space>
+        <Container title="导航模式">
+          <template v-for="item in layouts" :key="item.layout">
+            <n-tooltip placement="bottom" trigger="hover">
+              <template #trigger>
+                <CheckBoxLayout :layout="item.layout" :checked="item.layout === layout" />
+              </template>
+              <span>{{ item.title }}</span>
+            </n-tooltip>
+          </template>
+        </Container>
+      </n-space>
     </n-drawer-content>
     <div
       :style="cssVar"
