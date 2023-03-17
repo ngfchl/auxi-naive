@@ -9,6 +9,7 @@ const props = withDefaults(defineProps<{
   siderCollapsedWidth?: number
   showSiderTrigger?: boolean | 'bar' | 'arrow-circle'
   inverted?: boolean
+  collapsed?: boolean
 }>(), {
   headerHeight: 48,
   inverted: false,

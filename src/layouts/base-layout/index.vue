@@ -6,8 +6,18 @@ import MobileLayout from '../mobile-layout/index.vue'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
 const appStore = useAppStore()
-const { layout, visible, toggleVisible, toggleCollapsed } = storeToRefs(appStore)
-const { isMobile, isPad } = useQueryBreakPoints()
+const { layout, visible } = storeToRefs(appStore)
+const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
+watchEffect(() => {
+  if (isPad.value)
+    appStore.toggleCollapsed(true)
+
+  else if (isDesktop.value)
+    appStore.toggleCollapsed(false)
+
+  if (isMobile.value)
+    appStore.toggleVisible(false)
+})
 </script>
 
 <template>
@@ -24,6 +34,7 @@ const { isMobile, isPad } = useQueryBreakPoints()
       v-if="layout.layout === 'mix'"
       :logo="layout.logo"
       :title="layout.title"
+      :collapsed="layout.collapsed"
       :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
