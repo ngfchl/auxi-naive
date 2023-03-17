@@ -36,6 +36,7 @@ watchEffect(() => {
       v-if="layout.layout === 'mix'"
       :logo="layout.logo"
       :title="layout.title"
+      :inverted="layout.layoutStyle === 'inverted'"
       :collapsed="layout.collapsed"
       :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
@@ -50,6 +51,7 @@ watchEffect(() => {
       v-if="layout.layout === 'top'"
       :logo="layout.logo"
       :title="layout.title"
+      :inverted="layout.layoutStyle === 'inverted'"
     >
       <template #headerRight>
         用户菜单
@@ -61,6 +63,7 @@ watchEffect(() => {
       v-model:collapsed="layout.collapsed"
       :logo="layout.logo"
       :title="layout.title"
+      :inverted="layout.layoutStyle === 'inverted'"
       :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
@@ -76,6 +79,7 @@ watchEffect(() => {
   </template>
   <SettingDrawer
     v-model:layout="layout.layout"
+    v-model:layout-style="layout.layoutStyle"
     :drawer-width="300"
     :float-top="240"
   />

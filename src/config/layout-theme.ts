@@ -2,6 +2,7 @@ import logo from '~/assets/ptools.svg'
 export interface LayoutTheme {
   title?: string
   layout: 'mix' | 'side' | 'top'
+  layoutStyle: 'light' | 'inverted'
   headerHeight: number
   logo: string
   siderWidth: number
@@ -13,6 +14,7 @@ export interface LayoutTheme {
 export const layoutThemeConfig: LayoutTheme = {
   title: 'Naive admin Pro',
   layout: 'mix',
+  layoutStyle: 'light',
   headerHeight: 48,
   siderWidth: 240,
   siderCollapsedWidth: 48,

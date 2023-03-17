@@ -5,14 +5,14 @@ defineProps<{
 </script>
 
 <template>
-  <n-space>
-    <div class="text-14px font-500">
+  <div>
+    <n-space class="text-14px font-500 w-100%">
       {{ title }}
-    </div>
+    </n-space>
     <n-space class="flex gap-0 justify-center">
       <slot />
     </n-space>
-  </n-space>
+  </div>
 </template>
 
 <style scoped>

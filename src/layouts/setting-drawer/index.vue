@@ -6,12 +6,14 @@ const props = withDefaults(defineProps<{
   floatTop: number | string
   drawerWidth: number | string
   layout?: 'side' | 'mix' | 'top'
+  layoutStyle?: 'light' | 'dark'
 }>(), {
   floatTop: 240,
   drawerWidth: 300,
   layout: 'top',
+  layoutStyle: 'light',
 })
-defineEmits(['update:layout'])
+defineEmits(['update:layout', 'update:layoutStyle'])
 let show = $ref(false)
 
 const cssVar = computed(() => {
@@ -29,6 +31,16 @@ const layouts = ref([{
 }, {
   key: 'side',
   title: '侧边布局',
+}])
+const layoutStyles = ref([{
+  id: 'light',
+  key: props.layout,
+  title: '亮色',
+}, {
+  id: 'inverted',
+  key: props.layout,
+  inverted: true,
+  title: '反转色',
 }])
 const onShow = (value: boolean) => {
   show = value
@@ -55,7 +67,21 @@ const onShow = (value: boolean) => {
   <n-drawer v-model:show="show" :width="drawerWidth">
     <n-drawer-content title="主题">
       <n-space>
-        <Container title="导航模式">
+        <Container title="主题风格">
+          <template v-for="item in layoutStyles" :key="item.id">
+            <CheckBoxLayout
+              :layout="layout"
+              :checked="item.id === layoutStyle"
+              :title="item.title"
+              :inverted="item.inverted"
+              @update:layout="() => $emit('update:layout', layout)"
+              @click="() => $emit('update:layoutStyle', item.id)"
+            />
+          </template>
+        </Container>
+      </n-space>
+      <n-space>
+        <Container title="布局风格">
           <template v-for="item in layouts" :key="item.key">
             <CheckBoxLayout
               :layout="item.key"
