@@ -6,14 +6,23 @@ const props = withDefaults(defineProps<{
   inverted?: boolean
   checked?: boolean
   title?: string | (() => VNodeChild)
+  dark?: boolean
 }>(), {
   inverted: false,
   layout: 'top',
   checked: true,
+  dark: false,
 })
-
+const contentCss = computed(() => {
+  if (props.dark) {
+    return [
+      'bg-dark',
+    ]
+  }
+  return []
+})
 const headerClass = computed(() => {
-  if (props.inverted) {
+  if (props.inverted || props.dark) {
     if (props.layout === 'mix' || props.layout === 'top') {
       return [
         'bg-[var(--inverted-color)]',
@@ -38,13 +47,13 @@ const siderClass = computed(() => {
       'h-73%',
       'bottom-0',
       'mt-5px',
-      props.inverted ? 'bg-[var(--inverted-color)]' : 'bg-neutral-200',
+      props.inverted || props.dark ? 'bg-[var(--inverted-color)]' : 'bg-neutral-200',
     ]
   }
   if (props.layout === 'side') {
     return [
       'h-100%',
-        `bg-[var(${props.inverted ? '--inverted-color' : 'neutral-200'})]`,
+      props.inverted || props.dark ? 'bg-[var(--inverted-color)]' : 'bg-neutral-200',
     ]
   }
 })
@@ -56,6 +65,7 @@ const siderClass = computed(() => {
       <template #trigger>
         <n-el
           tag="div"
+          :class="contentCss"
           class="cursor-pointer inline-block relative w-44px h-36px b-rd-2px overflow-hidden bg-[var(--pro-admin-layout-content-bg)] shadow-[var(--pro-admin-layout-box-shadow)]"
         >
           <div

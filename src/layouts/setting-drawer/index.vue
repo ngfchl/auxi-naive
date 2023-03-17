@@ -2,6 +2,7 @@
 import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
 import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
+import type { LayoutTheme } from '~/config/layout-theme'
 const props = withDefaults(defineProps<{
   floatTop: number | string
   drawerWidth: number | string
@@ -13,7 +14,7 @@ const props = withDefaults(defineProps<{
   layout: 'top',
   layoutStyle: 'light',
 })
-defineEmits(['update:layout', 'update:layoutStyle'])
+const emit = defineEmits(['update:layout', 'update:layoutStyle'])
 let show = $ref(false)
 
 const cssVar = computed(() => {
@@ -44,11 +45,14 @@ const layoutStyles = ref([{
 }, {
   id: 'dark',
   key: props.layout,
-  inverted: true,
+  dark: true,
   title: '暗色',
 }])
 const onShow = (value: boolean) => {
   show = value
+}
+const switchTheme = (dark: boolean | undefined, theme: LayoutTheme['layoutStyle']) => {
+  emit('update:layoutStyle', theme)
 }
 </script>
 
@@ -79,8 +83,9 @@ const onShow = (value: boolean) => {
               :checked="item.id === layoutStyle"
               :title="item.title"
               :inverted="item.inverted"
+              :dark="item.dark"
               @update:layout="() => $emit('update:layout', layout)"
-              @click="() => $emit('update:layoutStyle', item.id)"
+              @click="switchTheme(item.dark, item.id)"
             />
           </template>
         </Container>

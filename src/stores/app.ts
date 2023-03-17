@@ -19,7 +19,12 @@ export const useAppStore = defineStore('app', () => {
     if (layout.layoutStyle === 'dark') return darkTheme
     return undefined
   })
-
+  watch(() => layout.layoutStyle, (value) => {
+    if (value === 'dark')
+      toggleDark(true)
+    else
+      toggleDark(false)
+  })
   return {
     layout, visible, toggleVisible, toggleCollapsed, layoutTheme, updateLayoutStyle,
   }
