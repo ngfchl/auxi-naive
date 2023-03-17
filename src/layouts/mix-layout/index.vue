@@ -47,9 +47,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       >
         菜单栏
       </LayoutSider>
-      <LayoutContent
-        position="absolute"
-      >
+      <LayoutContent>
         <slot />
       </LayoutContent>
     </n-layout>

@@ -1,7 +1,12 @@
 <script lang="ts" setup>
-
+import CheckBoxLayout from '~/layouts/setting-drawer/checkbox-layout.vue'
 </script>
 
 <template>
-  <div />
+  <div>
+    <CheckBoxLayout layout="top" />
+    <CheckBoxLayout layout="mix" />
+    <CheckBoxLayout layout="side" />
+    <CheckBoxLayout layout="side" inverted />
+  </div>
 </template>

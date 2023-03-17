@@ -74,7 +74,7 @@ watchEffect(() => {
       <router-view />
     </SideLayout>
   </template>
-  <SettingDrawer />
+  <SettingDrawer :drawer-width="300" :float-top="240" />
 </template>
 
 <style scoped>

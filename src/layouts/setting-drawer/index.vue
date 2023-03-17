@@ -45,6 +45,7 @@ const onShow = (value: boolean) => {
       class="absolute top-[var(--pro-admin-float-top)] right-[var(--pro-admin-drawer-width)] "
     >
       <n-button
+        ghost
         size="large" type="error"
         class="b-rd-tr-0! b-rd-br-0! right-0"
         @click="onShow(false)"
