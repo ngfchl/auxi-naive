@@ -3,6 +3,8 @@ import MixLayout from '../mix-layout/index.vue'
 import SideLayout from '../side-layout/index.vue'
 import TopLayout from '../top-layout/index.vue'
 import MobileLayout from '../mobile-layout/index.vue'
+import SettingDrawer from '../setting-drawer/index.vue'
+
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
 const appStore = useAppStore()
@@ -72,6 +74,7 @@ watchEffect(() => {
       <router-view />
     </SideLayout>
   </template>
+  <SettingDrawer />
 </template>
 
 <style scoped>
