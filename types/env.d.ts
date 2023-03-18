@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_APP_BASE: string
 
   readonly VITE_APP_BASE_API: string
+
+  readonly VITE_APP_BASE_URL: string
 }
 
 interface ImportMeta {
