@@ -5,14 +5,14 @@ import PwdLogin from '~/pages/login/components/pwd-login.vue'
 
 <template>
   <BlankLayout>
-    <div flex="~ col" class="py-20px items-center justify-center">
+    <div flex="~ col" class="py-20px items-center justify-center mt-12%">
       <div class="flex items-center">
         <img src="@/assets/ptools.svg" class="h-40px w-40px" alt="">
         <span class="ml-2 text-33px font-600">
           PT一下你就晓嘚
         </span>
       </div>
-      <div class="flex items-center mt-12px mb-40px text-[var(--text-color-3)]">
+      <div class="flex items-center mt-12px mb-20px text-[var(--text-color-3)]">
         {{ $t('login.admin.desc') }}
       </div>
     </div>
