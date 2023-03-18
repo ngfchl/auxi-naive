@@ -9,7 +9,7 @@ const instance = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API || '/',
   timeout: 6000,
 })
-const requestHandler = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig<any>> => {
+const requestHandler = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig<any> | any> => {
   const authorization = useAuthorization()
   /**
      * 判断是否存在token，如果存在的话，则每个http header都加上token
@@ -29,7 +29,19 @@ export interface ResponseBody<T = any> {
 }
 
 const responseHandler = (response: AxiosResponse): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
-  return response.data
+  const { message } = useGlobalConfig()
+
+  const { data, code, msg } = response.data
+  if (code !== 0) {
+    message?.warning(
+      // title: i18n.global.t('global.request.error.403'),
+      msg,
+      {
+        keepAliveOnHover: true,
+      },
+    )
+  }
+  return data
 }
 const errorHandler = (error: AxiosError): Promise<any> => {
   const { notification } = useGlobalConfig()

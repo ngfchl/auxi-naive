@@ -1,5 +1,13 @@
 <script lang="ts" setup>
 import { Accessibility, LockClosed } from '@vicons/ionicons5'
+const userStore = useUserStore()
+
+const onLogin = async () => {
+  await userStore.userLogin({
+    username: '',
+    password: '',
+  })
+}
 </script>
 
 <template>
@@ -26,7 +34,7 @@ import { Accessibility, LockClosed } from '@vicons/ionicons5'
       </div>
     </n-form-item-row>
   </n-form>
-  <n-button type="primary" block secondary strong>
+  <n-button type="primary" block secondary strong @click="onLogin">
     {{ $t("login.login") }}
   </n-button>
 </template>

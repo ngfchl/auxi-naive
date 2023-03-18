@@ -1,6 +1,7 @@
 export default {
   // 登录页
   'login.admin.desc': '一个让你轻松玩PT的小工具',
+  'login.wrong': '登录失败！',
   'login.account.tab': '密码登录',
   'login.mobile.tab': '手机号登录',
   'login.username.placeholder': '用户名: ',
