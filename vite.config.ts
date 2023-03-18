@@ -17,6 +17,7 @@ export default defineConfig({
     alias: {
       '~': baseSrc,
       '~@': baseSrc,
+      '@': baseSrc,
     },
   },
   plugins: [
