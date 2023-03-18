@@ -3,7 +3,6 @@ import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
 import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
 import ColorLayout from '~/layouts/setting-drawer/color-layout.vue'
-import type { LayoutTheme } from '~/config/layout-theme'
 import type { ThemeType } from '~/config/theme'
 
 const props = withDefaults(defineProps<{
@@ -20,7 +19,7 @@ const props = withDefaults(defineProps<{
   layoutStyle: 'light',
 })
 const emit = defineEmits(['update:layout', 'update:layoutStyle', 'update:theme'])
-let show = $ref(false)
+const show = $ref(false)
 
 const cssVar = computed(() => {
   return {
@@ -53,16 +52,6 @@ const layoutStyles = ref([{
   dark: true,
   title: '暗色',
 }])
-const onShow = (value: boolean) => {
-  show = value
-}
-const switchTheme = (theme: LayoutTheme['layoutStyle']) => {
-  emit('update:layoutStyle', theme)
-}
-
-const onChangeTheme = (item: ThemeType) => {
-  emit('update:theme', item.key)
-}
 </script>
 
 <template>
@@ -72,7 +61,7 @@ const onChangeTheme = (item: ThemeType) => {
         text
         size="large" type="tertiary"
         class="b-rd-tr-0! b-rd-br-0!"
-        @click="onShow(true)"
+        @click="show = true"
       >
         <template #icon>
           <n-icon size="24">
@@ -93,8 +82,7 @@ const onChangeTheme = (item: ThemeType) => {
               :title="item.title"
               :inverted="item.inverted"
               :dark="item.dark"
-              @update:layout="() => $emit('update:layout', layout)"
-              @click="switchTheme(item.id)"
+              @click="() => $emit('update:layoutStyle', item.id)"
             />
           </template>
         </Container>
@@ -134,7 +122,7 @@ const onChangeTheme = (item: ThemeType) => {
         ghost
         size="large" type="error"
         class="b-rd-tr-0! b-rd-br-0! right-0"
-        @click="onShow(false)"
+        @click="show = false"
       >
         <template #icon>
           <n-icon size="24">
