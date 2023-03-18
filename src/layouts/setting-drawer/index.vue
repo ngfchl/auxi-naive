@@ -29,28 +29,28 @@ const cssVar = computed(() => {
 })
 const layouts = ref([{
   key: 'mix',
-  title: '混合布局',
-}, {
-  key: 'top',
-  title: '顶栏布局',
+  title: 'global.layout.setting.drawer.layout.mix',
 }, {
   key: 'side',
-  title: '侧边布局',
+  title: 'global.layout.setting.drawer.layout.side',
+}, {
+  key: 'top',
+  title: 'global.layout.setting.drawer.layout.top',
 }])
 const layoutStyles = ref([{
   id: 'light',
   key: props.layout,
-  title: '亮色',
+  title: 'global.layout.setting.drawer.style.light',
 }, {
   id: 'inverted',
   key: props.layout,
   inverted: true,
-  title: '反色',
+  title: 'global.layout.setting.drawer.style.inverted',
 }, {
   id: 'dark',
   key: props.layout,
   dark: true,
-  title: '暗色',
+  title: 'global.layout.setting.drawer.style.dark',
 }])
 </script>
 
@@ -72,14 +72,14 @@ const layoutStyles = ref([{
     </div>
   </teleport>
   <n-drawer v-model:show="show" :width="drawerWidth">
-    <n-drawer-content title="主题">
+    <n-drawer-content :title="$t('global.layout.setting.drawer.custom')">
       <n-space>
-        <Container title="主题风格">
+        <Container :title="$t('global.layout.setting.drawer.style')">
           <template v-for="item in layoutStyles" :key="item.id">
             <CheckBoxLayout
               :layout="layout"
               :checked="item.id === layoutStyle"
-              :title="item.title"
+              :title="$t(item.title)"
               :inverted="item.inverted"
               :dark="item.dark"
               @click="() => $emit('update:layoutStyle', item.id)"
@@ -88,12 +88,12 @@ const layoutStyles = ref([{
         </Container>
       </n-space>
       <n-space>
-        <Container title="布局风格">
+        <Container :title="$t('global.layout.setting.drawer.layout')">
           <template v-for="item in layouts" :key="item.key">
             <CheckBoxLayout
               :layout="item.key"
               :checked="item.key === layout"
-              :title="item.title"
+              :title="$t(item.title)"
               :inverted="layoutStyle === 'inverted'"
               @click="() => $emit('update:layout', item.key)"
             />
@@ -101,16 +101,15 @@ const layoutStyles = ref([{
         </Container>
       </n-space>
       <n-space>
-        <Container v-if="themeList" title="主题色配置">
-          <n-space>
-            <ColorLayout
-              v-for="item in themeList"
-              :key="item.key"
-              :color="item.color"
-              :checked="item.key === theme"
-              @click="() => $emit('update:theme', item.key)"
-            />
-          </n-space>
+        <Container v-if="themeList" :title="$t('global.layout.setting.drawer.theme')">
+          <ColorLayout
+            v-for="item in themeList"
+            :key="item.key"
+            :color="item.color"
+            :title="$t(`global.layout.setting.drawer.theme.${item.key}`)"
+            :checked="item.key === theme"
+            @click="() => $emit('update:theme', item.key)"
+          />
         </Container>
       </n-space>
     </n-drawer-content>

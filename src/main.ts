@@ -5,6 +5,7 @@ import '@unocss/reset/tailwind.css'
 import '~/assets/styles/index.css'
 import 'uno.css'
 import router from '~/routes'
+import i18n from '~/locales'
 
 const pinia = createPinia()
 /**
@@ -17,4 +18,5 @@ document.head.appendChild(meta)
 const app = createApp(App)
 app.use(router)
 app.use(pinia)
+app.use(i18n)
 app.mount('#app')

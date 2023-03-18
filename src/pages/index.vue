@@ -5,6 +5,9 @@ const appStore = useAppStore()
 const handleTheme = (theme: string) => {
   appStore.updateTheme(theme)
 }
+const onSwitch = (lang: string) => {
+  useAppLocale().value = lang
+}
 </script>
 
 <template>
@@ -13,4 +16,13 @@ const handleTheme = (theme: string) => {
       {{ key }}
     </n-button>
   </div>
+  <n-space>
+    <n-input />
+    <n-button @click="onSwitch('en-US')">
+      English
+    </n-button>
+    <n-button @click="onSwitch('zh-CN')">
+      中文
+    </n-button>
+  </n-space>
 </template>
