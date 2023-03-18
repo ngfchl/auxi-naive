@@ -8,7 +8,7 @@ import SettingDrawer from '../setting-drawer/index.vue'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
 const appStore = useAppStore()
-const { layout, visible } = storeToRefs(appStore)
+const { layout, visible, themeList } = storeToRefs(appStore)
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 watchEffect(() => {
   if (isPad.value)
@@ -80,6 +80,8 @@ watchEffect(() => {
   <SettingDrawer
     v-model:layout="layout.layout"
     v-model:layout-style="layout.layoutStyle"
+    v-model:theme="layout.theme"
+    :theme-list="themeList"
     :drawer-width="300"
     :float-top="240"
   />

@@ -2,19 +2,24 @@
 import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
 import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
+import ColorLayout from '~/layouts/setting-drawer/color-layout.vue'
 import type { LayoutTheme } from '~/config/layout-theme'
+import type { ThemeType } from '~/config/theme'
+
 const props = withDefaults(defineProps<{
   floatTop: number | string
   drawerWidth: number | string
   layout?: 'side' | 'mix' | 'top'
   layoutStyle?: 'light' | 'inverted' | 'dark'
+  themeList?: ThemeType[]
+  theme?: string
 }>(), {
   floatTop: 240,
   drawerWidth: 300,
   layout: 'top',
   layoutStyle: 'light',
 })
-const emit = defineEmits(['update:layout', 'update:layoutStyle'])
+const emit = defineEmits(['update:layout', 'update:layoutStyle', 'update:theme'])
 let show = $ref(false)
 
 const cssVar = computed(() => {
@@ -51,8 +56,12 @@ const layoutStyles = ref([{
 const onShow = (value: boolean) => {
   show = value
 }
-const switchTheme = (dark: boolean | undefined, theme: LayoutTheme['layoutStyle']) => {
+const switchTheme = (theme: LayoutTheme['layoutStyle']) => {
   emit('update:layoutStyle', theme)
+}
+
+const onChangeTheme = (item: ThemeType) => {
+  emit('update:theme', item.key)
 }
 </script>
 
@@ -85,7 +94,7 @@ const switchTheme = (dark: boolean | undefined, theme: LayoutTheme['layoutStyle'
               :inverted="item.inverted"
               :dark="item.dark"
               @update:layout="() => $emit('update:layout', layout)"
-              @click="switchTheme(item.dark, item.id)"
+              @click="switchTheme(item.id)"
             />
           </template>
         </Container>
@@ -101,6 +110,19 @@ const switchTheme = (dark: boolean | undefined, theme: LayoutTheme['layoutStyle'
               @click="() => $emit('update:layout', item.key)"
             />
           </template>
+        </Container>
+      </n-space>
+      <n-space>
+        <Container v-if="themeList" title="主题色配置">
+          <n-space>
+            <ColorLayout
+              v-for="item in themeList"
+              :key="item.key"
+              :color="item.color"
+              :checked="item.key === theme"
+              @click="() => $emit('update:theme', item.key)"
+            />
+          </n-space>
         </Container>
       </n-space>
     </n-drawer-content>

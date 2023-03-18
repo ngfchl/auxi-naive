@@ -10,6 +10,7 @@ export interface LayoutTheme {
   showSiderTrigger: boolean | 'bar' | 'arrow-circle'
   inverted: boolean
   collapsed: boolean
+  theme: string
 }
 export const layoutThemeConfig: LayoutTheme = {
   title: 'Naive admin Pro',
@@ -21,5 +22,6 @@ export const layoutThemeConfig: LayoutTheme = {
   showSiderTrigger: 'bar',
   inverted: false,
   collapsed: false,
+  theme: 'default',
   logo,
 }

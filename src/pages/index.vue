@@ -1,19 +1,16 @@
 <script lang="ts" setup>
-import type { LayoutTheme } from '~/config/layout-theme'
+import { colors } from '~/config/theme'
 
 const appStore = useAppStore()
-const handleTheme = (theme: LayoutTheme['layoutStyle']) => {
-  appStore.updateLayoutStyle(theme)
+const handleTheme = (theme: string) => {
+  appStore.updateTheme(theme)
 }
 </script>
 
 <template>
   <div class="flex gap-0 justify-center">
-    <n-button @click="handleTheme('dark')">
-      深色
-    </n-button>
-    <n-button @click="handleTheme('light')">
-      浅色
+    <n-button v-for="(item, key) in colors" :key="key" :color="item.common.primaryColor" @click="handleTheme(key)">
+      {{ key }}
     </n-button>
   </div>
 </template>
