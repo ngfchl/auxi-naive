@@ -13,8 +13,8 @@ export interface LayoutTheme {
   theme: string
 }
 export const layoutThemeConfig: LayoutTheme = {
-  title: 'Naive admin Pro',
-  layout: 'mix',
+  title: 'PT一下你就知道',
+  layout: 'side',
   layoutStyle: 'light',
   headerHeight: 48,
   siderWidth: 240,
