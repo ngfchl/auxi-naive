@@ -4,7 +4,6 @@ import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
 import ColorLayout from '~/layouts/setting-drawer/color-layout.vue'
 import type { ThemeType } from '~/config/theme'
-import RightContent from '~/layouts/common/right-content.vue'
 
 const props = withDefaults(defineProps<{
   floatTop: number | string
@@ -74,11 +73,6 @@ const layoutStyles = ref([{
   </teleport>
   <n-drawer v-model:show="show" :width="drawerWidth">
     <n-drawer-content :title="$t('global.layout.setting.drawer.custom')">
-      <n-space>
-        <Container :title="$t('global.layout.setting.drawer.lang')">
-          <RightContent />
-        </Container>
-      </n-space>
       <n-space>
         <Container :title="$t('global.layout.setting.drawer.style')">
           <template v-for="item in layoutStyles" :key="item.id">

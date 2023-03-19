@@ -23,4 +23,9 @@ export default {
   'global.request.error.403': '资源请求错误',
   'global.request.error.500': '服务器错误',
   'global.request.error.other': '未知错误',
+  // 用户设置
+  'global.layout.header.right.logout': '退出登录',
+  'global.layout.header.right.logout.success': '退出成功',
+  'global.layout.header.right.user.setting': '个人设置',
+  'global.layout.header.right.user.center': '个人中心',
 }
