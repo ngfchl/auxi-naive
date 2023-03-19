@@ -36,7 +36,7 @@ export const userLoginApi = (params: UserAccountLoginParams | UserMobileLoginPar
   return usePost<UserAccountLoginParams | UserMobileLoginParams, UserLoginResult>(loginUrl, params)
 }
 
-export const userGetInfoUrl = '/user/info'
+export const userGetInfoUrl = 'config/userinfo'
 /**
  * 获取用户信息接口
  */
