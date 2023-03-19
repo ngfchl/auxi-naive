@@ -11,12 +11,12 @@ const onSwitch = (lang: string) => {
 </script>
 
 <template>
-  <div class="flex gap-0 justify-center">
+  <n-space class="flex gap-0 justify-center" justify="space-around" size="large">
     <n-button v-for="(item, key) in colors" :key="key" :color="item.common.primaryColor" @click="handleTheme(key)">
       {{ key }}
     </n-button>
-  </div>
-  <n-space>
+  </n-space>
+  <n-space class="mt-3">
     <n-input />
     <n-button @click="onSwitch('en-US')">
       English
