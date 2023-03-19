@@ -3,7 +3,11 @@ const attrs = useAttrs()
 </script>
 
 <template>
-  <n-layout-content v-bind="attrs" style="--n-color:var(--pro-admin-layout-content-bg)">
+  <n-layout-content
+    v-bind="attrs"
+    style="--n-color:var(--pro-admin-layout-content-bg)"
+    class="p-4"
+  >
     <slot />
   </n-layout-content>
 </template>
