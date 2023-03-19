@@ -1,3 +1,4 @@
+import type { DropdownOption } from 'naive-ui'
 import { darkTheme } from '~/config/dark-theme'
 import type { LayoutTheme } from '~/config/layout-theme'
 import { layoutThemeConfig } from '~/config/layout-theme'
@@ -48,6 +49,19 @@ export const useAppStore = defineStore('app', () => {
     }
     return list
   })
+
+  const localeOptions = $ref<DropdownOption[]>([
+    {
+      label: '简体中文',
+      key: 'zh-CN',
+      icon: () => '🇨🇳',
+    },
+    {
+      label: 'English',
+      key: 'en-US',
+      icon: () => '🇺🇸',
+    },
+  ])
   return {
     layout,
     visible,
@@ -58,5 +72,6 @@ export const useAppStore = defineStore('app', () => {
     overrideTheme,
     updateTheme,
     themeList,
+    localeOptions,
   }
 })

@@ -1,5 +1,6 @@
 export default {
   'global.layout.setting.drawer.style': 'Page style setting',
+  'global.layout.setting.drawer.lang': 'Language Select',
   'global.layout.setting.drawer.style.light': 'Light menu style',
   'global.layout.setting.drawer.style.inverted': 'Inverted menu style',
   'global.layout.setting.drawer.style.dark': 'Dark menu style',

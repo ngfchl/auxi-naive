@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <div>
+  <div class="pb-2">
     <n-space class="text-14px font-500 w-100%">
       {{ title }}
     </n-space>

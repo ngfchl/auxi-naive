@@ -1,5 +1,6 @@
 export default {
   'global.layout.setting.drawer.style': '风格设置',
+  'global.layout.setting.drawer.lang': '语言设置',
   'global.layout.setting.drawer.style.light': '亮色风格',
   'global.layout.setting.drawer.style.inverted': '反色风格',
   'global.layout.setting.drawer.style.dark': '暗黑风格',
