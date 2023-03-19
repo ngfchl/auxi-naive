@@ -13,10 +13,12 @@ export const useUserStore = defineStore('user', () => {
   const setToken = (val: string) => {
     token.value = val
   }
-  const userLogin = async (params: UserAccountLoginParams | UserMobileLoginParams) => {
-    const { data } = await userLoginApi(params)
-    if (data?.token)
-      setToken(data.token)
+  const userLogin = async (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
+    const res = await userLoginApi(params)
+    if (res) {
+      setToken(res.auth_token)
+      return true
+    }
   }
   return {
     userInfo,
