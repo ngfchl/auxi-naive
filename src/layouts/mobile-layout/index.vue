@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { MenuOutline } from '@vicons/ionicons5'
 import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutHeader } from '../common'
-
 const props = withDefaults(defineProps<{
   headerHeight?: number
   logo?: string
@@ -33,7 +33,7 @@ const onShowMenu = () => {
     >
       <div class="flex items-center">
         <n-icon @click="onShowMenu">
-          <MenuUnfoldOutlined />
+          <MenuOutline />
         </n-icon>
       </div>
       <slot name="headerRight">
