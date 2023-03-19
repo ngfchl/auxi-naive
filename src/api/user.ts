@@ -28,6 +28,18 @@ export interface UserLoginResult {
   token: IncludeNull<string>
 }
 export const loginUrl = 'config/login'
+/**
+ * 登录接口
+ * @param params
+ */
 export const userLoginApi = (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
   return usePost<UserAccountLoginParams | UserMobileLoginParams, UserLoginResult>(loginUrl, params)
+}
+
+export const userGetInfoUrl = '/user/info'
+/**
+ * 获取用户信息接口
+ */
+export const userGetInfoApi = () => {
+  return useGet<any, UserInfo>(userGetInfoUrl)
 }

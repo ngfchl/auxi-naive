@@ -5,6 +5,8 @@ import '@unocss/reset/tailwind.css'
 import '~/assets/styles/index.css'
 import 'uno.css'
 import router from '~/routes'
+import '~/routes/router-guard'
+
 import i18n from '~/locales'
 
 const pinia = createPinia()

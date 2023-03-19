@@ -57,7 +57,12 @@ const errorHandler = (error: AxiosError): Promise<any> => {
         content: data?.msg || statusText,
         duration: 3000,
       })
-      router.replace({ path: '/login' }).then(() => {
+      router.replace({
+        path: '/login',
+        query: {
+          redirect: router?.currentRoute.value?.path,
+        },
+      }).then(() => {
         /**
          * 这里处理清空用户信息和token的逻辑，后续扩展
          */
