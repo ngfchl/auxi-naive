@@ -11,6 +11,16 @@ export interface UserInfo {
   birth?: string
 }
 
+export interface MenuInfo {
+  id: number
+  pid?: number
+  path: string
+  name?: string
+  title: string
+  component?: string
+  icon?: string
+  redirect?: string
+}
 export interface UserAccountLoginParams {
   username: IncludeNull<string>
   password: IncludeNull<string>
@@ -42,4 +52,9 @@ export const userGetInfoUrl = 'config/userinfo'
  */
 export const userGetInfoApi = () => {
   return useGet<any, UserInfo>(userGetInfoUrl)
+}
+
+const userMenuUrl = 'user/menus'
+export const userRoutesApi = () => {
+  return useGet<any, MenuInfo[]>(userMenuUrl)
 }

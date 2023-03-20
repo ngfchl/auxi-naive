@@ -4,6 +4,7 @@ import type { UserAccountLoginParams, UserInfo, UserMobileLoginParams } from '~/
 import router from '~/routes'
 import i18n from '~/locales'
 import { dynamicRoutes, rootRouter } from '~/routes/dynamic-routes'
+import { generateMenu, generateRoute } from '~/routes/generate-route'
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo>()
   const t = i18n.global.t
@@ -74,7 +75,19 @@ export const useUserStore = defineStore('user', () => {
     routerRecords.value = dynamicRoutes
     return currentRouter
   }
-
+  /**
+   * 从后端获取路由信息
+   */
+  const generateDynamicRoutes = async () => {
+    const routerData = await generateRoute()
+    if (routerData)
+      routerRecords.value = routerData.children
+    // https://mock.28yanyu.cn/mock/637af0d4080d2f1284a9e77b/user/menus
+    return routerData
+  }
+  const menusData = computed(() => {
+    return generateMenu(routerRecords.value)
+  })
   return {
     userInfo,
     setUserInfo,
@@ -84,5 +97,7 @@ export const useUserStore = defineStore('user', () => {
     logout,
     routerRecords,
     generateRoutes,
+    generateDynamicRoutes,
+    menusData,
   }
 })

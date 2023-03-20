@@ -14,6 +14,13 @@ interface ImportMeta {
 
 declare module 'vue-router'{
   interface RouteMeta {
-    title?: string // 先仅扩展一个title后续再补充
+    id: number
+    pid?: number
+    // path?: string
+    // name?: string
+    title?: string
+    // component?: string
+    icon?: string
+    // redirect?: string
   }
 }

@@ -48,11 +48,23 @@ router.beforeEach(async (to, from, next) => {
           next()
           return
         }
-        // 处理动态路由
-        const currentRouter = await userStore.generateRoutes()
-        if (currentRouter && !router.getRoutes().some(route => route.path === currentRouter.path)) {
-          await router.addRoute(currentRouter)
-          // next({ path: to.path, replace: true })
+        // 调用获取路由信息
+
+        // 处理动态路由 前端处理
+        // const currentRouter = await userStore.generateRoutes()
+        // if (currentRouter && !router.getRoutes().some(route => route.path === currentRouter.path)) {
+        //   await router.addRoute(currentRouter)
+        //   // next({ path: to.path, replace: true })
+        //   next({
+        //     ...to,
+        //     replace: true,
+        //   })
+        //   return
+        // }
+        // 处理动态路由 后端输出
+        const routerRecord = await userStore.generateDynamicRoutes()
+        if (routerRecord) {
+          await router.addRoute(routerRecord)
           next({
             ...to,
             replace: true,

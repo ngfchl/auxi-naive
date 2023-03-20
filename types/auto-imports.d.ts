@@ -60,7 +60,7 @@ declare global {
   const mapStores: typeof import('pinia')['mapStores']
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
-  const menuOptions: typeof import('../src/composables/menu-data')['menuOptions']
+  const menuOptions_test: typeof import('../src/composables/menu-data')['menuOptions_test']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']

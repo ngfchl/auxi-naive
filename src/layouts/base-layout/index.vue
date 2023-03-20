@@ -8,6 +8,7 @@ import SettingDrawer from '../setting-drawer/index.vue'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
 const appStore = useAppStore()
+
 const { layout, visible, themeList } = storeToRefs(appStore)
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 watchEffect(() => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MenuOption, MenuProps } from 'naive-ui'
 import SideMenu from '../side-menu/index.vue'
-import { menuOptions } from '~/composables/menu-data'
+// import { menuOptions } from '~/composables/menu-data'
 const props = withDefaults(defineProps<{
   // ...
   collapsed?: boolean
@@ -19,6 +19,8 @@ const props = withDefaults(defineProps<{
   side: false,
 })
 const emit = defineEmits(['update:collapsed', 'update:active', 'update:expandedKeys'])
+const userStore = useUserStore()
+const menuOptions = computed(() => userStore.menusData)
 const handlechange = (val: boolean) => {
   emit('update:collapsed', val)
 }
