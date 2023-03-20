@@ -26,10 +26,12 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       :inverted="inverted"
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
-      <div class="flex items-center justify-center">
-        <HeaderLogo :src="logo" :size="30" />
-        <HeaderTitle :title="title" :size="20" />
-      </div>
+      <template #logo>
+        <div class="flex items-center justify-center">
+          <HeaderLogo :src="logo" :size="30" />
+          <HeaderTitle :title="title" :size="20" />
+        </div>
+      </template>
     </LayoutHeader>
     <n-layout has-sider>
       <LayoutSider
@@ -39,7 +41,7 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
         :width="siderWidth"
         :collapsed-width="siderCollapsedWidth"
         class="pro-admin-mix-content"
-        @update:collapsed="$event => $emit('update:collapsed', $event)"
+        @update:collapsed="$emit('update:collapsed', $event)"
       >
         菜单栏
       </LayoutSider>

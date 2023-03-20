@@ -2,6 +2,7 @@
 import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
 import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
+import type { Layout } from '~/config/layout-theme'
 import ColorLayout from '~/layouts/setting-drawer/color-layout.vue'
 import type { ThemeType } from '~/config/theme'
 
@@ -27,7 +28,8 @@ const cssVar = computed(() => {
     '--pro-admin-drawer-width': `${props.drawerWidth}px`,
   }
 })
-const layouts = ref([{
+
+const layouts = ref<Layout[]>([{
   key: 'mix',
   title: 'global.layout.setting.drawer.layout.mix',
 }, {
