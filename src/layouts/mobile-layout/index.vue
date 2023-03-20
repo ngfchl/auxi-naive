@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { MenuOutline } from '@vicons/ionicons5'
+import type { MenuProps } from 'naive-ui'
 import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutHeader } from '../common'
+import SideMenu from '../side-menu/index.vue'
+import RightContent from '~/layouts/common/header/right-content.vue'
+
 const props = withDefaults(defineProps<{
   headerHeight?: number
   logo?: string
@@ -9,6 +13,7 @@ const props = withDefaults(defineProps<{
   drawerInverted?: boolean
   visible?: boolean
   logoVisible?: boolean
+  expandedKeys?: MenuProps['expandedKeys']
 }>(), {
   headerHeight: 48,
   headerInverted: false,
@@ -16,10 +21,12 @@ const props = withDefaults(defineProps<{
   visible: false,
   logoVisible: true,
 })
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:visible', 'update:active', 'update:expandedKeys'])
 const headerHeightVar = computed(() => `${props.headerHeight}px`)
 const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
-
+const userStore = useUserStore()
+const menuOptions = computed(() => userStore.menusData)
+const { active } = useMenuState()
 const onShowMenu = () => {
   emit('update:visible', true)
 }
@@ -31,16 +38,14 @@ const onShowMenu = () => {
       :inverted="headerInverted"
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
-      <div class="flex items-center">
-        <n-icon @click="onShowMenu">
-          <MenuOutline />
-        </n-icon>
-      </div>
-      <slot name="headerRight">
-        <div>
-          右侧
+      <template #left-content>
+        <div class="flex items-center">
+          <n-icon size="24" @click="onShowMenu">
+            <MenuOutline />
+          </n-icon>
         </div>
-      </slot>
+      </template>
+      <RightContent />
     </LayoutHeader>
     <LayoutContent class="pro-admin-mix-content ">
       <slot />
@@ -59,7 +64,12 @@ const onShowMenu = () => {
           <HeaderLogo :src="logo" :size="24" />
           <HeaderTitle :title="title" :size="18" />
         </div>
-        《斯通纳》是美国作家约翰·威廉姆斯在 1965 年出版的小说。
+        <SideMenu
+          :value="active" :options="menuOptions"
+          :expanded-keys="expandedKeys"
+          @update:value="$emit('update:active', $event)"
+          @update:expanded-keys="$emit('update:expandedKeys', $event)"
+        />
       </n-layout-header>
     </n-drawer-content>
   </n-drawer>
