@@ -1,22 +1,7 @@
-import type { MenuOption } from 'naive-ui'
 import type { RouteRecordRaw } from 'vue-router'
 import modules from './modules'
 import type { MenuInfo } from '~/api/user'
 import { rootRouter } from '~/routes/dynamic-routes'
-
-export const generateMenu = (routes: RouteRecordRaw[]) => {
-  const menus: MenuOption[] = []
-  for (const route of routes) {
-    const currentMenu: MenuOption = {
-      key: route.path,
-      label: route.meta?.title,
-    }
-    if (route.children && route.children.length > 0)
-      currentMenu.children = generateMenu(route.children)
-    menus.push(currentMenu)
-  }
-  return menus
-}
 
 const defaultRoutes: Record<string, any> = {
   RouteView: () => import('~/layouts/base-layout/route-view.vue'),
@@ -75,6 +60,7 @@ export const generateRoute = async () => {
       component: 'RouteView',
       title: '工作区',
       icon: 'AppstoreOutlined',
+
     },
     {
       id: 2,

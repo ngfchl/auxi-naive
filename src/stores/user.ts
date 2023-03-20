@@ -4,7 +4,8 @@ import type { UserAccountLoginParams, UserInfo, UserMobileLoginParams } from '~/
 import router from '~/routes'
 import i18n from '~/locales'
 import { dynamicRoutes, rootRouter } from '~/routes/dynamic-routes'
-import { generateMenu, generateRoute } from '~/routes/generate-route'
+import { generateMenu } from '~/routes/generate-menu'
+import { generateRoute } from '~/routes/generate-route'
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo>()
   const t = i18n.global.t

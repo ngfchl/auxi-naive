@@ -21,6 +21,6 @@ declare module 'vue-router'{
     title?: string
     // component?: string
     icon?: string
-    // redirect?: string
+    target?: '_blank' | '_self' | '_parent' | '_top'
   }
 }
