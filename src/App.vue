@@ -5,6 +5,7 @@ const appStore = useAppStore()
 const { layoutTheme, overrideTheme } = storeToRefs(appStore)
 useAutoDark()
 const { targetLocale } = useAutoLang()
+useMenuStateProvider()
 </script>
 
 <template>

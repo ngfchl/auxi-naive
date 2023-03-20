@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{
   side?: boolean
   collapsedIconSize?: number
   siderCollapsedWidth?: number
-  active?: string
+  // active?: string
   options?: MenuOption[]
   expandedKeys?: MenuProps['expandedKeys']
 }>(), {
@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits(['update:collapsed', 'update:active', 'update:expandedKeys'])
 const userStore = useUserStore()
 const menuOptions = computed(() => userStore.menusData)
+const { active } = useMenuState()
 const handlechange = (val: boolean) => {
   emit('update:collapsed', val)
 }
