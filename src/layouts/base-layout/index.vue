@@ -42,9 +42,7 @@ watchEffect(() => {
       :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
-    >
-      <router-view />
-    </MixLayout>
+    />
     <SideLayout
       v-if="layout.layout === 'side'"
       v-model:collapsed="layout.collapsed"
@@ -54,17 +52,13 @@ watchEffect(() => {
       :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
-    >
-      <router-view />
-    </SideLayout>
+    />
     <TopLayout
       v-if="layout.layout === 'top'"
       :logo="layout.logo"
       :title="layout.title"
       :inverted="layout.layoutStyle === 'inverted'"
-    >
-      <router-view />
-    </TopLayout>
+    />
   </template>
   <SettingDrawer
     v-model:layout="layout.layout"
