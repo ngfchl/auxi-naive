@@ -51,8 +51,12 @@ router.beforeEach(async (to, from, next) => {
         // 处理动态路由
         const currentRouter = await userStore.generateRoutes()
         if (currentRouter && !router.getRoutes().some(route => route.path === currentRouter.path)) {
-          router.addRoute(currentRouter)
-          next({ path: to.path, replace: true })
+          await router.addRoute(currentRouter)
+          // next({ path: to.path, replace: true })
+          next({
+            ...to,
+            replace: true,
+          })
           return
         }
         // 判断当前是不是登录页面，如果是登录页面，那么就跳转到首页
