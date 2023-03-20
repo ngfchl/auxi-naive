@@ -44,14 +44,6 @@ watchEffect(() => {
     >
       <router-view />
     </MixLayout>
-    <TopLayout
-      v-if="layout.layout === 'top'"
-      :logo="layout.logo"
-      :title="layout.title"
-      :inverted="layout.layoutStyle === 'inverted'"
-    >
-      <router-view />
-    </TopLayout>
     <SideLayout
       v-if="layout.layout === 'side'"
       v-model:collapsed="layout.collapsed"
@@ -64,6 +56,14 @@ watchEffect(() => {
     >
       <router-view />
     </SideLayout>
+    <TopLayout
+      v-if="layout.layout === 'top'"
+      :logo="layout.logo"
+      :title="layout.title"
+      :inverted="layout.layoutStyle === 'inverted'"
+    >
+      <router-view />
+    </TopLayout>
   </template>
   <SettingDrawer
     v-model:layout="layout.layout"
