@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SelectLang from '../common/select-lang/index.vue'
+import SelectLang from '../common/header/select-lang.vue'
 const appLocale = useAppLocale()
 const appStore = useAppStore()
 </script>
