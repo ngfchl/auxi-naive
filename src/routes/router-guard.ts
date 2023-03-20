@@ -15,30 +15,46 @@ export const allowRouteHasLogin = [...allowRoutes, loginRoute]
  * 路由前置函数
  */
 router.beforeEach(async (to, from, next) => {
+  // 获取token信息
+  const token = useAuthorization()
+  const userStore = useUserStore()
   // 开启进度条
   const { loadingBar } = useGlobalConfig()
   loadingBar?.start()
-  // 获取token信息
-  const token = useAuthorization()
-
-  const userStore = useUserStore()
   // 如果用户信息不存在，就跳转到登录页
   if (!token.value) {
-    if (!allowRouteHasLogin.includes(to.path)) {
-      next({
-        path: '/login',
-        query: {
-          redirect: to.path,
-        },
-      })
+    // 3. 如果不在白名单里面，就跳转到登录页面
+    // 如果在白名单里面就直接跳转
+    if (allowRouteHasLogin.includes(to.path)) {
+      next()
       return
     }
+    // 不在白名单里面就跳转到登录页面
+    next({
+      path: '/login',
+      query: {
+        redirect: to.path,
+      },
+    })
+    return
   }
   else {
     if (!userStore.userInfo && !allowRoutes.includes(to.path)) {
       try {
         // 如果用户信息不存在，那么就需要获取用户信息
         await userStore.getUserInfo()
+        // 检查要跳转的路由是否已经存在于路由列表中
+        if (router.getRoutes().some(route => route.path === to.path)) {
+          next()
+          return
+        }
+        // 处理动态路由
+        const currentRouter = await userStore.generateRoutes()
+        if (currentRouter && !router.getRoutes().some(route => route.path === currentRouter.path)) {
+          router.addRoute(currentRouter)
+          next({ path: to.path, replace: true })
+          return
+        }
         // 判断当前是不是登录页面，如果是登录页面，那么就跳转到首页
         if (to.path === loginRoute) {
           // 跳转至首页
@@ -54,14 +70,16 @@ router.beforeEach(async (to, from, next) => {
           if (e.response?.status === 401)
             return
         }
+        else {
         // 如果获取用户信息失败，那么我们直接阻止用户跳转并同时跳转到Error页面
-        next({
-          path: '/error',
-          query: {
-            redirect: to.path,
-          },
-        })
-        return
+          next({
+            path: '/error',
+            query: {
+              redirect: to.path,
+            },
+          })
+          return
+        }
       }
     }
   }
