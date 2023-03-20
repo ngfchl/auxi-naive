@@ -1,39 +1,37 @@
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { useMessage } from 'naive-ui'
+<script lang="ts" setup>
+import { EllipsisVerticalSharp } from '@vicons/ionicons5'
+import type { DropdownOption } from 'naive-ui'
+import { useMultiTab } from '~/composables/multi-tabs-state'
+import TabTitle from '~/layouts/multi-tab/tab-title.vue'
+import type { TabItem } from '~/layouts/multi-tab/type'
+const state = useMultiTabInject()
+const { tabList, current, closeTab } = useMultiTab()
+function handleClose(name: number) {
 
-export default defineComponent({
-  setup() {
-    const nameRef = ref(1)
-    const message = useMessage()
-    const panelsRef = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-    const state = useMultiTabInject()
-    function handleClose(name: number) {
-      const { value: panels } = panelsRef
-      if (panels.length === 1) {
-        message.error('最后一个了')
-        return
-      }
-      message.info(`关掉 ${name}`)
-      const index = panels.findIndex(v => name === v)
-      panels.splice(index, 1)
-      if (nameRef.value === name)
-        nameRef.value = panels[index]
-    }
-    return {
-      panels: panelsRef,
-      name: nameRef,
-      handleClose,
-    }
+}
+const renderTabTitle = (item: TabItem) => {
+  return h(TabTitle, { item })
+}
+const options = $ref<DropdownOption[]>([
+  {
+    label: '关闭当前页',
+    key: 'closeCurrent',
+    disabled: tabList.value.length <= 1,
+  }, {
+    label: '刷新当前页',
+    key: 'refreshCurrent',
   },
-})
+])
+const handleSelect = (key: string) => {
+  if (key === 'closeCurrent')
+    closeTab()
+}
 </script>
 
 <template>
   <n-tabs
-    v-model:value="name"
+    :value="current"
     type="card"
-    closable
     tab-style="min-width: 80px;"
     class="bg-white dark:bg-transparent"
     @close="handleClose"
@@ -42,15 +40,18 @@ export default defineComponent({
       <div class="ml-5px" />
     </template>
     <template #suffix>
-      <n-button type="warning">
-        操作
-      </n-button>
+      <n-dropdown type="warning" trigger="click" :options="options" @select="handleSelect">
+        <n-icon size="16" class="cursor-pointer">
+          <EllipsisVerticalSharp />
+        </n-icon>
+      </n-dropdown>
     </template>
     <n-tab-pane
-      v-for="panel in panels"
-      :key="panel"
-      :tab="panel.toString()"
-      :name="panel"
+      v-for="panel in tabList"
+      :key="panel.path"
+      closable
+      :tab="renderTabTitle(panel)"
+      :name="panel.path"
     />
   </n-tabs>
 </template>
