@@ -4,9 +4,9 @@ import type { Component } from 'vue'
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@vicons/antd'
 import type { VNodeChild } from '@vue/runtime-core'
 import { NIcon } from 'naive-ui'
-import SelectLang from './select-lang/index.vue'
-import SelectUser from '~/layouts/common/select-user.vue'
-import Notify from '~/layouts/common/notify.vue'
+import SelectLang from './select-lang.vue'
+import SelectUser from '~/layouts/common/header/select-user.vue'
+import Notify from '~/layouts/common/notify/notify.vue'
 
 const appStore = useAppStore()
 const appLocale = useAppLocale()

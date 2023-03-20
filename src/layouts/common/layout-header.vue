@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RightContent from '~/layouts/common/right-content.vue'
+import RightContent from '~/layouts/common/header/right-content.vue'
 </script>
 
 <template>
