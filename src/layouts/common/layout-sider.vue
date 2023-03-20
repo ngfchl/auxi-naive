@@ -2,11 +2,9 @@
 import type { MenuOption, MenuProps } from 'naive-ui'
 import SideMenu from '../side-menu/index.vue'
 import { menuOptions } from '~/composables/menu-data'
-import HeaderLogo from '~/layouts/common/header/header-logo.vue'
-import HeaderTitle from '~/layouts/common/header/header-title.vue'
 const props = withDefaults(defineProps<{
   // ...
-  // collapsed?: boolean
+  collapsed?: boolean
   logo?: string
   title?: string
   side?: boolean
@@ -20,24 +18,26 @@ const props = withDefaults(defineProps<{
   collapsedIconSize: 24,
   side: false,
 })
-defineEmits(['update:collapsed', 'update:active', 'update:expandedKeys'])
-const attrs = useAttrs()
+const emit = defineEmits(['update:collapsed', 'update:active', 'update:expandedKeys'])
+const handlechange = (val: boolean) => {
+  emit('update:collapsed', val)
+}
 </script>
 
 <template>
-  <n-layout-sider class="pro-admin-layout-sider" v-bind="attrs" collapse-mode="width">
+  <n-layout-sider :collapsed="collapsed" class="pro-admin-layout-sider" collapse-mode="width" @update:collapsed="handlechange">
     <slot name="logo" />
     <hr>
     <SideMenu
-      :collapsed="attrs.collapsed"
+      :collapsed="collapsed"
       :collapsed-icon-size="collapsedIconSize"
       :collapsed-width="siderCollapsedWidth"
       :value="active"
       :options="menuOptions"
       :expanded-keys="expandedKeys"
-      @update:value="$event => $emit('update:active', $event)"
-      @update:collapsed="$event => $emit('update:collapsed', $event)"
-      @update:expanded-keys="$event => $emit('update:expandedKeys', $event)"
+      @update:value="$emit('update:active', $event)"
+      @update:collapsed="$emit('update:collapsed', $event)"
+      @update:expanded-keys="$emit('update:expandedKeys', $event)"
     />
   </n-layout-sider>
 </template>
