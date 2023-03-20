@@ -16,12 +16,13 @@ const handleSelect = (value: string) => {
 
 <template>
   <n-dropdown
+    class="h-28px flex items-center"
     trigger="hover"
     :value="value"
     :options="options"
     @select="handleSelect"
   >
-    <n-icon class="text-18px cursor-pointer py-2" size="20">
+    <n-icon class="cursor-pointer" size="22">
       <LanguageSharp />
     </n-icon>
   </n-dropdown>

@@ -13,7 +13,10 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <n-dropdown :options="options" @select="onSelect">
+  <n-dropdown
+    :options="options"
+    @select="onSelect"
+  >
     <div class="flex items-center cursor-pointer">
       <n-avatar
         v-if="avatar"

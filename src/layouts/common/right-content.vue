@@ -6,6 +6,7 @@ import type { VNodeChild } from '@vue/runtime-core'
 import { NIcon } from 'naive-ui'
 import SelectLang from './select-lang/index.vue'
 import SelectUser from '~/layouts/common/select-user.vue'
+import Notify from '~/layouts/common/notify.vue'
 
 const appStore = useAppStore()
 const appLocale = useAppLocale()
@@ -43,8 +44,9 @@ const handleSelect = (value: string) => {
 </script>
 
 <template>
-  <SelectLang v-model:value="appLocale" :options="appStore.localeOptions" />
-  <n-space align="center">
+  <n-space class="flex justify-center items-baseline h-30px">
+    <SelectLang v-model:value="appLocale" class="py--3px mt-2px" :options="appStore.localeOptions" />
+    <Notify />
     <SelectUser :options="userOptions" @select="handleSelect" />
   </n-space>
 </template>
