@@ -7,6 +7,7 @@ export default defineComponent({
     const nameRef = ref(1)
     const message = useMessage()
     const panelsRef = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+    const state = useMultiTabInject()
     function handleClose(name: number) {
       const { value: panels } = panelsRef
       if (panels.length === 1) {

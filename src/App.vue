@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useAutoLang } from '~/composables/auto-lang'
 import { useAutoDark } from '~/composables/autoDark'
+import { useMultiTabProvider } from '~/composables/multi-tabs-state'
 const appStore = useAppStore()
 const { layoutTheme, overrideTheme } = storeToRefs(appStore)
 useAutoDark()
 const { targetLocale } = useAutoLang()
 useMenuStateProvider()
+useMultiTabProvider()
 </script>
 
 <template>

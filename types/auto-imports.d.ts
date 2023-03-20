@@ -222,6 +222,8 @@ declare global {
   const useMouse: typeof import('@vueuse/core')['useMouse']
   const useMouseInElement: typeof import('@vueuse/core')['useMouseInElement']
   const useMousePressed: typeof import('@vueuse/core')['useMousePressed']
+  const useMultiTabInject: typeof import('../src/composables/multi-tabs-state')['useMultiTabInject']
+  const useMultiTabProvider: typeof import('../src/composables/multi-tabs-state')['useMultiTabProvider']
   const useMutationObserver: typeof import('@vueuse/core')['useMutationObserver']
   const useNavigatorLanguage: typeof import('@vueuse/core')['useNavigatorLanguage']
   const useNetwork: typeof import('@vueuse/core')['useNetwork']
