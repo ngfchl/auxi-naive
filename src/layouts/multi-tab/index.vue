@@ -6,8 +6,9 @@ import TabTitle from '~/layouts/multi-tab/tab-title.vue'
 import type { TabItem } from '~/layouts/multi-tab/type'
 const state = useMultiTabInject()
 const { tabList, current, closeTab } = useMultiTab()
-function handleClose(name: number) {
-
+const router = useRouter()
+const handleClose = (path: string) => {
+  closeTab(path)
 }
 const renderTabTitle = (item: TabItem) => {
   return h(TabTitle, { item })
@@ -22,9 +23,12 @@ const options = $ref<DropdownOption[]>([
     key: 'refreshCurrent',
   },
 ])
-const handleSelect = (key: string) => {
+const handleDropdownSelect = (key: string) => {
   if (key === 'closeCurrent')
     closeTab()
+}
+const handleSelectTab = (path: string) => {
+  router.push(path)
 }
 </script>
 
@@ -34,13 +38,14 @@ const handleSelect = (key: string) => {
     type="card"
     tab-style="min-width: 80px;"
     class="bg-white dark:bg-transparent"
+    @update:value="handleSelectTab"
     @close="handleClose"
   >
     <template #prefix>
       <div class="ml-5px" />
     </template>
     <template #suffix>
-      <n-dropdown type="warning" trigger="click" :options="options" @select="handleSelect">
+      <n-dropdown type="warning" trigger="click" :options="options" @select="handleDropdownSelect">
         <n-icon size="16" class="cursor-pointer">
           <EllipsisVerticalSharp />
         </n-icon>
