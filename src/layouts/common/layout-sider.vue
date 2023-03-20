@@ -26,10 +26,8 @@ const attrs = useAttrs()
 
 <template>
   <n-layout-sider class="pro-admin-layout-sider" v-bind="attrs" collapse-mode="width">
-    <div v-if="side" class="flex items-center justify-center mt-3">
-      <HeaderLogo :src="logo" :size="30" />
-      <HeaderTitle v-if="!attrs.collapsed" :title="title" :size="18" />
-    </div>
+    <slot name="logo" />
+    <hr>
     <SideMenu
       :collapsed="attrs.collapsed"
       :collapsed-icon-size="collapsedIconSize"

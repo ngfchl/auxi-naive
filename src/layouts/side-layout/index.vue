@@ -26,29 +26,24 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       :inverted="inverted"
       :collapsed="collapsed"
       :show-trigger="showSiderTrigger"
-      :side="true"
       :logo="logo"
       :title="title"
       :width="siderWidth"
       :collapsed-width="siderCollapsedWidth"
       @update:collapsed="$event => $emit('update:collapsed', $event)"
-    />
+    >
+      <template #logo>
+        <div class="flex items-center justify-center h-48px">
+          <HeaderLogo :src="logo" :size="30" />
+          <HeaderTitle v-if="!collapsed" :title="title" :size="18" />
+        </div>
+      </template>
+    </LayoutSider>
     <LayoutBase>
       <LayoutHeader
         :inverted="inverted"
         class="pro-admin-mix-header flex justify-between items-center px-4"
-      >
-        <slot name="headerLeft">
-          <div>
-            左侧
-          </div>
-        </slot>
-        <slot name="headerRight">
-          <div>
-            右侧
-          </div>
-        </slot>
-      </LayoutHeader>
+      />
       <LayoutContent
         class="pro-admin-mix-content"
       >

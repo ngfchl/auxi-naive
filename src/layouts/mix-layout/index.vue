@@ -26,15 +26,10 @@ const contentHeightVar = computed(() => `calc(100vh - ${props.headerHeight}px)`)
       :inverted="inverted"
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
-      <div class="flex items-center">
-        <HeaderLogo :src="logo" />
-        <HeaderTitle :title="title" />
+      <div class="flex items-center justify-center">
+        <HeaderLogo :src="logo" :size="30" />
+        <HeaderTitle :title="title" :size="20" />
       </div>
-      <slot name="headerRight">
-        <div>
-          右侧
-        </div>
-      </slot>
     </LayoutHeader>
     <n-layout has-sider>
       <LayoutSider
