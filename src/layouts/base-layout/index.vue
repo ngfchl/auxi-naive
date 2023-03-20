@@ -42,9 +42,6 @@ watchEffect(() => {
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
     >
-      <template #headerRight>
-        用户菜单
-      </template>
       <router-view />
     </MixLayout>
     <TopLayout
@@ -53,9 +50,6 @@ watchEffect(() => {
       :title="layout.title"
       :inverted="layout.layoutStyle === 'inverted'"
     >
-      <template #headerRight>
-        用户菜单
-      </template>
       <router-view />
     </TopLayout>
     <SideLayout
@@ -68,12 +62,6 @@ watchEffect(() => {
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
     >
-      <template #headerRight>
-        用户菜单
-      </template>
-      <template #menu>
-        菜单栏
-      </template>
       <router-view />
     </SideLayout>
   </template>
