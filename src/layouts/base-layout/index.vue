@@ -34,10 +34,10 @@ watchEffect(() => {
   <template v-else>
     <MixLayout
       v-if="layout.layout === 'mix'"
+      v-model:collapsed="layout.collapsed"
       :logo="layout.logo"
       :title="layout.title"
       :inverted="layout.layoutStyle === 'inverted'"
-      :collapsed="layout.collapsed"
       :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
