@@ -27,7 +27,7 @@ const onLogin = async () => {
     </n-form-item-row>
     <n-form-item-row path="rememberMe">
       <div class="w-100% flex items-center justify-between">
-        <n-checkbox v-model:value="model.rememberMe">
+        <n-checkbox v-model:checked="model.rememberMe">
           {{ $t("login.remember-me") }}
         </n-checkbox>
       </div>
