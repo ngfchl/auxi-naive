@@ -7,7 +7,7 @@ import { Layout } from '~/layouts'
 export const rootRouter: RouteRecordRaw = {
   path: '/',
   name: 'default-router',
-  redirect: '/home',
+  redirect: '/dashboard',
   component: Layout,
   children: [],
 }
@@ -20,16 +20,13 @@ export const dynamicRoutes: RouteRecordRaw[] = [
       {
         path: '/home',
         name: 'home',
-        component: () => import('~/pages/index.vue'),
-        meta: {
-          title: '首页',
-        },
+        component: () => import('~/pages/dashboard/analysis.vue'),
       },
-      {
-        path: '/workspace',
-        name: 'workspace',
-        component: () => import('~/pages/workspace/index.vue'),
-      },
+      // {
+      //   path: '/dashboard/workspace',
+      //   name: 'workspace',
+      //   component: () => import('~/pages/dashboard/workspace.vue'),
+      // },
     ],
 
   },

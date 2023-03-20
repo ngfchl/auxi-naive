@@ -13,7 +13,7 @@ export interface UserInfo {
 
 export interface MenuInfo {
   id: number
-  pid?: number
+  pid?: number | null
   path: string
   name?: string
   title: string

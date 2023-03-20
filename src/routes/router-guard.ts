@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios'
+import i18n from '~/locales'
 import router from '~/routes/index'
 
 /**
@@ -109,7 +110,10 @@ router.afterEach((to) => {
   const { loadingBar } = useGlobalConfig()
   const title = to.meta?.title
   loadingBar?.finish()
-  if (title) { document.title = `${title} - ${appStore.layout.title}` }
+  if (title) {
+    const localeTitle = i18n.global.t(title)
+    document.title = `${localeTitle} - ${appStore.layout.title}`
+  }
   else {
     if (appStore.layout.title)
       document.title = appStore.layout.title
