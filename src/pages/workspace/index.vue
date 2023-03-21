@@ -3,6 +3,6 @@
 
 <template>
   <div>
-    page
+    <n-input />
   </div>
 </template>

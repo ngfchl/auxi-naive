@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  workspace.vue的文件。
+  <n-input />
 </template>
 
 <style scoped>
