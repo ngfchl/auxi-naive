@@ -1,4 +1,4 @@
-import i18n, { defaultLocale, loadLanguageAsync } from '~/locales'
+import { defaultLocale, loadLanguageAsync } from '~/locales'
 
 export const useAppLocale = createGlobalState(() => useStorage('locale', defaultLocale))
 export const useAutoLang = () => {
@@ -22,28 +22,21 @@ export const useAutoLang = () => {
     }
   }
   const { isSupported, language } = useNavigatorLanguage()
+  if (isSupported.value) {
+    if (language.value && language.value !== defaultLocale) setLanguage(language.value).then(() => {})
 
-  if (isSupported.value && language.value) {
-    const lang = language.value
-    if (lang !== defaultLocale)
-      setLanguage (lang).then (() => {})
-
-    watch (language, (newLang) => {
-      if (newLang)
-        setLanguage (newLang).then (() => {})
+    watch(language, (lang) => {
+      if (lang) setLanguage(lang).then(() => {})
     })
   }
-  else {
-    if (appLocale.value !== defaultLocale)
-      setLanguage(appLocale.value).then(() => {})
-  }
-  watch(appLocale, () => {
-    if (appLocale.value !== i18n.global.locale.value)
-      setLanguage(appLocale.value).then(() => {})
+
+  watch(appLocale, (lang) => {
+    if (lang && lang !== locale.value) setLanguage(lang).then(() => {})
   })
-  const targetLocale = computed(() => getLocaleMessage(appLocale.value).naiveUI || {})
+
+  setLanguage(appLocale.value).then(() => {})
   const naiveLocale = computed(() => getLocaleMessage(appLocale.value).naiveUI || {})
   return {
-    targetLocale, setLanguage, naiveLocale,
+    setLanguage, naiveLocale,
   }
 }

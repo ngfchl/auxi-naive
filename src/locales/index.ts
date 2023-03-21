@@ -10,11 +10,12 @@ const i18n = createI18n({
   missingWarn: false,
   // 默认多语言
   locale: defaultLocale,
+  fallbackLocale: defaultLocale,
   messages: {
     'zh-CN': zhCN,
   },
 })
-export const loadLanguageAsync = async (lang: string = defaultLocale) => {
+export const loadLanguageAsync = async (lang: string) => {
   const current = i18n.global.locale.value
   try {
     if (current !== lang) {
