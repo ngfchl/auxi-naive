@@ -7,12 +7,30 @@ import type { TabItem } from '~/layouts/multi-tab/type'
 const state = useMultiTabInject()
 const { tabList, current, closeTab, refreshTab } = useMultiTab()
 const router = useRouter()
+
+const contextMenuPosition = reactive({
+  x: 0,
+  y: 0,
+  show: false,
+})
 const handleClose = (path: string) => {
   closeTab(path)
+  contextMenuPosition.show = false
+}
+
+const handleContextMenu = (e: MouseEvent) => {
+  e.preventDefault()
+  contextMenuPosition.show = false
+  nextTick().then(() => {
+    contextMenuPosition.show = true
+    contextMenuPosition.x = e.clientX
+    contextMenuPosition.y = e.clientY
+  })
 }
 const renderTabTitle = (item: TabItem) => {
-  return h(TabTitle, { item })
+  return h(TabTitle, { item, onContextMenu: handleContextMenu })
 }
+
 const options = $computed<DropdownOption[]>(() => [
   {
     label: '关闭当前页',
@@ -28,9 +46,11 @@ const handleDropdownSelect = (key: string) => {
     closeTab()
   if (key === 'refreshCurrent')
     refreshTab()
+  contextMenuPosition.show = false
 }
 const handleSelectTab = (path: string) => {
   router.push(path)
+  contextMenuPosition.show = false
 }
 </script>
 
@@ -61,4 +81,14 @@ const handleSelectTab = (path: string) => {
       :name="panel.path"
     />
   </n-tabs>
+  <n-dropdown
+    placement="bottom-start"
+    trigger="manual"
+    :x="contextMenuPosition.x"
+    :y="contextMenuPosition.y"
+    :options="options"
+    :show="contextMenuPosition.show"
+    @select="handleDropdownSelect"
+    @clickoutside="contextMenuPosition.show = false"
+  />
 </template>

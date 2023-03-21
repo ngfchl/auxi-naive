@@ -3,12 +3,16 @@ import { RefreshOutline } from '@vicons/ionicons5'
 import type { TabItem } from '~/layouts/multi-tab/type'
 const props = defineProps<{
   item: TabItem
+  onContextMenu: (e: MouseEvent) => void
 }>()
 const { refreshTab, current } = useMultiTab()
+const handleContextMenu = (e: MouseEvent) => {
+  props.onContextMenu(e)
+}
 </script>
 
 <template>
-  <span>
+  <span @contextmenu="handleContextMenu">
     {{ $t(item.tabTitle) }}
   </span>
   <n-icon
