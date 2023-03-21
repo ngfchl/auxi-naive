@@ -57,7 +57,7 @@ const onShowMenu = () => {
       @update:collapsed="$emit('update:collapsed', $event)"
     >
       <template #logo>
-        <div class="flex items-center justify-center">
+        <div class="flex items-center justify-center pro-admin-mix-header">
           <HeaderLogo :src="logo" :size="30" />
           <HeaderTitle v-if="!collapsed" :title="title" :size="20" />
         </div>
