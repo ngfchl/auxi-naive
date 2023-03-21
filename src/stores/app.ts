@@ -1,12 +1,13 @@
 import type { DropdownOption } from 'naive-ui'
 import { darkTheme } from '~/config/dark-theme'
 import type { LayoutTheme } from '~/config/layout-theme'
-import { layoutThemeConfig } from '~/config/layout-theme'
+// import { layoutThemeConfig } from '~/config/layout-theme'
 import type { ThemeType } from '~/config/theme'
 import { colors, darkColors } from '~/config/theme'
 
 export const useAppStore = defineStore('app', () => {
-  const defaultTheme = import.meta.env.DEV ? layoutThemeConfig : useLayoutTheme()
+  // const defaultTheme = import.meta.env.DEV ? layoutThemeConfig : useLayoutTheme()
+  const defaultTheme = useLayoutTheme()
   const layout = reactive(unref(defaultTheme))
   const visible = ref(false)
   const toggleVisible = (value: boolean) => {

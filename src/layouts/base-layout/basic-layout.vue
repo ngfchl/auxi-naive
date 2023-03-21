@@ -12,8 +12,6 @@ const props = withDefaults(defineProps<{
   inverted?: boolean
   collapsed?: boolean
   isMobile?: boolean
-  visible?: boolean
-  logoVisible?: boolean
   layout: 'side' | 'mix' | 'top'
 }>(), {
   headerHeight: 48,
@@ -97,11 +95,6 @@ const onShowMenu = () => {
       </LayoutContent>
     </n-layout>
   </n-layout>
-  <DrawerMenu
-    :visible="visible"
-    :drawer-inverted="inverted"
-    :logo-visible="logoVisible"
-  />
 </template>
 
 <style scoped>
