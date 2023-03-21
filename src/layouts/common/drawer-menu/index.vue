@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { MenuOutline } from '@vicons/ionicons5'
 import type { MenuProps } from 'naive-ui'
-import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutHeader } from '../common'
-import SideMenu from '../side-menu/index.vue'
+import { HeaderLogo, HeaderTitle, LayoutBase, LayoutContent, LayoutHeader } from '../../common'
+import SideMenu from '~/layouts/side-menu/index.vue'
 import RightContent from '~/layouts/common/header/right-content.vue'
 
 const props = withDefaults(defineProps<{
-  headerHeight?: number
   logo?: string
   title?: string
-  headerInverted?: boolean
   drawerInverted?: boolean
   visible?: boolean
   logoVisible?: boolean
   expandedKeys?: MenuProps['expandedKeys']
 }>(), {
   headerHeight: 48,
-  headerInverted: false,
   drawerInverted: false,
   visible: false,
   logoVisible: true,
@@ -33,26 +30,6 @@ const onShowMenu = () => {
 </script>
 
 <template>
-  <LayoutBase class="h-screen">
-    <LayoutHeader
-      :inverted="headerInverted"
-      class="pro-admin-mix-header flex justify-between items-center px-4"
-    >
-      <template #logo>
-        <div class="flex items-center">
-          <n-icon size="24" @click="onShowMenu">
-            <MenuOutline />
-          </n-icon>
-        </div>
-      </template>
-
-      <RightContent />
-    </LayoutHeader>
-    <LayoutContent class="pro-admin-mix-content ">
-      <slot />
-    </LayoutContent>
-  </LayoutBase>
-
   <n-drawer
     :show="visible"
     :width="240"
@@ -66,7 +43,9 @@ const onShowMenu = () => {
           <HeaderTitle :title="title" :size="18" />
         </div>
         <SideMenu
-          :value="active" :options="menuOptions"
+          :value="active"
+          :inverted="drawerInverted"
+          :options="menuOptions"
           :expanded-keys="expandedKeys"
           @update:value="$emit('update:active', $event)"
           @update:expanded-keys="$emit('update:expandedKeys', $event)"
@@ -77,10 +56,5 @@ const onShowMenu = () => {
 </template>
 
 <style scoped>
-.pro-admin-mix-header{
-  height: v-bind(headerHeightVar);
-}
-.pro-admin-mix-content{
-  height: v-bind(contentHeightVar);
-}
+
 </style>

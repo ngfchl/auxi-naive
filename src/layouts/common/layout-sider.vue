@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { MenuOption, MenuProps } from 'naive-ui'
 import SideMenu from '../side-menu/index.vue'
-// import { menuOptions } from '~/composables/menu-data'
 const props = withDefaults(defineProps<{
   // ...
   collapsed?: boolean
@@ -11,6 +10,7 @@ const props = withDefaults(defineProps<{
   collapsedIconSize?: number
   siderCollapsedWidth?: number
   // active?: string
+  inverted?: boolean
   options?: MenuOption[]
   expandedKeys?: MenuProps['expandedKeys']
 }>(), {
@@ -22,14 +22,20 @@ const emit = defineEmits(['update:collapsed', 'update:active', 'update:expandedK
 const userStore = useUserStore()
 const menuOptions = computed(() => userStore.menusData)
 const { active } = useMenuState()
-const handlechange = (val: boolean) => {
+const handleChange = (val: boolean) => {
   emit('update:collapsed', val)
 }
 </script>
 
 <template>
-  <n-layout-sider :collapsed="collapsed" class="pro-admin-layout-sider" collapse-mode="width" @update:collapsed="handlechange">
-    <slot name="logo" />
+  <n-layout-sider
+    :inverted="inverted"
+    :collapsed="collapsed"
+    class="h-screen" collapse-mode="width" @update:collapsed="handleChange"
+  >
+    <div class="flex items-center justify-center">
+      <slot name="logo" />
+    </div>
     <hr>
     <SideMenu
       :collapsed="collapsed"
@@ -37,6 +43,7 @@ const handlechange = (val: boolean) => {
       :collapsed-width="siderCollapsedWidth"
       :value="active"
       :options="menuOptions"
+      :inverted="inverted"
       :expanded-keys="expandedKeys"
       @update:value="$emit('update:active', $event)"
       @update:collapsed="$emit('update:collapsed', $event)"

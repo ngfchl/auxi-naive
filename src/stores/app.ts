@@ -50,7 +50,7 @@ export const useAppStore = defineStore('app', () => {
     return list
   })
 
-  const localeOptions = $ref<DropdownOption[]>([
+  const localeOptions = ref<DropdownOption[]>([
     {
       label: '简体中文',
       key: 'zh-CN',

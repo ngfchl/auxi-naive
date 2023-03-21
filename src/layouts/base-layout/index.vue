@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import MixLayout from '../mix-layout/index.vue'
-import SideLayout from '../side-layout/index.vue'
-import TopLayout from '../top-layout/index.vue'
 import MobileLayout from '../mobile-layout/index.vue'
 import SettingDrawer from '../setting-drawer/index.vue'
 
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
+import BasicLayout from '~/layouts/base-layout/basic-layout.vue'
 
 const appStore = useAppStore()
 
@@ -33,32 +31,46 @@ watchEffect(() => {
     <router-view />
   </MobileLayout>
   <template v-else>
-    <MixLayout
-      v-if="layout.layout === 'mix'"
+    <BasicLayout
       v-model:collapsed="layout.collapsed"
+      :is-mobile="isMobile"
+      :visible="visible"
+      :logo-visible="layout.logoVisible"
+      :header-height="layout.headerHeight"
       :logo="layout.logo"
       :title="layout.title"
-      :inverted="layout.layoutStyle === 'inverted'"
-      :show-sider-trigger="layout.showSiderTrigger"
-      :sider-collapsed-width="layout.siderCollapsedWidth"
       :sider-width="layout.siderWidth"
-    />
-    <SideLayout
-      v-if="layout.layout === 'side'"
-      v-model:collapsed="layout.collapsed"
-      :logo="layout.logo"
-      :title="layout.title"
-      :inverted="layout.layoutStyle === 'inverted'"
-      :show-sider-trigger="layout.showSiderTrigger"
       :sider-collapsed-width="layout.siderCollapsedWidth"
-      :sider-width="layout.siderWidth"
-    />
-    <TopLayout
-      v-if="layout.layout === 'top'"
-      :logo="layout.logo"
-      :title="layout.title"
+      :show-sider-trigger="layout.showSiderTrigger"
       :inverted="layout.layoutStyle === 'inverted'"
+      :layout="layout.layout"
     />
+    <!--    <MixLayout -->
+    <!--      v-if="layout.layout === 'mix'" -->
+    <!--      v-model:collapsed="layout.collapsed" -->
+    <!--      :logo="layout.logo" -->
+    <!--      :title="layout.title" -->
+    <!--      :inverted="layout.layoutStyle === 'inverted'" -->
+    <!--      :show-sider-trigger="layout.showSiderTrigger" -->
+    <!--      :sider-collapsed-width="layout.siderCollapsedWidth" -->
+    <!--      :sider-width="layout.siderWidth" -->
+    <!--    /> -->
+    <!--    <SideLayout -->
+    <!--      v-if="layout.layout === 'side'" -->
+    <!--      v-model:collapsed="layout.collapsed" -->
+    <!--      :logo="layout.logo" -->
+    <!--      :title="layout.title" -->
+    <!--      :inverted="layout.layoutStyle === 'inverted'" -->
+    <!--      :show-sider-trigger="layout.showSiderTrigger" -->
+    <!--      :sider-collapsed-width="layout.siderCollapsedWidth" -->
+    <!--      :sider-width="layout.siderWidth" -->
+    <!--    /> -->
+    <!--    <TopLayout -->
+    <!--      v-if="layout.layout === 'top'" -->
+    <!--      :logo="layout.logo" -->
+    <!--      :title="layout.title" -->
+    <!--      :inverted="layout.layoutStyle === 'inverted'" -->
+    <!--    /> -->
   </template>
   <SettingDrawer
     v-model:layout="layout.layout"
