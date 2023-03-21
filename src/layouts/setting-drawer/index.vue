@@ -2,9 +2,9 @@
 import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
 import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
-import type { Layout } from '~/config/layout-theme'
 import ColorLayout from '~/layouts/setting-drawer/color-layout.vue'
 import type { ThemeType } from '~/config/theme'
+import type { Layout } from '~/layouts/common/layout.vue'
 
 const props = withDefaults(defineProps<{
   floatTop: number | string
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<{
   layoutStyle: 'light',
 })
 const emit = defineEmits(['update:layout', 'update:layoutStyle', 'update:theme'])
-const show = $ref(false)
+const show = ref(false)
 
 const cssVar = computed(() => {
   return {

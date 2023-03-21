@@ -10,7 +10,7 @@ withDefaults(defineProps<{
   count: 0,
 })
 
-const options = $ref<DropdownOption[]>([
+const options = ref<DropdownOption[]>([
   {
     key: 'content',
     type: 'render',

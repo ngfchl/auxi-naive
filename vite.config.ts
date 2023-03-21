@@ -33,10 +33,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
-      vue({
-      // 响应式语法糖
-        reactivityTransform: true,
-      }),
+      vue(),
       AutoImport({
       // 配置需要自动导入的库
         imports: [

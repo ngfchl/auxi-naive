@@ -31,7 +31,7 @@ const renderTabTitle = (item: TabItem) => {
   return h(TabTitle, { item, onContextMenu: handleContextMenu })
 }
 
-const options = $computed<DropdownOption[]>(() => [
+const options = computed<DropdownOption[]>(() => [
   {
     label: '关闭当前页',
     key: 'closeCurrent',
