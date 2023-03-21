@@ -5,7 +5,7 @@ import { useMultiTab } from '~/composables/multi-tabs-state'
 import TabTitle from '~/layouts/multi-tab/tab-title.vue'
 import type { TabItem } from '~/layouts/multi-tab/type'
 const state = useMultiTabInject()
-const { tabList, current, closeTab } = useMultiTab()
+const { tabList, current, closeTab, refreshTab } = useMultiTab()
 const router = useRouter()
 const handleClose = (path: string) => {
   closeTab(path)
@@ -13,7 +13,7 @@ const handleClose = (path: string) => {
 const renderTabTitle = (item: TabItem) => {
   return h(TabTitle, { item })
 }
-const options = $ref<DropdownOption[]>([
+const options = $computed<DropdownOption[]>(() => [
   {
     label: '关闭当前页',
     key: 'closeCurrent',
@@ -26,6 +26,8 @@ const options = $ref<DropdownOption[]>([
 const handleDropdownSelect = (key: string) => {
   if (key === 'closeCurrent')
     closeTab()
+  if (key === 'refreshCurrent')
+    refreshTab()
 }
 const handleSelectTab = (path: string) => {
   router.push(path)

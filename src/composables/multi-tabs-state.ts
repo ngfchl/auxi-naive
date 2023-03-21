@@ -39,7 +39,14 @@ export const useMultiTab = () => {
     const targetIndex = currentIndex === 0 ? currentIndex + 1 : currentIndex - 1
     router.replace(tabList.value[targetIndex].route!).then(() => state.tabList.splice(currentIndex, 1))
   }
-
+  const refreshTab = (path?: string) => {
+    if (!path)
+      path = current.value
+    router.replace({
+      // todo 这里会出现死循环
+      path: `/redirect${path}`,
+    }).then(() => {}).catch(() => {})
+  }
   watch(() => route.fullPath, () => {
     if (current.value !== route.path)
       state.current = route.path
@@ -61,6 +68,6 @@ export const useMultiTab = () => {
     immediate: true,
   })
   return {
-    tabList, current, closeTab,
+    tabList, current, closeTab, refreshTab,
   }
 }
