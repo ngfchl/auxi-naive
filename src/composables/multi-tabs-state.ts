@@ -44,7 +44,7 @@ export const useMultiTab = () => {
     if (current.value !== route.path)
       state.current = route.path
     const tabIndex = tabList.value.findIndex(tab => tab.path === route.path)
-    if (tabIndex === -1) {
+    if (tabIndex !== -1) {
       // 更新一下路由信息
       state.tabList[tabIndex].route = omit(route, ['matched'])
     }
@@ -52,7 +52,7 @@ export const useMultiTab = () => {
       // 添加路由信息
       const item: TabItem = {
         path: route.path,
-        tabTitle: route.meta.title,
+        tabTitle: route.meta.title ?? '',
         route: omit(route, ['matched']),
       }
       state.tabList.push(item)
