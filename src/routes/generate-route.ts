@@ -39,6 +39,7 @@ const generator = (menuInfo: MenuInfo[], pid?: number | string): RouteRecordRaw[
         icon: menuItem.icon,
         id: menuItem.id,
         pid: menuItem.pid ?? undefined,
+        keepAlive: menuItem.keepAlive,
       },
       children: generator(menuInfo, menuItem.id),
     }

@@ -20,6 +20,7 @@ export interface MenuInfo {
   component?: string
   icon?: string
   redirect?: string
+  keepAlive?: boolean
 }
 export interface UserAccountLoginParams {
   username: IncludeNull<string>
