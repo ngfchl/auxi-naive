@@ -5,7 +5,6 @@ import NotifyContent from '~/layouts/common/notify/notify-content.vue'
 withDefaults(defineProps<{
   count?: number
   maxCount?: number
-  inverted: boolean
 }>(), {
   maxCount: 99,
   count: 0,
