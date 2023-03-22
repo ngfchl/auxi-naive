@@ -1,34 +1,16 @@
-interface Param {
-  value: number
-  unit: string
+const formatSize = (value: number): string => {
+  const sizes = ['', 'W', 'E']
+  let i = 0
+  while (value >= 1000 && i < sizes.length - 1) {
+    value /= 1000
+    i++
+  }
+  return `${value.toFixed(2)}${sizes[i]}`
 }
 
-export default (value: number | 'infinity' | 'Infinity') => {
-  if ((`${value}`).toLowerCase() === 'infinity')
+export default (value: number | 'infinity' | 'Infinity'): string => {
+  if (!isFinite(<number>value))
     return '∞'
-
-  // if (!isNaN(parseFloat(value))) {
-  //     return value
-  // }
-  const param: Param = {
-    value: 0,
-    unit: '',
-  }
-  if (typeof value !== 'number')
-    value = parseInt(value)
-
-  const k = 10000
-  const sizes = ['', 'W', 'E']
-  let i
-
-  if (value < k) {
-    param.value = value
-    param.unit = ''
-  }
-  else {
-    i = Math.floor(Math.log(value) / Math.log(k))
-    param.value = Number(((value / Math.pow(k, i))).toFixed(2))
-    param.unit = sizes[i]
-  }
-  return `${param.value}${param.unit}`
+  const numValue = parseFloat(`${value}`)
+  return formatSize(numValue)
 }

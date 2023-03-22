@@ -15,7 +15,7 @@ const sizeUnits: UnitTable = [
   { unit: 'YB', ratio: 1024 ** 8 },
 ]
 
-const renderSize = (value: number, precision = 2, baseUnit = 'B'): string => {
+export default (value: number, precision = 2, baseUnit = 'B'): string => {
   const k = sizeUnits.findIndex(({ unit }) => unit === baseUnit)
   let size = value / sizeUnits[k].ratio
   let i = k
@@ -25,4 +25,3 @@ const renderSize = (value: number, precision = 2, baseUnit = 'B'): string => {
   }
   return `${size.toFixed(precision)} ${sizeUnits[i].unit}`
 }
-export default renderSize
