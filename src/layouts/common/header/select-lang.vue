@@ -16,7 +16,6 @@ const handleSelect = (value: string) => {
 
 <template>
   <n-dropdown
-    class="h-28px flex items-center"
     trigger="hover"
     :value="value"
     :options="options"
