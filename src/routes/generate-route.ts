@@ -61,7 +61,7 @@ export const generateRoute = async () => {
       component: 'RouteView',
       redirect: '/dashboard/analysis',
       title: 'pages.dashboard.title',
-      icon: 'DashboardOutlined',
+      icon: 'Speedometer',
     },
     {
       id: 2,
@@ -70,6 +70,7 @@ export const generateRoute = async () => {
       name: 'DashboardAnalysis',
       component: 'DashboardAnalysis',
       title: 'pages.dashboard.analysis.title',
+      icon: 'StatsChartSharp',
     },
     {
       id: 3,
@@ -78,6 +79,7 @@ export const generateRoute = async () => {
       path: '/dashboard/workspace',
       component: 'DashboardWorkspace',
       title: 'pages.dashboard.workspace.title',
+      icon: 'CodeWorking',
     },
     {
       id: 4,
@@ -86,7 +88,7 @@ export const generateRoute = async () => {
       path: 'https://www.baidu.com',
       component: 'BlankRoute',
       title: 'pages.jump.baidu',
-      icon: 'LinkOutlined',
+      icon: 'LinkSharp',
     },
   ]
   if (data) {

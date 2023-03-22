@@ -4,6 +4,7 @@ import type { RouteLocationNormalized } from 'vue-router'
 export interface TabItem {
   path: string
   tabTitle: string
+  icon?: string
   route?: Omit<RouteLocationNormalized, 'matched'>
 }
 

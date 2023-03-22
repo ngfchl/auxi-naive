@@ -60,6 +60,7 @@ export const useMultiTab = () => {
       const item: TabItem = {
         path: route.path,
         tabTitle: route.meta.title ?? '',
+        icon: route.meta.icon ?? '',
         route: omit(route, ['matched']),
       }
       state.tabList.push(item)

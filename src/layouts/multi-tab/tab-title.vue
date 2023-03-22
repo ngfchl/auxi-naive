@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { RefreshOutline } from '@vicons/ionicons5'
 import type { TabItem } from '~/layouts/multi-tab/type'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 const props = defineProps<{
   item: TabItem
   onContextMenu: (e: MouseEvent) => void
@@ -12,7 +13,8 @@ const handleContextMenu = (e: MouseEvent) => {
 </script>
 
 <template>
-  <span @contextmenu="handleContextMenu">
+  <span class="flex items-center" @contextmenu="handleContextMenu">
+    <MenuIcon v-if="item.icon" :icon="item.icon" class="mr-2" />
     {{ $t(item.tabTitle) }}
   </span>
   <n-icon
