@@ -5,6 +5,7 @@ import NotifyContent from '~/layouts/common/notify/notify-content.vue'
 withDefaults(defineProps<{
   count?: number
   maxCount?: number
+  inverted: boolean
 }>(), {
   maxCount: 99,
   count: 0,
@@ -21,9 +22,9 @@ const options = ref<DropdownOption[]>([
 
 <template>
   <n-dropdown trigger="click" :options="options">
-    <n-el class="flex cursor-pointer">
+    <n-el class="flex cursor-pointer ">
       <n-badge :value="count" :max="maxCount">
-        <n-icon class="text-[var(--text-color-base)] cursor-pointer" size="22">
+        <n-icon class="text-[var(--n-text-color)]" size="22">
           <NotificationsOutline />
         </n-icon>
       </n-badge>
