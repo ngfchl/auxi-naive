@@ -25,7 +25,10 @@ const { active } = useMenuState()
 </script>
 
 <template>
-  <n-layout-header :inverted="inverted" class="pro-admin-layout-header pro-admin-mix-layout-header flex justify-between items-center">
+  <n-layout-header
+    :inverted="inverted"
+    class="flex justify-between items-center"
+  >
     <slot name="logo" />
     <div>
       <SideMenu

@@ -58,8 +58,9 @@ const handleSelectTab = (path: string) => {
   <n-tabs
     :value="current"
     type="card"
+    animated
     tab-style="min-width: 80px;"
-    class="bg-white dark:bg-transparent"
+    class="bg-#f0f0f0 dark:bg-transparent"
     @update:value="handleSelectTab"
     @close="handleClose"
   >
@@ -77,6 +78,7 @@ const handleSelectTab = (path: string) => {
       v-for="panel in tabList"
       :key="panel.path"
       closable
+      display-directive="show:lazy"
       :tab="renderTabTitle(panel)"
       :name="panel.path"
     />
