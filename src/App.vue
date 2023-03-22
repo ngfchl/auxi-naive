@@ -5,15 +5,15 @@ import { useMultiTabProvider } from '~/composables/multi-tabs-state'
 const appStore = useAppStore()
 const { layoutTheme, overrideTheme } = storeToRefs(appStore)
 useAutoDark()
-const { targetLocale } = useAutoLang()
+const { naiveLocale } = useAutoLang()
 useMenuStateProvider()
 useMultiTabProvider()
 </script>
 
 <template>
   <n-config-provider
-    :locale="targetLocale.locale"
-    :date-locale="targetLocale.dateLocale"
+    :locale="naiveLocale.locale"
+    :date-locale="naiveLocale.dateLocale"
     :theme="layoutTheme"
     :theme-overrides="overrideTheme"
   >

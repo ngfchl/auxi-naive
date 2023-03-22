@@ -3,13 +3,13 @@ import type { RouteRecordRaw } from 'vue-router'
 const staticRoutes: RouteRecordRaw[] = [
   {
     path: '/login',
-    component: () => import('~/pages/login/index.vue'),
     name: 'login',
+    component: () => import('~/pages/login/index.vue'),
   },
   {
     path: '/error',
     name: 'error',
-    component: () => import('~/pages/error/index.vue'),
+    component: () => import('~/pages/exception/error.vue'),
   },
   {
     path: '/redirect/:path(.*)',
@@ -18,7 +18,7 @@ const staticRoutes: RouteRecordRaw[] = [
   },
   {
     path: '/:pathMatch(.*)',
-    component: () => import('~/pages/error/error.vue'),
+    component: () => import('~/pages/exception/404.vue'),
   },
 ]
 
