@@ -33,6 +33,7 @@ const generator = (menuInfo: MenuInfo[], pid?: number | string): RouteRecordRaw[
     const currentRoute: RouteRecordRaw = {
       path: menuItem.path,
       name: menuItem.name,
+      redirect: menuItem.redirect,
       component: getComponent(menuItem.component),
       meta: {
         title: menuItem.title,
@@ -62,6 +63,7 @@ export const generateRoute = async () => {
       redirect: '/dashboard/analysis',
       title: 'pages.dashboard.title',
       icon: 'Speedometer',
+      keepAlive: true,
     },
     {
       id: 2,
@@ -80,10 +82,11 @@ export const generateRoute = async () => {
       component: 'DashboardWorkspace',
       title: 'pages.dashboard.workspace.title',
       icon: 'CodeWorking',
+      keepAlive: true,
     },
     {
       id: 4,
-      pid: null,
+      pid: 1,
       name: 'JumpBaidu',
       path: 'https://www.baidu.com',
       component: 'BlankRoute',
