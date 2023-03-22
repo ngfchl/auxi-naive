@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ArrowRightOutlined, SettingOutlined } from '@vicons/antd'
+import { ArrowForward, SettingsSharp } from '@vicons/ionicons5'
 import CheckBoxLayout from './checkbox-layout.vue'
 import Container from './container.vue'
 import ColorLayout from '~/layouts/setting-drawer/color-layout.vue'
 import type { ThemeType } from '~/config/theme'
-import type { Layout } from '~/layouts/common/layout.vue'
 
 const props = withDefaults(defineProps<{
   floatTop: number | string
@@ -29,7 +28,7 @@ const cssVar = computed(() => {
   }
 })
 
-const layouts = ref<Layout[]>([{
+const layouts = ref([{
   key: 'mix',
   title: 'global.layout.setting.drawer.layout.mix',
 }, {
@@ -67,7 +66,7 @@ const layoutStyles = ref([{
       >
         <template #icon>
           <n-icon size="24">
-            <SettingOutlined />
+            <SettingsSharp />
           </n-icon>
         </template>
       </n-button>
@@ -127,7 +126,7 @@ const layoutStyles = ref([{
       >
         <template #icon>
           <n-icon size="24">
-            <ArrowRightOutlined />
+            <ArrowForward />
           </n-icon>
         </template>
       </n-button>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DropdownOption } from 'naive-ui'
 import type { Component } from 'vue'
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@vicons/antd'
+import { AccessibilitySharp, LogOutSharp, SettingsSharp } from '@vicons/ionicons5'
 import type { VNodeChild } from '@vue/runtime-core'
 import { NIcon } from 'naive-ui'
 import SelectLang from './select-lang.vue'
@@ -20,12 +20,12 @@ const userOptions = ref<DropdownOption[]>([
   {
     label: () => t('global.layout.header.right.user.center'),
     key: 'user-center',
-    icon: () => renderIcon(UserOutlined),
+    icon: () => renderIcon(AccessibilitySharp),
   },
   {
     label: () => t('global.layout.header.right.user.setting'),
     key: 'user-setting',
-    icon: () => renderIcon(SettingOutlined),
+    icon: () => renderIcon(SettingsSharp),
   },
   {
     key: 'header-divider',
@@ -33,7 +33,7 @@ const userOptions = ref<DropdownOption[]>([
   },
   {
     label: () => t('global.layout.header.right.logout'),
-    icon: () => renderIcon(LogoutOutlined),
+    icon: () => renderIcon(LogOutSharp),
     key: 'logout',
   },
 ])
