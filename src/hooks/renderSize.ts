@@ -1,12 +1,28 @@
-export default (value: string | number | null | '') => {
-  if (value === null || value === '')
-    return 0
+type UnitTable = {
+  unit: string
+  ratio: number
+}[]
 
-  const unitArr = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  let index = 0
-  const srcsize = parseFloat(typeof value === 'string' ? value : value.toString())
-  index = Math.floor(Math.log(srcsize) / Math.log(1024))
-  const size = srcsize / Math.pow(1024, index)
-  // 保留的小数位数
-  return `${size.toFixed(2)} ${unitArr[index]}`
+const sizeUnits: UnitTable = [
+  { unit: 'B', ratio: 1024 ** 0 },
+  { unit: 'KB', ratio: 1024 ** 1 },
+  { unit: 'MB', ratio: 1024 ** 2 },
+  { unit: 'GB', ratio: 1024 ** 3 },
+  { unit: 'TB', ratio: 1024 ** 4 },
+  { unit: 'PB', ratio: 1024 ** 5 },
+  { unit: 'EB', ratio: 1024 ** 6 },
+  { unit: 'ZB', ratio: 1024 ** 7 },
+  { unit: 'YB', ratio: 1024 ** 8 },
+]
+
+const renderSize = (value: number, precision = 2, baseUnit = 'B'): string => {
+  const k = sizeUnits.findIndex(({ unit }) => unit === baseUnit)
+  let size = value / sizeUnits[k].ratio
+  let i = k
+  while (i < sizeUnits.length - 1 && size >= 1024) {
+    size /= 1024
+    i++
+  }
+  return `${size.toFixed(precision)} ${sizeUnits[i].unit}`
 }
+export default renderSize
