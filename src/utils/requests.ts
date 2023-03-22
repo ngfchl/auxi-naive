@@ -7,7 +7,7 @@ import router from '~/routes'
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API || '/',
-  timeout: 6000,
+  timeout: 60000,
 })
 const requestHandler = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig<any> | any> => {
   const authorization = useAuthorization()
@@ -28,18 +28,18 @@ export interface ResponseBody<T = any> {
   msg: string
 }
 
-const responseHandler = (response: AxiosResponse): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any => {
+const responseHandler = (response: AxiosResponse): any | ResponseBody<any> | AxiosResponse<any> | Promise<any> => {
   const { message } = useGlobalConfig()
 
   const { data, code, msg } = response.data
   if (code !== 0) {
     message?.warning(
-      // title: i18n.global.t('global.request.error.403'),
       msg,
       {
         keepAliveOnHover: true,
       },
     )
+    return
   }
   return data
 }
@@ -97,7 +97,7 @@ const errorHandler = (error: AxiosError): Promise<any> => {
 
 instance.interceptors.request.use(requestHandler)
 instance.interceptors.response.use(responseHandler, errorHandler)
-const useGet = <P = any, R = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise< ResponseBody<R>> => {
+const useGet = <P = any, R = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise<ResponseBody<R>> => {
   return instance.request({
     url,
     method: 'GET',
