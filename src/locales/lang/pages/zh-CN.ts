@@ -23,8 +23,4 @@ export default {
   'login.sign-in-with': '其他登录方式：',
   'login.signup': '注册账户',
   'login.login': '登录',
-  'pages.dashboard.title': '仪表盘',
-  'pages.dashboard.analysis.title': '分析页',
-  'pages.dashboard.workspace.title': '访问量',
-  'pages.jump.baidu': '跳转百度',
 }

@@ -21,8 +21,5 @@ export default {
   'login.sign-in-with': 'Sign in with:',
   'login.signup': 'Sign up',
   'login.login': 'Login',
-  'pages.dashboard.title': 'Dashboard',
-  'pages.dashboard.analysis.title': 'Analysis',
-  'pages.dashboard.workspace.title': 'Workspace',
-  'pages.jump.baidu': 'Jump to Baidu',
+
 }
