@@ -1,11 +1,15 @@
-import type { DownloadSpeedType } from '~/api/download'
-import { getDownloadSpeedList } from '~/api/download'
+import type { DownloadSpeedType, Downloader } from '~/api/download'
+import { $getDownloadSpeedList, $getDownloaderList } from '~/api/download'
 
 export const useDownloadStore = defineStore('download', () => {
   const speedList = ref<DownloadSpeedType[]>([])
+  const downloaderList = ref<Downloader[]>([])
   const timer = ref()
   const setDownloadSpeedList = (value: DownloadSpeedType[]) => {
     speedList.value = value
+  }
+  const getDownloaderList = async () => {
+    downloaderList.value = await $getDownloaderList()
   }
   const speedTotal = reactive<DownloadSpeedType>({
     name: '总速度',
@@ -29,9 +33,9 @@ export const useDownloadStore = defineStore('download', () => {
     })
   }
   const getSpeedListTimer = async () => {
-    speedList.value = await getDownloadSpeedList()
+    speedList.value = await $getDownloadSpeedList()
     timer.value = setInterval(async () => {
-      speedList.value = await getDownloadSpeedList()
+      speedList.value = await $getDownloadSpeedList()
       getSpeedTotal()
     }, 5000)
   }
@@ -47,5 +51,7 @@ export const useDownloadStore = defineStore('download', () => {
     timer,
     getSpeedTotal,
     speedTotal,
+    downloaderList,
+    getDownloaderList,
   }
 })

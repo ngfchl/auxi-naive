@@ -10,17 +10,28 @@ export interface DownloadSpeedType {
   category: string
 }
 
+export interface Downloader {
+  id: number
+  name: string
+  usernames?: string
+  password?: string
+  host: string
+  port?: number
+  category: string
+  reserved_space?: number
+}
+
 export const downloadSpeedUrl = 'download/downloaders/speed'
 /**
  * 获取下载器实时数据
  */
-export const getDownloadSpeedList: () => Promise<any> = async () => {
+export const $getDownloadSpeedList: () => Promise<any> = async () => {
   return await getList<null, DownloadSpeedType[]>(downloadSpeedUrl)
 }
 
 /**
  * 获取下载器列表
  */
-export const getDownloaderList = async () => {
-  return await getList('download/downloaders')
+export const $getDownloaderList: () => Promise<any> = async () => {
+  return await getList<Downloader[]>('download/downloaders')
 }
