@@ -11,6 +11,16 @@ export interface DownloadSpeedType {
 }
 
 export const downloadSpeedUrl = 'download/downloaders/speed'
+/**
+ * 获取下载器实时数据
+ */
 export const getDownloadSpeedList: () => Promise<any> = async () => {
   return await getList<null, DownloadSpeedType[]>(downloadSpeedUrl)
+}
+
+/**
+ * 获取下载器列表
+ */
+export const getDownloaderList = async () => {
+  return await getList('download/downloaders')
 }
