@@ -7,10 +7,32 @@ export const useDownloadStore = defineStore('download', () => {
   const setDownloadSpeedList = (value: DownloadSpeedType[]) => {
     speedList.value = value
   }
+  const speedTotal = reactive<DownloadSpeedType>({
+    name: '总速度',
+    connection_status: false,
+    dl_info_data: 0,
+    dl_info_speed: 0,
+    up_info_data: 0,
+    up_info_speed: 0,
+    category: 'none',
+  })
+  const getSpeedTotal = () => {
+    speedTotal.dl_info_data = 0
+    speedTotal.dl_info_speed = 0
+    speedTotal.up_info_data = 0
+    speedTotal.up_info_speed = 0
+    speedList.value.forEach((speed: DownloadSpeedType) => {
+      speedTotal.dl_info_data += speed.dl_info_data
+      speedTotal.dl_info_speed += speed.dl_info_speed
+      speedTotal.up_info_speed += speed.up_info_speed
+      speedTotal.up_info_data += speed.up_info_data
+    })
+  }
   const getSpeedListTimer = async () => {
     speedList.value = await getDownloadSpeedList()
     timer.value = setInterval(async () => {
       speedList.value = await getDownloadSpeedList()
+      getSpeedTotal()
     }, 5000)
   }
   const clearSpeedListTimer = () => {
@@ -23,5 +45,7 @@ export const useDownloadStore = defineStore('download', () => {
     setDownloadSpeedList,
     clearSpeedListTimer,
     timer,
+    getSpeedTotal,
+    speedTotal,
   }
 })
