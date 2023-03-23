@@ -43,8 +43,7 @@ export const useMultiTab = () => {
     if (!path)
       path = current.value
     router.replace({
-      // todo 这里会出现死循环
-      path: `/redirect${path}`,
+      path: `/redirect/${path}`,
     }).then(() => {}).catch(() => {})
   }
   watch(() => route.fullPath, () => {
