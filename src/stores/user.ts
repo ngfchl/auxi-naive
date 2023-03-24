@@ -45,7 +45,7 @@ export const useUserStore = defineStore('user', () => {
    * 获取用户信息
    */
   const getUserInfo = async () => {
-    const { data } = await userGetInfoApi()
+    const data = await userGetInfoApi()
     if (data)
       setUserInfo(data)
   }
