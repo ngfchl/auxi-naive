@@ -11,4 +11,21 @@ export const rootRouter: RouteRecordRaw = {
   component: Layout,
   children: [],
 }
-export const dynamicRoutes: RouteRecordRaw[] = []
+export const dynamicRoutes: RouteRecordRaw[] = [{
+  path: '/',
+  name: 'default-router',
+  redirect: '/dashboard/analysis',
+  children: [
+    {
+      path: 'dashboard',
+      name: 'dashboard',
+      component: () => import('@/pages/dashboard/analysis.vue'),
+      meta: {
+        id: 0,
+        title: 'dashboard',
+        icon: 'dashboard',
+      },
+    },
+
+  ],
+}]
