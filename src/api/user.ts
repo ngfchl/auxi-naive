@@ -51,7 +51,7 @@ export const userGetInfoUrl = 'config/userinfo'
 /**
  * 获取用户信息接口
  */
-export const userGetInfoApi = () => {
+export const userGetInfoApi: () => any = () => {
   return useGet<any, UserInfo>(userGetInfoUrl)
 }
 
