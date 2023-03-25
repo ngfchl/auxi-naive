@@ -32,26 +32,34 @@ export const useDownloadStore = defineStore('download', () => {
       speedTotal.up_info_data += speed.up_info_data
     })
   }
-  const getSpeedListTimer = async () => {
+  const getSpeedList = async () => {
     speedList.value = await $getDownloadSpeedList()
-    timer.value = setInterval(async () => {
-      speedList.value = await $getDownloadSpeedList()
-      getSpeedTotal()
-    }, 5000)
+    getSpeedTotal()
   }
   const clearSpeedListTimer = () => {
     clearInterval(timer.value)
     timer.value = null
   }
+  const getSpeedListTimer = async () => {
+    timer.value = setInterval(async () => {
+      speedList.value = await $getDownloadSpeedList()
+      getSpeedTotal()
+    }, 5000)
+    setTimeout(() => {
+      clearSpeedListTimer()
+    }, 1000 * 60 * 15)
+  }
+
   return {
+    timer,
     speedList,
+    speedTotal,
+    downloaderList,
     getSpeedListTimer,
     setDownloadSpeedList,
     clearSpeedListTimer,
-    timer,
     getSpeedTotal,
-    speedTotal,
-    downloaderList,
+    getSpeedList,
     getDownloaderList,
   }
 })

@@ -3,14 +3,11 @@ import { ArrowDownSharp, ArrowUpSharp } from '@vicons/ionicons5'
 import renderSize from '~/hooks/renderSize'
 import DownloadItems from '~/pages/dashboard/components/download-items.vue'
 const downloadStore = useDownloadStore()
-const { getSpeedListTimer, clearSpeedListTimer } = downloadStore
+const { getSpeedListTimer, clearSpeedListTimer, getSpeedList } = downloadStore
 const { speedList, timer, speedTotal } = storeToRefs(downloadStore)
 const flag = ref(false)
 onBeforeMount(async () => {
-  await getSpeedListTimer()
-  setTimeout(() => {
-    clearSpeedListTimer()
-  }, 1000 * 60 * 15)
+  await getSpeedList()
 })
 </script>
 
