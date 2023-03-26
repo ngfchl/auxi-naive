@@ -5,6 +5,7 @@ export default {
   'pages.dashboard.workspace.title': '访问量',
   'pages.jump.baidu': '跳转百度',
   'pages.site.title': '站点管理',
+  'pages.site.mysite.title': '我的站点',
   'pages.site.website.title': '站点管理',
   'pages.site.torrent.title': '种子管理',
   'pages.download.title': '下载管理',

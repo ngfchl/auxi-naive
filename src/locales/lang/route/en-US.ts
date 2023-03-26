@@ -5,6 +5,7 @@ export default {
   'pages.dashboard.workspace.title': 'Workspace',
   'pages.jump.baidu': 'Jump to Baidu',
   'pages.site.title': 'site',
+  'pages.site.mysite.title': 'mysite',
   'pages.site.website.title': 'website',
   'pages.site.torrent.title': 'torrent',
   'pages.download.title': 'download',
