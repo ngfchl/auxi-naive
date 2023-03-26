@@ -2,14 +2,47 @@ import { getList } from '~/hooks/getList'
 import renderSize from '@/hooks/renderSize'
 import numberFormat from '@/hooks/numberFormat'
 import { useGlobalConfig } from '~/composables/gobal-config'
-import type { MySite, SiteHistoryList } from '~/stores/website'
+
+export interface MySite {
+  id: number
+  site: number
+  nickname: string
+  passkey: string
+  get_info: boolean
+  sign_in: boolean
+  get_torrents: boolean
+  brush_flow: boolean
+  repeat_torrents: boolean
+  hr: boolean
+  search: boolean
+  user_id: string
+  joined: string
+  user_agent: string
+  cookie: string
+}
+
+export interface SiteHistoryList {
+  uploaded_list: number[]
+  downloaded_list: number[]
+  diff_uploaded_list: number[]
+  diff_downloaded_list: number[]
+  bonus_list: number[]
+  score_list: number[]
+  ratio_list: number[]
+  seeding_size_list: number[]
+  seeding_list: number[]
+  leeching_list: number[]
+  invitation_list: number[]
+  bonus_hour_list: number[]
+  date_list: number[]
+}
 
 const { message } = useGlobalConfig()
 
 /**
  * 获取我的站点列表
  */
-export const $mySiteList = async () => {
+export const $mySiteList: () => Promise<any> = async () => {
   return await getList('mysite/mysite')
 }
 
