@@ -4,7 +4,7 @@ import { useWebsiteStore } from '~/stores/website'
 
 const { message } = useGlobalConfig()
 const websiteStore = useWebsiteStore()
-const { getMySiteList } = websiteStore
+const { getSiteList } = websiteStore
 const {
   columns,
   siteList,
@@ -12,7 +12,7 @@ const {
 const rowKey = (row: RowData) => row.id
 
 onMounted(async () => {
-  await getMySiteList()
+  await getSiteList()
 })
 </script>
 
