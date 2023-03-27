@@ -1,6 +1,6 @@
 import type { DataTableColumns, FormRules } from 'naive-ui'
-import { NButton, NSpace, NSwitch } from 'naive-ui'
-import type { MySite } from '~/api/website'
+import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
+import type { MySite, NewestStatus, WebSite } from '~/api/website'
 import {
   $getHistoryList,
   $getMySite,
@@ -9,7 +9,7 @@ import {
   $parseSiteHistory,
   $refreshSite,
   $signSite,
-  $siteInfoNewList,
+  $siteInfoNewList, $siteList,
   $siteStatusNewestList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
@@ -18,14 +18,14 @@ import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 export const useWebsiteStore = defineStore('website', () => {
   const { message } = useGlobalConfig()
   /**
-   * 搜索字符串
-   */
+     * 搜索字符串
+     */
   const searchKey = ref('')
   const eDrawer = ref(false)
   const sign = ref(false)
   const chart = ref(false)
   const drawerTitle = ref('详情')
-  const columns = ref<DataTableColumns<MySite>>([
+  const columns = ref<DataTableColumns<WebSite>>([
     {
       title: 'id',
       key: 'id',
@@ -33,53 +33,82 @@ export const useWebsiteStore = defineStore('website', () => {
     },
     {
       title: '名称',
+      key: 'name',
+      minWidth: 65,
+    },
+    {
+      title: '昵称',
       key: 'nickname',
       minWidth: 65,
     },
     {
-      title: '开启功能',
+      title: '标签',
+      key: 'tags',
+      minWidth: 85,
+      render(row: WebSite) {
+        const tagList = row.tags.split(',')
+        return tagList.map((tagKey) => {
+          return h(
+            NTag,
+            {
+              style: {
+                marginRight: '6px',
+              },
+              type: 'info',
+              bordered: false,
+            },
+            {
+              default: () => tagKey,
+            },
+          )
+        })
+      },
+    },
+    {
+      title: '支持功能',
       key: 'ability',
-      render(row: MySite) {
+      render(row: WebSite) {
         const abilityList = [
           {
             name: '签到',
-            key: 'sign_in',
-            support: row.sign_in,
+            key: 'func_sign_in',
+            support: row.func_sign_in,
           },
           {
             name: '数据',
-            key: 'get_info',
-            support: row.get_info,
+            key: 'func_get_userinfo',
+            support: row.func_get_userinfo,
           },
 
           {
             name: '抓种',
-            key: 'get_torrents',
-            support: row.get_torrents,
+            key: 'func_get_torrents',
+            support: row.func_get_torrents,
           },
           // {
           //   name: '刷流',
-          //   key: 'brush_flow',
-          //   support: row.brush_flow,
+          //   key: 'func_brush_flow',
+          //   support: row.func_brush_flow,
           // },
           // {
           //   name: '辅种',
-          //   key: 'repeat_torrents',
-          //   support: row.repeat_torrents,
+          //   key: 'func_repeat_torrents',
+          //   support: row.func_repeat_torrents,
           // },
           // {
           //   name: '搜索',
-          //   key: 'search',
-          //   support: row.search,
+          //   key: 'func_search',
+          //   support: row.func_search,
           // },
           // {
           //   name: 'H&R',
-          //   key: 'hr',
-          //   support: row.hr,
+          //   key: 'func_hr',
+          //   support: row.func_hr,
           // },
         ]
         return h(NSpace, () => {
           return abilityList.map((ability) => {
+            if (!ability.support) return null
             return h(
               NSwitch,
               {
@@ -116,12 +145,12 @@ export const useWebsiteStore = defineStore('website', () => {
     {
       key: 'actions',
       title: '操作',
-      render(row: MySite) {
+      render(row: WebSite) {
         return h(
           NButton,
           {
             size: 'small',
-            onClick: () => message?.warning(`下载器ID：${row.id}`),
+            onClick: () => message?.warning(`站点ID：${row.id}`),
           },
           { default: () => '操作' },
         )
@@ -163,63 +192,66 @@ export const useWebsiteStore = defineStore('website', () => {
   })
 
   /**
-   * 是否打开编辑页
-   */
+     * 是否打开编辑页
+     */
   const showAddMySite = ref(false)
 
   /**
-   * 编辑页名称
-   */
+     * 编辑页名称
+     */
   const title = ref('添加站点')
 
-  const siteList = ref<MySite[]>([mySite])
-  const data = reactive({
-    showList: [],
-    siteStatusList: [],
-    mySiteForm: mySite,
-    siteInfoList: [],
-    signInList: null,
-    siteHistory: {},
-  })
+  const siteList = ref<WebSite[]>([])
+  const mySiteList = ref<MySite[]>([])
+  const showList = ref<NewestStatus[]>([])
+  const siteStatusList = ref<NewestStatus[]>([])
+  const mySiteForm = ref<MySite>(mySite)
+  const siteInfoList = ref([])
+  const signInList = ref([])
+  const siteHistory = ref([])
+
   const getMySiteList = async () => {
-    siteList.value = await $mySiteList()
+    mySiteList.value = await $mySiteList()
+  }
+  const getSiteList = async () => {
+    siteList.value = await $siteList()
   }
   /**
-   * 搜索
-   */
+     * 搜索
+     */
   const siteSearch = async () => {
     searchKey.value === ''
-      ? data.showList = data.siteStatusList
-      : data.showList = data.siteStatusList.filter((item) => {
+      ? showList.value = siteStatusList.value
+      : showList.value = siteStatusList.value.filter((item) => {
         const { site, my_site } = item
         return site.url.toLowerCase().includes(searchKey.value.toLowerCase())
-              || site.name.toLowerCase().includes(searchKey.value.toLowerCase())
-              || site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
-              || my_site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
-              || my_site.user_id.toLowerCase().includes(searchKey.value.toLowerCase())
+                    || site.name.toLowerCase().includes(searchKey.value.toLowerCase())
+                    || site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
+                    || my_site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
+                    || my_site.user_id.toLowerCase().includes(searchKey.value.toLowerCase())
       })
   }
   /**
-   * 初始化数据列表
-   */
+     * 初始化数据列表
+     */
   const initData = async () => {
-    data.siteStatusList = await $siteStatusNewestList()
+    siteStatusList.value = await $siteStatusNewestList()
     await siteSearch()
   }
 
   /**
-   * 打开编辑窗口
-   * @param id
-   */
+     * 打开编辑窗口
+     * @param id
+     */
   const editMysite = async (id: number) => {
-    data.siteInfoList = await $siteInfoNewList()
-    data.mySiteForm = id === 0 ? mySite : await $getMySite({ mysite_id: id })
-    title.value = id === 0 ? '添加站点' : `编辑站点：${data.mySiteForm.nickname}`
+    siteInfoList.value = await $siteInfoNewList()
+    mySiteForm.value = id === 0 ? mySite : await $getMySite({ mysite_id: id })
+    title.value = id === 0 ? '添加站点' : `编辑站点：${mySiteForm.nickname}`
     showAddMySite.value = true
   }
   /**
-   * 签到
-   */
+     * 签到
+     */
   const signSite = async (site_id: number) => {
     const flag = await $signSite(site_id)
     if (flag)
@@ -227,11 +259,11 @@ export const useWebsiteStore = defineStore('website', () => {
   }
 
   /**
-   * 获取签到列表
-   */
+     * 获取签到列表
+     */
   const getSignList = async (site_id: number) => {
-    data.signInList = await $getSignList({ site_id, page: 1, limit: 5 })
-    const item = data.siteStatusList.find((item) => {
+    signInList.value = await $getSignList({ site_id, page: 1, limit: 5 })
+    const item = siteStatusList.value.find((item) => {
       return item.my_site.id === site_id
     })
     drawerTitle.value = `${item.my_site.nickname}  签到信息`
@@ -239,8 +271,8 @@ export const useWebsiteStore = defineStore('website', () => {
     eDrawer.value = true
   }
   /**
-   * 更新站点数据
-   */
+     * 更新站点数据
+     */
   const refreshSite = async (site_id: number) => {
     const flag = await $refreshSite(site_id)
     if (flag)
@@ -248,40 +280,50 @@ export const useWebsiteStore = defineStore('website', () => {
   }
 
   /**
-   * 更新站点数据
-   */
+     * 更新站点数据
+     */
   const siteEChart = async (site_id: number) => {
     const res = await $getHistoryList({ site_id })
-    data.siteHistory = {}
-    data.siteHistory = await $parseSiteHistory(res)
+    siteHistory.value = {}
+    siteHistory.value = await $parseSiteHistory(res)
     chart.value = true
     eDrawer.value = true
   }
 
   /**
-   *
-   */
+     *
+     */
   const initSomeData = () => {
-    data.siteHistory = {}
-    data.signInList = null
+    siteHistory.value = {}
+    signInList.value = null
   }
   /**
-   * 关闭编辑窗口并刷新数据
-   */
+     * 关闭编辑窗口并刷新数据
+     */
   const closeEditForm = async () => {
     await initData()
     showAddMySite.value = false
   }
   return {
+    eDrawer,
     addMySiteFormRules,
     mySite,
     columns,
     showAddMySite,
     siteList,
-    initSomeData,
+    mySiteList,
+    showList,
+    siteStatusList,
+    mySiteForm,
+    siteInfoList,
+    searchKey,
+    signInList,
+    siteHistory,
     getMySiteList,
-    siteEChart,
+    getSiteList,
     siteSearch,
+    initSomeData,
+    siteEChart,
     initData,
     editMysite,
     signSite,

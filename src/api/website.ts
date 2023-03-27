@@ -3,6 +3,44 @@ import renderSize from '@/hooks/renderSize'
 import numberFormat from '@/hooks/numberFormat'
 import { useGlobalConfig } from '~/composables/gobal-config'
 
+export interface WebSite {
+  id: number
+  name: string
+  nickname: string
+  logo: string
+  tags: '电影' | '电视剧' | 'MV' | 'MUSIC' | '纪录片'
+  sp_full: number
+  page_message: string
+  url: string
+  func_sign_in: boolean
+  func_get_userinfo: boolean
+  func_get_torrents: boolean
+  func_hr_discern: boolean
+  func_brush_flow: boolean
+  func_search_torrents: boolean
+  func_repeat_torrents: boolean
+}
+
+// eslint-disable-next-line import/export
+export interface UserLevelRule {
+  id: number
+  site: number
+  level_id: number
+  level: string
+  days: number
+  uploaded: number
+  downloaded: number
+  bonus: number
+  score: number
+  ratio: number
+  torrents: number
+  leeches: number
+  seeding_delta: number
+  keep_account: boolean
+  graduation: boolean
+  rights: string
+}
+
 export interface MySite {
   id: number
   site: number
@@ -21,6 +59,45 @@ export interface MySite {
   cookie: string
 }
 
+export interface SiteStatus {
+  id: number
+  updated_at: string
+  site: number
+  uploaded: number
+  downloaded: number
+  ratio: number
+  my_bonus: number
+  my_score: number
+  seed_volume: number
+  seed_days: number
+  leech: number
+  seed: number
+  bonus_hour: number
+  publish: number
+  invitation: number
+  my_level: string
+  my_hr: string
+  mail: number
+  updated: string
+}
+
+export interface SignInfo {
+  id: number
+  updated_at: string
+  site: number
+  sign_in_today: boolean
+  sign_in_info: string
+  updated: string
+}
+
+export interface NewestStatus {
+  my_site: MySite
+  site: WebSite
+  sign_in_today: SignInfo
+  status: SiteStatus
+  level: UserLevelRule
+  next_level: UserLevelRule
+}
 export interface SiteHistoryList {
   uploaded_list: number[]
   downloaded_list: number[]
@@ -43,7 +120,7 @@ const { message } = useGlobalConfig()
  * 获取我的站点列表
  */
 export const $mySiteList: () => Promise<any> = async () => {
-  return await getList('mysite/mysite')
+  return await getList<null, MySite[]>('mysite/mysite')
 }
 
 /**
@@ -56,29 +133,29 @@ export const $torrentList = async () => {
  * 获取未添加站点列表
  */
 export const $siteInfoNewList = async () => {
-  return await getList('website/website/new')
+  return await getList<null, WebSite>('website/website/new')
 }
 
 /**
  * 获取已添加站点最新状态列表
  */
-export const $siteStatusNewestList = async () => {
-  return await getList('mysite/status/newest')
+export const $siteStatusNewestList: () => Promise<any> = async () => {
+  return await getList<null, NewestStatus>('mysite/status/newest')
 }
 
 /**
  * 获取已添加站点网站列表
  */
-export const $siteList = async () => {
-  return await getList('website/website')
+export const $siteList: () => Promise<any> = async () => {
+  return await getList<null, WebSite>('website/website')
 }
 
 /**
  * 获取单个站点信息
  * @param params
  */
-export const $getMySite = async (params: object) => {
-  return await getList('mysite/mysite/get', params)
+export const $getMySite = async (params: number) => {
+  return await getList<Number, MySite>('mysite/mysite/get', params)
 }
 /**
  * 删除单个站点信息
