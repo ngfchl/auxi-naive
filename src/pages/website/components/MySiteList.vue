@@ -57,6 +57,8 @@ onMounted(async () => {
     </n-button>
     <n-input
       v-model:value="searchKey"
+      autofocus
+      :input-props="{ autocomplete: 'off' }"
       clearable
       placeholder="名称昵称网址等"
       @input="siteSearch"
