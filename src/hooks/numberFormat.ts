@@ -1,8 +1,8 @@
 const formatSize = (value: number): string => {
   const sizes = ['', 'W', 'E']
   let i = 0
-  while (value >= 1000 && i < sizes.length - 1) {
-    value /= 1000
+  while (value >= 10000 && i < sizes.length - 1) {
+    value /= 10000
     i++
   }
   return `${value.toFixed(2)}${sizes[i]}`

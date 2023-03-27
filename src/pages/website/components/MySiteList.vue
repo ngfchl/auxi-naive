@@ -5,11 +5,13 @@ import { useWebsiteStore } from '~/stores/website'
 import MySiteForm from '~/pages/website/components/MySiteForm.vue'
 import SignInList from '~/pages/website/components/SignInList.vue'
 import numberFormat from '~/hooks/numberFormat'
+defineEmits(['update:eDrawer'])
 const websiteStore = useWebsiteStore()
 const {
   eDrawer,
   searchKey,
   showList,
+  drawerTitle,
   siteStatusList,
   mySiteList,
   addMySiteFormRules,
@@ -31,6 +33,7 @@ const {
   getSignList,
   refreshSite,
 } = websiteStore
+
 /**
  * 挂载时初始化数据
  */
@@ -57,7 +60,6 @@ onMounted(async () => {
     </n-button>
     <n-input
       v-model:value="searchKey"
-      autofocus
       :input-props="{ autocomplete: 'off' }"
       clearable
       placeholder="名称昵称网址等"
@@ -287,10 +289,11 @@ onMounted(async () => {
   <!--    /> -->
   <!--  </el-dialog> -->
   <n-drawer
-    v-model="eDrawer" class="detail"
+    :show="eDrawer" class="detail"
     destroy-on-close
     direction="btt"
     size="100%" style="direction: ltr;"
+    @update:show="val => $emit('update:eDrawer', val)"
   >
     <template #default>
       <h4 class="title" style="text-align: center;" v-text="drawerTitle" />
