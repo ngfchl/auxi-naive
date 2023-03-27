@@ -88,6 +88,15 @@ export const generateRoute = async () => {
     }, {
       id: 4,
       pid: 3,
+      path: '/website/mysite',
+      name: 'mysite',
+      component: 'MySite',
+      title: 'pages.site.mysite.title',
+      icon: 'Speedometer',
+      keepAlive: true,
+    }, {
+      id: 18,
+      pid: 3,
       path: '/website/website',
       name: 'website',
       component: 'Website',
