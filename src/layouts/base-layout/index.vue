@@ -26,6 +26,7 @@ watchEffect(() => {
     v-if="isMobile"
     v-model:visible="visible"
     :logo="layout.logo"
+    :inverted="layout.inverted"
     :title="layout.title"
   >
     <router-view />
@@ -45,32 +46,6 @@ watchEffect(() => {
       :inverted="layout.layoutStyle === 'inverted'"
       :layout="layout.layout"
     />
-    <!--    <MixLayout -->
-    <!--      v-if="layout.layout === 'mix'" -->
-    <!--      v-model:collapsed="layout.collapsed" -->
-    <!--      :logo="layout.logo" -->
-    <!--      :title="layout.title" -->
-    <!--      :inverted="layout.layoutStyle === 'inverted'" -->
-    <!--      :show-sider-trigger="layout.showSiderTrigger" -->
-    <!--      :sider-collapsed-width="layout.siderCollapsedWidth" -->
-    <!--      :sider-width="layout.siderWidth" -->
-    <!--    /> -->
-    <!--    <SideLayout -->
-    <!--      v-if="layout.layout === 'side'" -->
-    <!--      v-model:collapsed="layout.collapsed" -->
-    <!--      :logo="layout.logo" -->
-    <!--      :title="layout.title" -->
-    <!--      :inverted="layout.layoutStyle === 'inverted'" -->
-    <!--      :show-sider-trigger="layout.showSiderTrigger" -->
-    <!--      :sider-collapsed-width="layout.siderCollapsedWidth" -->
-    <!--      :sider-width="layout.siderWidth" -->
-    <!--    /> -->
-    <!--    <TopLayout -->
-    <!--      v-if="layout.layout === 'top'" -->
-    <!--      :logo="layout.logo" -->
-    <!--      :title="layout.title" -->
-    <!--      :inverted="layout.layoutStyle === 'inverted'" -->
-    <!--    /> -->
   </template>
   <SettingDrawer
     v-model:layout="layout.layout"

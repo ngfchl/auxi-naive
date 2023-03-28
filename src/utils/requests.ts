@@ -29,25 +29,7 @@ export interface ResponseBody<T = any> {
 }
 
 const responseHandler = (response: AxiosResponse): any | ResponseBody<any> | AxiosResponse<any> | Promise<any> => {
-  const { message } = useGlobalConfig()
-  if (typeof response.data === 'string') {
-    // 正则表达式查找替换所有无穷大字符
-    const reg = /Infinity/g
-    const res_info = response.data.replace(reg, '"∞"')
-    response.data = JSON.parse(res_info)
-  }
-  const { data, code, msg } = response.data
-  if (code !== 0) {
-    message?.warning(
-      msg,
-      {
-        keepAliveOnHover: true,
-      },
-    )
-    return
-  }
-
-  return data
+  return response.data
 }
 const errorHandler = (error: AxiosError): Promise<any> => {
   const { notification } = useGlobalConfig()

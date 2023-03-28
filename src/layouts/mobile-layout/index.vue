@@ -9,15 +9,13 @@ const props = withDefaults(defineProps<{
   headerHeight?: number
   logo?: string
   title?: string
-  headerInverted?: boolean
-  drawerInverted?: boolean
+  inverted?: boolean
   visible?: boolean
   logoVisible?: boolean
   expandedKeys?: MenuProps['expandedKeys']
 }>(), {
   headerHeight: 48,
-  headerInverted: false,
-  drawerInverted: false,
+  inverted: false,
   visible: false,
   logoVisible: true,
 })
@@ -35,7 +33,7 @@ const onShowMenu = () => {
 <template>
   <LayoutBase class="h-screen">
     <LayoutHeader
-      :inverted="headerInverted"
+      :inverted="inverted"
       class="pro-admin-mix-header flex justify-between items-center px-4"
     >
       <template #logo>
@@ -60,13 +58,15 @@ const onShowMenu = () => {
     @update:show="val => $emit('update:visible', val)"
   >
     <n-drawer-content body-content-style="padding:0;">
-      <n-layout-header :inverted="drawerInverted" class="h-100%">
+      <n-layout-header :inverted="inverted" class="h-100%">
         <div v-if="logoVisible" class="h-48px flex justify-center items-center b-b">
           <HeaderLogo :src="logo" :size="24" />
           <HeaderTitle :title="title" :size="18" />
         </div>
         <SideMenu
-          :value="active" :options="menuOptions"
+          :inverted="inverted"
+          :value="active"
+          :options="menuOptions"
           :expanded-keys="expandedKeys"
           @update:value="$emit('update:active', $event)"
           @update:expanded-keys="$emit('update:expandedKeys', $event)"
