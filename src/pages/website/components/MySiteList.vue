@@ -12,6 +12,8 @@ const {
   searchKey,
   showList,
   drawerTitle,
+  sign,
+  chart,
   siteStatusList,
   mySiteList,
   addMySiteFormRules,
@@ -80,7 +82,7 @@ onMounted(async () => {
     y-gap="8"
   >
     <n-gi
-      v-for="{ site, my_site, status, sign } in showList"
+      v-for="{ site, my_site, status, sign_in_today } in showList"
       :key="my_site.id"
       :timestamp="`加入时间: ${my_site.joined.replace('T', ' ')}`"
     >
@@ -257,7 +259,7 @@ onMounted(async () => {
               编辑
             </n-button>
             <n-button
-              v-if="my_site.sign_in && site.func_sign_in && (!sign || !sign.sign_in_today)"
+              v-if="my_site.sign_in && site.func_sign_in && (!sign_in_today || !sign_in_today.sign_in_today)"
               size="small"
               type="primary"
               @click="signSite(my_site.id)"
@@ -265,7 +267,7 @@ onMounted(async () => {
               签到
             </n-button>
             <n-button
-              v-if="sign && sign.sign_in_today" size="small" type="primary"
+              v-if="sign_in_today && sign_in_today.sign_in_today" size="small" type="primary"
               @click="getSignList(my_site.id)"
             >
               签到历史
@@ -289,17 +291,18 @@ onMounted(async () => {
   <!--    /> -->
   <!--  </el-dialog> -->
   <n-drawer
-    :show="eDrawer" class="detail"
-    destroy-on-close
-    direction="btt"
-    size="100%" style="direction: ltr;"
-    @update:show="val => $emit('update:eDrawer', val)"
+    v-model:show="eDrawer"
+    resizable
+    height="100%"
+    placement="top"
   >
-    <template #default>
-      <h4 class="title" style="text-align: center;" v-text="drawerTitle" />
-    </template>
-    <!--    <SignInList v-if="sign" :sign-list="signInList" style="direction: ltr;" /> -->
-    <!--    <ECharts v-if="chart" :my-option="siteHistory" style="width: 95vw;height: 80vh;" /> -->
+    <n-drawer-content closable>
+      <template #header>
+        <h4 class="title" style="text-align: center;" v-text="drawerTitle" />
+      </template>
+      <SignInList v-if="sign" :sign-list="signInList" />
+      <ECharts v-else :my-option="siteHistory" theme="dark" style="width: 95vw;height: 80vh;" />
+    </n-drawer-content>
   </n-drawer>
 </template>
 

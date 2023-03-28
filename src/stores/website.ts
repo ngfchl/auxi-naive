@@ -1,6 +1,6 @@
-import type { DataTableColumns, FormRules } from 'naive-ui'
+import type { DataTableColumns, FormRules, SelectProps } from 'naive-ui'
 import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
-import type { MySite, NewestStatus, WebSite } from '~/api/website'
+import type { MySite, NewestStatus, SiteStatus, WebSite } from '~/api/website'
 import {
   $getHistoryList,
   $getMySite,
@@ -14,9 +14,10 @@ import {
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+import MySiteForm from '~/pages/website/components/MySiteForm.vue'
 
 export const useWebsiteStore = defineStore('website', () => {
-  const { message } = useGlobalConfig()
+  const { message, dialog } = useGlobalConfig()
   /**
      * 搜索字符串
      */
@@ -158,7 +159,7 @@ export const useWebsiteStore = defineStore('website', () => {
       align: 'center',
     },
   ])
-  const mySite = reactive<MySite>({
+  const mySite = ref<MySite>({
     id: 0,
     site: 0,
     nickname: '',
@@ -169,13 +170,12 @@ export const useWebsiteStore = defineStore('website', () => {
     brush_flow: false,
     repeat_torrents: false,
     hr: false,
-    search: true,
+    search: false,
     user_id: '',
     joined: '2023-01-01 12:00:00',
     user_agent: window.navigator.userAgent,
     cookie: '',
   })
-
   const addMySiteFormRules = reactive<FormRules>({
     site: [
       { required: true, message: '请选择要添加的站点', trigger: 'change' },
@@ -195,20 +195,14 @@ export const useWebsiteStore = defineStore('website', () => {
      * 是否打开编辑页
      */
   const showAddMySite = ref(false)
-
-  /**
-     * 编辑页名称
-     */
-  const title = ref('添加站点')
-
   const siteList = ref<WebSite[]>([])
   const mySiteList = ref<MySite[]>([])
   const showList = ref<NewestStatus[]>([])
   const siteStatusList = ref<NewestStatus[]>([])
   const mySiteForm = ref<MySite>(mySite)
-  const siteInfoList = ref([])
+  const siteInfoList = ref<SelectProps[]>([])
   const signInList = ref([])
-  const siteHistory = ref([])
+  const siteHistory = ref()
 
   const getMySiteList = async () => {
     mySiteList.value = await $mySiteList()
@@ -244,29 +238,59 @@ export const useWebsiteStore = defineStore('website', () => {
      * @param id
      */
   const editMysite = async (id: number) => {
-    siteInfoList.value = await $siteInfoNewList()
-    mySiteForm.value = id === 0 ? mySite : await $getMySite({ mysite_id: id })
-    title.value = id === 0 ? '添加站点' : `编辑站点：${mySiteForm.nickname}`
-    showAddMySite.value = true
+    const siteList = id === 0 ? await $siteInfoNewList() : await $siteList()
+    siteList.forEach((item: WebSite) => {
+      siteInfoList.value.push({
+        value: item.id,
+        label: item.name,
+      })
+    })
+    if (id !== 0)
+      mySite.value = await $getMySite({ mysite_id: id })
+    dialog?.info({
+      title: id === 0 ? '添加站点' : `编辑站点：${mySiteForm.value.nickname}`,
+      content: () => h(
+        MySiteForm,
+        {
+          mySite,
+          siteInfoList,
+          addMySiteFormRules,
+        }),
+      closable: true,
+      onClose: () => dialog.destroyAll(),
+    })
+  }
+  const replaceSiteInfo = (site_id: number, siteInfo: SiteStatus) => {
+    const index = siteStatusList.value.findIndex((item) => {
+      return item.my_site.id === site_id
+    })
+    const item = siteStatusList.value[index]
+    item.status = siteInfo
+    siteStatusList.value.splice(index, 1, item)
   }
   /**
      * 签到
      */
   const signSite = async (site_id: number) => {
-    const flag = await $signSite(site_id)
-    if (flag)
+    const data = await $signSite(site_id)
+    if (data)
       await initData()
+      // replaceSiteInfo(site_id, flag)
+  }
+  const getSite = (site_id: number) => {
+    return siteStatusList.value.find((item) => {
+      return item.my_site.id === site_id
+    })
   }
 
   /**
      * 获取签到列表
      */
   const getSignList = async (site_id: number) => {
-    signInList.value = await $getSignList({ site_id, page: 1, limit: 5 })
-    const item = siteStatusList.value.find((item) => {
-      return item.my_site.id === site_id
-    })
-    drawerTitle.value = `${item.my_site.nickname}  签到信息`
+    const sign_list_res = await $getSignList({ site_id, page: 1, limit: 5 })
+    signInList.value = sign_list_res.items
+    const item = getSite(site_id)
+    drawerTitle.value = `${item?.my_site.nickname}  签到信息`
     sign.value = true
     eDrawer.value = true
   }
@@ -274,9 +298,10 @@ export const useWebsiteStore = defineStore('website', () => {
      * 更新站点数据
      */
   const refreshSite = async (site_id: number) => {
-    const flag = await $refreshSite(site_id)
-    if (flag)
-      await initData()
+    const data = await $refreshSite(site_id)
+    if (data)
+      // await initData()
+      replaceSiteInfo(site_id, data)
   }
 
   /**
@@ -284,9 +309,10 @@ export const useWebsiteStore = defineStore('website', () => {
      */
   const siteEChart = async (site_id: number) => {
     const res = await $getHistoryList({ site_id })
-    siteHistory.value = {}
+    const item = getSite(site_id)
+    drawerTitle.value = `${item?.my_site.nickname}  历史数据`
     siteHistory.value = await $parseSiteHistory(res)
-    chart.value = true
+    sign.value = false
     eDrawer.value = true
   }
 
@@ -306,6 +332,7 @@ export const useWebsiteStore = defineStore('website', () => {
   }
   return {
     eDrawer,
+    drawerTitle,
     addMySiteFormRules,
     mySite,
     columns,
@@ -317,6 +344,8 @@ export const useWebsiteStore = defineStore('website', () => {
     mySiteForm,
     siteInfoList,
     searchKey,
+    sign,
+    chart,
     signInList,
     siteHistory,
     getMySiteList,

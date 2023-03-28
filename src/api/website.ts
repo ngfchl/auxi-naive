@@ -90,6 +90,17 @@ export interface SignInfo {
   updated: string
 }
 
+export interface SignInParams {
+  site_id: number
+  page: number
+  limit: number
+}
+export interface SiteInfoPage {
+  per_page: number
+  total: number
+  items: SignInfo[]
+}
+
 export interface NewestStatus {
   my_site: MySite
   site: WebSite
@@ -132,7 +143,7 @@ export const $torrentList = async () => {
 /**
  * 获取未添加站点列表
  */
-export const $siteInfoNewList = async () => {
+export const $siteInfoNewList: () => Promise<any> = async () => {
   return await getList<null, WebSite>('website/website/new')
 }
 
@@ -154,8 +165,8 @@ export const $siteList: () => Promise<any> = async () => {
  * 获取单个站点信息
  * @param params
  */
-export const $getMySite = async (params: number) => {
-  return await getList<Number, MySite>('mysite/mysite/get', params)
+export const $getMySite: (params: object) => Promise<any> = async (params: object) => {
+  return await getList<object, MySite>('mysite/mysite/get', params)
 }
 /**
  * 删除单个站点信息
@@ -209,7 +220,8 @@ export const $saveMySite = async (params: MySite) => {
  * @param site_id
  */
 export const $signSite = async (site_id: number) => {
-  const { msg, code } = await usePost('mysite/signin', { site_id })
+  const response = await usePost('mysite/signin', { site_id })
+  const { code, msg } = response
   switch (code) {
     case 0:
       message?.success(msg)
@@ -225,11 +237,11 @@ export const $signSite = async (site_id: number) => {
  * @param site_id
  */
 export const $refreshSite = async (site_id: number) => {
-  const { msg, code } = await usePost('mysite/status', { site_id })
+  const { msg, code, data } = await usePost('mysite/status', { site_id })
   switch (code) {
     case 0:
       message?.success(msg)
-      return true
+      return data
     default:
       message?.error(msg)
       return false
@@ -240,16 +252,16 @@ export const $refreshSite = async (site_id: number) => {
  * 获取站点签到信息列表
  * @param params
  */
-export const $getSignList = async (params: object) => {
-  return await getList('mysite/signin', params)
+export const $getSignList: (params: SignInParams) => Promise<any> = async (params: SignInParams) => {
+  return await getList<SignInParams, SiteInfoPage>('mysite/signin', params)
 }
 
 /**
  * 获取站点历史数据
  * @param params
  */
-export const $getHistoryList = async (params: object) => {
-  return await getList('mysite/status/chart', params)
+export const $getHistoryList: (params: object) => Promise<any> = async (params: object) => {
+  return await getList<object, SiteHistoryList>('mysite/status/chart', params)
 }
 
 /**
