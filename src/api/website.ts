@@ -104,7 +104,7 @@ export interface SiteInfoPage {
 export interface NewestStatus {
   my_site: MySite
   site: WebSite
-  sign_in_today: SignInfo
+  sign: SignInfo
   status: SiteStatus
   level: UserLevelRule
   next_level: UserLevelRule
@@ -221,17 +221,28 @@ export const $saveMySite = async (params: MySite) => {
  */
 export const $signSite = async (site_id: number) => {
   const response = await usePost('mysite/signin', { site_id })
-  const { code, msg } = response
+  const { code, msg, data } = response
   switch (code) {
     case 0:
       message?.success(msg)
-      return true
+      return data
     default:
       message?.error(msg)
       return false
   }
 }
-
+export const $getNewestStatus = async (site_id: number) => {
+  const response = await usePost('mysite/status/get', { site_id })
+  const { code, msg, data } = response
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return data
+    default:
+      message?.error(msg)
+      return false
+  }
+}
 /**
  * 刷新
  * @param site_id
