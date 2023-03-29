@@ -1,9 +1,50 @@
 <script setup lang="ts">
+import type { RowData } from 'naive-ui/es/data-table/src/interface'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
+const taskStore = useTaskStore()
+const {
+  columns,
+  taskList,
+  scheduleList,
+} = storeToRefs(taskStore)
+const {
+  getTaskList,
+  getScheduleList,
+  editSchedule,
+} = taskStore
+const rowKey = (row: RowData) => row.task
+onBeforeMount(async () => {
+  await getScheduleList()
+})
 </script>
 
 <template>
-  计划任务
+  <n-space class="mb-2 flex items-center">
+    <n-button
+      type="warning"
+      size="small"
+      class="flex items-center"
+      @click="getScheduleList"
+    >
+      <MenuIcon icon="RefreshSharp" />
+    </n-button>
+    <n-button
+      size="small"
+      type="success"
+      @click="editSchedule(0)"
+    >
+      添加
+    </n-button>
+  </n-space>
+  <n-data-table
+    :columns="columns"
+    :data="scheduleList"
+    :row-key="rowKey"
+    size="small"
+    bordered
+    striped
+  />
 </template>
 
 <style scoped>
