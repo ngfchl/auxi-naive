@@ -15,6 +15,7 @@ const {
   sign_today,
   signInList,
   siteHistory,
+  siteStatusList,
 } = storeToRefs(websiteStore)
 
 const {
@@ -37,16 +38,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <n-space class="mb-2">
+  <n-space class="mb-2 flex items-center">
     <n-button
       type="warning"
+      size="small"
+      class="flex items-center"
       @click="initData()"
     >
-      <n-icon size="18">
+      {{ siteStatusList.length }}
+      <n-icon size="18" class="ml-1">
         <RefreshSharp />
       </n-icon>
     </n-button>
     <n-button
+      size="small"
       type="success"
       @click="editMysite(0)"
     >
@@ -54,6 +59,7 @@ onMounted(async () => {
     </n-button>
     <n-input
       v-model:value="searchKey"
+      size="small"
       :input-props="{ autocomplete: 'off' }"
       clearable
       placeholder="名称昵称网址等"
@@ -78,7 +84,7 @@ onMounted(async () => {
       :key="my_site.id"
       :timestamp="`加入时间: ${my_site.joined.replace('T', ' ')}`"
     >
-      <n-card>
+      <n-card hoverable embedded>
         <template #header>
           <div class="text-13px">
             <span class="text-16px flex items-center justify-between">
@@ -105,7 +111,7 @@ onMounted(async () => {
                   <MenuIcon icon="ReloadSharp" />
                 </n-button>
                 <n-button size="small" ghost type="info" @click="siteEChart(my_site.id)">
-                  历史
+                  数据
                 </n-button>
               </n-space>
             </span>
@@ -278,10 +284,11 @@ onMounted(async () => {
               签到
             </n-button>
             <n-button
-              v-if="sign && sign.sign_in_today" size="small" type="info"
+              v-if="sign && sign.sign_in_today" size="small" type="success" ghost
               @click="getSignList(my_site.id)"
             >
-              签到历史
+              签到
+              <MenuIcon size="20" icon="CheckboxSharp" color="green" />
             </n-button>
           </n-space>
         </template>
