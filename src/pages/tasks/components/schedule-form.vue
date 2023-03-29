@@ -22,11 +22,11 @@ const {
     label-position="top"
     status-icon
   >
-    <n-form-item v-if="scheduleForm.id === 0" label="选择站点" path="task">
+    <n-form-item v-if="scheduleForm.id === 0" label="选择任务" path="task">
       <n-select
         v-model:value="scheduleForm.task"
         :disabled="scheduleForm.id !== 0"
-        :placeholder="scheduleForm.id !== 0 ? '' : '请选择要添加的站点'"
+        :placeholder="scheduleForm.id !== 0 ? '' : '请选择要添加的任务'"
         :options="taskSelectList"
         filterable
       />

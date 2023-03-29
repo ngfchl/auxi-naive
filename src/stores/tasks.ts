@@ -69,6 +69,7 @@ export const useTaskStore = defineStore('task', () => {
   })
   const getTaskList = async () => {
     taskList.value = await $taskList()
+    taskSelectList.value.length = 1
     taskList.value?.forEach((item) => {
       taskSelectList.value.push({
         label: item.desc,
