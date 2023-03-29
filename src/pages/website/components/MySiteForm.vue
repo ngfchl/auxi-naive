@@ -1,25 +1,15 @@
 <script lang="ts" setup>
-import type { FormInst } from 'naive-ui'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
 const websiteStore = useWebsiteStore()
 const { refMySiteForm, mySiteForm, siteInfoList, addMySiteFormRules } = storeToRefs(websiteStore)
 const { saveMySite, removeMySite } = websiteStore
-
-/**
- * 重置表单
- * @param formEl
- */
-const resetForm = (formEl: FormInst | undefined) => {
-  if (!formEl) return
-  formEl()
-}
 </script>
 
 <template>
   <div>
     <n-form
-      ref="refMySiteForm"
+      :ref="refMySiteForm"
       :model="mySiteForm"
       :rules="addMySiteFormRules"
       class="site-form"
@@ -183,7 +173,7 @@ const resetForm = (formEl: FormInst | undefined) => {
       </n-form-item>
     </n-form>
     <n-divider />
-    <n-space :gutter="20" class="dialog-footer" justify="center">
+    <n-space justify="center">
       <n-popconfirm
         v-if="mySiteForm.id !== 0"
         @positive-click="removeMySite(mySiteForm.id)"
@@ -198,10 +188,6 @@ const resetForm = (formEl: FormInst | undefined) => {
 
       <n-button type="primary" @click="saveMySite">
         保存
-      </n-button>
-
-      <n-button @click="resetForm(refMySiteForm)">
-        重 置
       </n-button>
     </n-space>
   </div>
