@@ -74,8 +74,8 @@ onMounted(async () => {
   </n-space>
 
   <n-grid
-    cols="sm:1 m:2 l:3 xl:4 2xl:6"
-    responsive="screen"
+    cols="400:1 600:2 900:3 1200:4"
+    responsive="self"
     x-gap="12"
     y-gap="8"
   >
