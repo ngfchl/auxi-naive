@@ -311,12 +311,6 @@ export const useWebsiteStore = defineStore('website',
       }
     }
 
-    const removeMySite = async (mysite_id: number) => {
-      const flag = await $removeMySite({ mysite_id })
-      if (flag)
-        await updateMySiteStatus(mySiteForm.value.id)
-    }
-
     /**
        * 签到
        */
@@ -330,7 +324,20 @@ export const useWebsiteStore = defineStore('website',
         return item.my_site.id === site_id
       })
     }
+    const deleteSite = (site_id: number) => {
+      const index = siteStatusList.value.findIndex((item) => {
+        return item.my_site.id === site_id
+      })
+      siteStatusList.value.splice(index, 1)
+    }
 
+    const removeMySite = async (site_id: number) => {
+      const flag = await $removeMySite({ site_id })
+      if (flag) {
+        deleteSite(site_id)
+        dialog?.destroyAll()
+      }
+    }
     /**
        * 获取签到列表
        */
