@@ -83,7 +83,7 @@ export const generateRoute = async () => {
       component: 'RouteView',
       redirect: '/website/website',
       title: 'pages.site.title',
-      icon: 'Speedometer',
+      icon: 'LogoChrome',
       keepAlive: true,
     }, {
       id: 4,
@@ -92,7 +92,7 @@ export const generateRoute = async () => {
       name: 'mysite',
       component: 'MySite',
       title: 'pages.site.mysite.title',
-      icon: 'Speedometer',
+      icon: 'PlanetSharp',
       keepAlive: true,
     }, {
       id: 18,
@@ -101,7 +101,7 @@ export const generateRoute = async () => {
       name: 'website',
       component: 'Website',
       title: 'pages.site.website.title',
-      icon: 'Speedometer',
+      icon: 'AtCircleSharp',
       keepAlive: true,
     },
     {
@@ -111,7 +111,7 @@ export const generateRoute = async () => {
       name: 'torrent',
       component: 'WebsiteTorrents',
       title: 'pages.site.torrent.title',
-      icon: 'Speedometer',
+      icon: 'MagnetSharp',
       keepAlive: true,
     },
     {
@@ -122,7 +122,7 @@ export const generateRoute = async () => {
       component: 'RouteView',
       redirect: '/download/downloader',
       title: 'pages.download.title',
-      icon: 'Speedometer',
+      icon: 'CloudDownloadSharp',
       keepAlive: true,
     },
     {
@@ -132,7 +132,7 @@ export const generateRoute = async () => {
       name: 'downloader',
       component: 'Downloader',
       title: 'pages.download.downloader.title',
-      icon: 'Speedometer',
+      icon: 'LogoMarkdown',
       keepAlive: true,
     },
     {
@@ -142,7 +142,7 @@ export const generateRoute = async () => {
       name: 'repeat',
       component: 'DownloadRepeat',
       title: 'pages.download.repeat.title',
-      icon: 'Speedometer',
+      icon: 'Copy',
       keepAlive: true,
     },
     {
@@ -152,7 +152,7 @@ export const generateRoute = async () => {
       name: 'brush',
       component: 'DownloadBrush',
       title: 'pages.download.brush.title',
-      icon: 'Speedometer',
+      icon: 'BrushSharp',
       keepAlive: true,
     },
     {
@@ -162,7 +162,7 @@ export const generateRoute = async () => {
       name: 'tasks',
       component: 'Tasks',
       title: 'pages.tasks.title',
-      icon: 'Speedometer',
+      icon: 'DocumentTextSharp',
       keepAlive: true,
     },
     {
@@ -173,7 +173,7 @@ export const generateRoute = async () => {
       component: 'RouteView',
       redirect: '/settings/system',
       title: 'pages.settings.title',
-      icon: 'Speedometer',
+      icon: 'SettingsSharp',
       keepAlive: true,
     },
     {
@@ -183,7 +183,7 @@ export const generateRoute = async () => {
       name: 'system',
       component: 'SystemSetting',
       title: 'pages.settings.system.title',
-      icon: 'Speedometer',
+      icon: 'CogSharp',
       keepAlive: true,
     },
     {
@@ -193,7 +193,7 @@ export const generateRoute = async () => {
       name: 'hosts',
       component: 'HostsSetting',
       title: 'pages.settings.hosts.title',
-      icon: 'Speedometer',
+      icon: 'LogoWebComponent',
       keepAlive: true,
     },
     {
@@ -203,7 +203,7 @@ export const generateRoute = async () => {
       name: 'supervisor',
       component: 'SupervisorSetting',
       title: 'pages.settings.supervisor.title',
-      icon: 'Speedometer',
+      icon: 'Apps',
       keepAlive: true,
     },
     {
@@ -214,7 +214,7 @@ export const generateRoute = async () => {
       component: 'RouteView',
       redirect: '/tools/logs',
       title: 'pages.tools.title',
-      icon: 'Speedometer',
+      icon: 'Construct',
       keepAlive: true,
     },
     {
@@ -224,7 +224,7 @@ export const generateRoute = async () => {
       name: 'logs',
       component: 'LogsTool',
       title: 'pages.tools.logs.title',
-      icon: 'Speedometer',
+      icon: 'ListSharp',
       keepAlive: true,
     },
     {
@@ -234,7 +234,7 @@ export const generateRoute = async () => {
       name: 'shell',
       component: 'ShellTool',
       title: 'pages.tools.shell.title',
-      icon: 'Speedometer',
+      icon: 'CodeSlashSharp',
       keepAlive: true,
     },
     {
@@ -244,7 +244,7 @@ export const generateRoute = async () => {
       name: 'import',
       component: 'ImportTool',
       title: 'pages.tools.import.title',
-      icon: 'Speedometer',
+      icon: 'LogInSharp',
       keepAlive: true,
     },
   ]
