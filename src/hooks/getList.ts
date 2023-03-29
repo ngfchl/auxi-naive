@@ -22,12 +22,7 @@ export const getList = async <P = any, T = any>(url: string, params?: P) => {
     return false
   }
   else {
-    message?.success(
-      msg,
-      {
-        keepAliveOnHover: true,
-      },
-    )
+    if (msg.length > 0) message?.success(msg, { keepAliveOnHover: true })
     return data
   }
 }
