@@ -221,22 +221,22 @@ export const $saveMySite = async (params: MySite) => {
  */
 export const $signSite = async (site_id: number) => {
   const response = await usePost('mysite/signin', { site_id })
-  const { code, msg, data } = response
+  const { code, msg } = response
   switch (code) {
     case 0:
       message?.success(msg)
-      return data
+      return true
     default:
       message?.error(msg)
       return false
   }
 }
-export const $getNewestStatus = async (site_id: number) => {
+export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_id: number) => {
   const response = await usePost('mysite/status/get', { site_id })
   const { code, msg, data } = response
   switch (code) {
     case 0:
-      message?.success(msg)
+      if (msg.length > 0) message?.success(msg)
       return data
     default:
       message?.error(msg)

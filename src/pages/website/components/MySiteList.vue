@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, Man, NotificationsCircleSharp, RefreshSharp, SearchSharp, ShareSharp, SwapVerticalSharp, WarningSharp } from '@vicons/ionicons5'
 import renderSize from '../../../hooks/renderSize'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useWebsiteStore } from '~/stores/website'
 import SignInList from '~/pages/website/components/SignInList.vue'
 import numberFormat from '~/hooks/numberFormat'
@@ -24,6 +25,7 @@ const {
   signSite,
   getSignList,
   refreshSite,
+  updateMySiteStatus,
 } = websiteStore
 
 /**
@@ -85,20 +87,34 @@ onMounted(async () => {
                 tag="a"
                 :href="site.url"
                 target="_blank"
-                type="error"
+                type="primary"
               >
-                <img :src="site.logo" class="w-15px mr-1" alt="">
+                <img :src="site.logo" class="w-14px mr-1" alt="">
                 {{ my_site.nickname }}
-                <small class="ml-2" v-text="site.tags" />
+                <n-tag
+                  v-for="tag in site.tags.split(',')" :key="tag"
+                  size="small" type="error" :bordered="false"
+                  class="ml-2 text-#3b5769"
+                >
+                  {{ tag }}
+                </n-tag>
 
               </n-button>
-              <n-button size="small" ghost type="info" @click="siteEChart(my_site.id)">
-                历史
-              </n-button>
+              <n-space>
+                <n-button size="small" ghost type="primary" @click="updateMySiteStatus(my_site.id)">
+                  <MenuIcon icon="ReloadSharp" />
+                </n-button>
+                <n-button size="small" ghost type="info" @click="siteEChart(my_site.id)">
+                  历史
+                </n-button>
+              </n-space>
             </span>
 
             <div class="flex items-center">
-              <span class="text-red-500 mr-2 flex items-center">
+              <span
+                v-if="status.my_level.length > 0"
+                class="text-red-500 mr-2 flex items-center"
+              >
                 <n-ellipsis>
                   <n-icon>
                     <Man />
@@ -107,27 +123,29 @@ onMounted(async () => {
                 </n-ellipsis>
               </span>
               <span class="text-blue-500 mr-2 flex items-center">
-                <n-icon><CardSharp /></n-icon>
-                <n-ellipsis>
+                <n-ellipsis
+                  v-if="status.invitation > 0"
+                  class="ml-1 flex items-center"
+                >
+                  <n-icon><CardSharp /></n-icon>
                   {{ status.invitation }}
                 </n-ellipsis>
+
                 <!--            <i :title="'加入时间：' + my_site.time_join" class="n-icon-date" -->
                 <!--               style="color: darkgreen" -->
                 <!--               v-text="' ' + site.weeks"></i> -->
                 <!--            <br v-if="status.my_hr !== 0 || status.mail > 0"> -->
 
-                <span
-                  v-if="status.my_hr !== 0"
+                <n-ellipsis
+                  v-if="String(status.my_hr).length > 0 && Number(status.my_hr) > 0"
                   class="ml-2 flex items-center"
                   style="color: orangered"
                   title="H&R"
                 >
-                  <n-ellipsis>
-                    <n-icon><WarningSharp /></n-icon>
-                    {{ status.my_hr }}
-                  </n-ellipsis>
+                  <n-icon><WarningSharp /></n-icon>
+                  {{ status.my_hr }}
+                </n-ellipsis>
 
-                </span>
                 <n-button
                   v-if="status.mail > 0"
                   :href="site.url + site.page_message"
@@ -144,35 +162,37 @@ onMounted(async () => {
         <template #default>
           <div v-if="status.updated_at">
             <div class="flex items-center justify-between">
-              <span class="float-left text-#3b5769 font-bold">保种分享：</span>
-              <div style="float: right">
-                <n-icon>
+              <span class="text-#3b5769 font-bold">保种分享：</span>
+              <div class="flex items-center">
+                <n-icon class="mr-1">
                   <Cloudy />
                 </n-icon>
-                {{ renderSize(status.seed_volume) }}
-                <n-icon>
+                <span>{{ renderSize(status.seed_volume) }}</span>
+
+                <n-icon class="ml-2 mr-1">
                   <ShareSharp />
                 </n-icon>
-                <span class="n-icon-share" style="color: saddlebrown" title="分享率">
+                <span style="color: saddlebrown" title="分享率">
                   {{ status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞' }}
                 </span>
               </div>
             </div>
             <n-divider />
             <div class="flex items-center justify-between">
-              <span style="float: left;font-weight: bold;color: #3b5769;line-height: 36px">实时数据：</span>
-              <span style="text-align: right;float: right">
-                <span style="color: green" title="做种数量" v-text="status.seed" />
-                <span>
-                  <n-icon><SwapVerticalSharp /></n-icon>
+              <span style="font-weight: bold;color: #3b5769;line-height: 36px">实时数据：</span>
+              <span style="text-align: right;" class="items-center">
+
+                <span style="color: green" title="做种数量">
+                  {{ status.seed }}
                 </span>
+                <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
                 <span style="color: indianred" title="正在下载" v-text="status.leech" />
-                <br>
+                <n-divider />
                 <span
                   style="color: green" title="上传量"
                   v-text="renderSize(status.uploaded)"
                 />
-                <n-icon><SwapVerticalSharp /></n-icon>
+                <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
                 <span
                   style="color: indianred" title="下载量"
                   v-text="renderSize(status.downloaded)"
@@ -181,7 +201,7 @@ onMounted(async () => {
             </div>
             <n-divider />
             <div class="flex items-center justify-between">
-              <span style="float: left;line-height: 36px;font-weight: bold;color: #3b5769;">魔力/积分：</span>
+              <span style="font-weight: bold;color: #3b5769;">魔力/积分：</span>
               <div class="text-right">
                 <n-icon>
                   <ColorWandOutline />
@@ -192,13 +212,14 @@ onMounted(async () => {
                   <span v-text="` ${numberFormat(status.my_bonus)}`" />
                   <span v-if="status.my_score !== 0" v-text="` / ${numberFormat(status.my_score)}`" />
                 </span>
-                <br>
+                <n-divider />
                 <n-icon>
                   <ColorWandSharp />
                 </n-icon>
                 <i
                   v-if="status.bonus_hour !== 0"
                   style="color: coral"
+                  class="ml-1"
                   title="时魔"
                   v-text="`${status.bonus_hour.toFixed(2)} / ${(status.bonus_hour / site.sp_full * 100).toFixed(2)}%`"
                 />
@@ -221,7 +242,7 @@ onMounted(async () => {
         <template #action>
           <n-space class="mt--10px mb--10px">
             <n-button
-              v-if="my_site.get_info && site.func_get_userinfo" size="small" type="success"
+              v-if="my_site.get_info && site.func_get_userinfo" size="small" type="primary"
               @click="refreshSite(my_site.id)"
             >
               刷新
@@ -257,7 +278,7 @@ onMounted(async () => {
               签到
             </n-button>
             <n-button
-              v-if="sign && sign.sign_in_today" size="small" type="primary"
+              v-if="sign && sign.sign_in_today" size="small" type="info"
               @click="getSignList(my_site.id)"
             >
               签到历史

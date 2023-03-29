@@ -1,10 +1,10 @@
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
-import type { MySite, NewestStatus, SignInfo, SiteStatus, WebSite } from '~/api/website'
+import type { MySite, NewestStatus, SiteStatus, WebSite } from '~/api/website'
 import {
   $editMySite,
   $getHistoryList,
-  $getMySite,
+  $getMySite, $getNewestStatus,
   $getSignList,
   $mySiteList,
   $parseSiteHistory,
@@ -261,31 +261,24 @@ export const useWebsiteStore = defineStore('website',
       siteStatusList.value = await $siteStatusNewestList()
       await siteSearch()
     }
-    const getSiteItemIndex = (
+
+    /**
+       * 更新数据后替换站点数据
+       * @param site_id
+       */
+    const updateMySiteStatus = async (
       site_id: number,
     ) => {
       const index = siteStatusList.value.findIndex((item: NewestStatus) => {
         return item.my_site.id === site_id
       })
-      const item = siteStatusList.value[index]
+
+      const item = await $getNewestStatus(site_id)
+      siteStatusList.value.splice(index, 1, item)
       return {
-        item, index,
+        item,
+        index,
       }
-    }
-    const updateMySite = (my_site_id: number, my_site: MySite) => {
-      const { item, index } = getSiteItemIndex(my_site_id)
-      item.my_site = my_site
-      siteStatusList.value.splice(index, 1, item)
-    }
-    const updateStatus = (my_site_id: number, status: SiteStatus) => {
-      const { item, index } = getSiteItemIndex(my_site_id)
-      item.status = status
-      siteStatusList.value.splice(index, 1, item)
-    }
-    const updateSignInfo = (my_site_id: number, signInfo: SignInfo) => {
-      const { item, index } = getSiteItemIndex(my_site_id)
-      item.sign = signInfo
-      siteStatusList.value.splice(index, 1, item)
     }
 
     /**
@@ -312,8 +305,7 @@ export const useWebsiteStore = defineStore('website',
       await refMySiteForm.value?.validate()
       const flag = mySiteForm.value.id === 0 ? await $saveMySite(mySiteForm.value) : await $editMySite(mySiteForm.value)
       if (flag) {
-        const my_site = await $getMySite({ mysite_id: mySiteForm.value.id })
-        if (my_site) updateMySite(mySiteForm.value.id, my_site)
+        await updateMySiteStatus(mySiteForm.value.id)
         mySiteForm.value = mySite
         dialog?.destroyAll()
       }
@@ -321,19 +313,17 @@ export const useWebsiteStore = defineStore('website',
 
     const removeMySite = async (mysite_id: number) => {
       const flag = await $removeMySite({ mysite_id })
-      if (flag) {
-        const { index } = getSiteItemIndex(mysite_id)
-        siteStatusList.value.splice(index, 1)
-      }
+      if (flag)
+        await updateMySiteStatus(mySiteForm.value.id)
     }
 
     /**
        * 签到
        */
     const signSite = async (site_id: number) => {
-      const data: SignInfo = await $signSite(site_id)
-      if (data)
-        updateSignInfo(site_id, data)
+      const flag = await $signSite(site_id)
+      if (flag)
+        await updateMySiteStatus(mySiteForm.value.id)
     }
     const getSite = (site_id: number) => {
       return siteStatusList.value.find((item) => {
@@ -361,7 +351,7 @@ export const useWebsiteStore = defineStore('website',
        */
     const refreshSite = async (site_id: number) => {
       const data: SiteStatus = await $refreshSite(site_id)
-      if (data) updateStatus(site_id, data)
+      if (data) await updateMySiteStatus(site_id)
     }
 
     /**
@@ -420,5 +410,6 @@ export const useWebsiteStore = defineStore('website',
       getSignList,
       refreshSite,
       closeEditForm,
+      updateMySiteStatus,
     }
   })

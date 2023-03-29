@@ -27,10 +27,6 @@ const resetForm = (formEl: FormInst | undefined) => {
       label-position="top"
       status-icon
     >
-      <n-input
-        v-show="false"
-        v-model:value="mySiteForm.id"
-      />
       <n-form-item v-if="mySiteForm.id === 0" label="选择站点" path="site">
         <n-select
           v-model:value="mySiteForm.site"
