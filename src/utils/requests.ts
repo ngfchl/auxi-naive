@@ -112,11 +112,11 @@ const usePut = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestCo
   })
 }
 
-const useDelete = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestConfig): Promise< ResponseBody<R>> => {
+const useDelete = <P = any, R = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise< ResponseBody<R>> => {
   return instance.request({
     url,
     method: 'DELETE',
-    data,
+    params,
     ...config,
   })
 }
