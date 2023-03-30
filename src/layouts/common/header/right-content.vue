@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import type { DropdownOption } from 'naive-ui'
-import type { Component } from 'vue'
-import { AccessibilitySharp, LogOutSharp, SettingsSharp } from '@vicons/ionicons5'
-import type { VNodeChild } from '@vue/runtime-core'
-import { NIcon } from 'naive-ui'
 import SelectLang from './select-lang.vue'
 import SelectUser from '~/layouts/common/header/select-user.vue'
 import Notify from '~/layouts/common/notify/notify.vue'
@@ -11,32 +6,8 @@ import Notify from '~/layouts/common/notify/notify.vue'
 const appStore = useAppStore()
 const appLocale = useAppLocale()
 const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 
-const { t } = useI18n()
-const renderIcon = (icon: Component): VNodeChild => h(NIcon, null, {
-  default: () => h(icon),
-})
-const userOptions = ref<DropdownOption[]>([
-  {
-    label: () => t('global.layout.header.right.user.center'),
-    key: 'user-center',
-    icon: () => renderIcon(AccessibilitySharp),
-  },
-  {
-    label: () => t('global.layout.header.right.user.setting'),
-    key: 'user-setting',
-    icon: () => renderIcon(SettingsSharp),
-  },
-  {
-    key: 'header-divider',
-    type: 'divider',
-  },
-  {
-    label: () => t('global.layout.header.right.logout'),
-    icon: () => renderIcon(LogOutSharp),
-    key: 'logout',
-  },
-])
 const handleSelect = (value: string) => {
   if (value === 'logout')
     userStore.logout()
@@ -45,9 +16,17 @@ const handleSelect = (value: string) => {
 
 <template>
   <n-space class="flex justify-center items-baseline h-30px">
-    <SelectLang v-model:value="appLocale" class="py--3px mt-2px" :options="appStore.localeOptions" />
+    <SelectLang
+      v-model:value="appLocale"
+      class="py--3px mt-2px"
+      :options="appStore.localeOptions"
+    />
     <Notify />
-    <SelectUser :options="userOptions" @select="handleSelect" />
+    <SelectUser
+      :options="appStore.userOptions"
+      :nickname="userInfo.user"
+      @select="handleSelect"
+    />
   </n-space>
 </template>
 

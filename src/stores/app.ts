@@ -1,4 +1,8 @@
+import { AccessibilitySharp, LogOutSharp, SettingsSharp } from '@vicons/ionicons5'
+import type { VNodeChild } from '@vue/runtime-core'
+import { NIcon } from 'naive-ui'
 import type { DropdownOption } from 'naive-ui'
+import type { Component } from 'vue'
 import { darkTheme } from '~/config/dark-theme'
 import type { LayoutTheme } from '~/config/layout-theme'
 // import { layoutThemeConfig } from '~/config/layout-theme'
@@ -10,6 +14,8 @@ export const useAppStore = defineStore('app', () => {
   const defaultTheme = useLayoutTheme()
   const layout = reactive(unref(defaultTheme))
   const visible = ref(false)
+  const { t } = useI18n()
+
   const toggleVisible = (value: boolean) => {
     visible.value = value
   }
@@ -50,7 +56,9 @@ export const useAppStore = defineStore('app', () => {
     }
     return list
   })
-
+  const renderIcon = (icon: Component): VNodeChild => h(NIcon, null, {
+    default: () => h(icon),
+  })
   const localeOptions = ref<DropdownOption[]>([
     {
       label: '简体中文',
@@ -63,9 +71,31 @@ export const useAppStore = defineStore('app', () => {
       icon: () => '🇺🇸',
     },
   ])
+  const userOptions = ref<DropdownOption[]>([
+    {
+      label: () => t('global.layout.header.right.user.center'),
+      key: 'user-center',
+      icon: () => renderIcon(AccessibilitySharp),
+    },
+    {
+      label: () => t('global.layout.header.right.user.setting'),
+      key: 'user-setting',
+      icon: () => renderIcon(SettingsSharp),
+    },
+    {
+      key: 'header-divider',
+      type: 'divider',
+    },
+    {
+      label: () => t('global.layout.header.right.logout'),
+      icon: () => renderIcon(LogOutSharp),
+      key: 'logout',
+    },
+  ])
   return {
     layout,
     visible,
+    userOptions,
     toggleVisible,
     toggleCollapsed,
     layoutTheme,
