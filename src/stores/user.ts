@@ -36,6 +36,13 @@ export const useUserStore = defineStore('user', () => {
   const userLogin = async (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
     const res = await userLoginApi(params)
     if (res) {
+      message?.success(
+        `登录成功！欢迎用户 ${res?.user}，玩得愉快！`,
+        {
+          duration: 3000,
+          keepAliveOnHover: true,
+        },
+      )
       setToken(res.auth_token)
       return true
     }

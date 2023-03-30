@@ -1,3 +1,4 @@
+import { useGlobalConfig } from '~/composables/gobal-config'
 import type { IncludeNull } from '~/utils/types'
 
 export interface UserInfo {
@@ -37,22 +38,39 @@ export interface UserMobileLoginParams {
 }
 export interface UserLoginResult {
   token: IncludeNull<string>
+  user: string
 }
+
+const { message } = useGlobalConfig()
 export const loginUrl = 'config/login'
 /**
  * 登录接口
  * @param params
  */
-export const userLoginApi = (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
-  return usePost<UserAccountLoginParams | UserMobileLoginParams, UserLoginResult>(loginUrl, params)
+export const userLoginApi = async (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
+  const { code, msg, data } = await usePost<UserAccountLoginParams | UserMobileLoginParams, UserLoginResult>(loginUrl, params)
+  switch (code) {
+    case 0:
+      return data
+    default:
+      message?.warning(msg)
+      return false
+  }
 }
 
 export const userGetInfoUrl = 'config/userinfo'
 /**
  * 获取用户信息接口
  */
-export const userGetInfoApi: () => any = () => {
-  return useGet<any, UserInfo>(userGetInfoUrl)
+export const userGetInfoApi = async () => {
+  const { code, msg, data } = await useGet<any, UserInfo>(userGetInfoUrl)
+  switch (code) {
+    case 0:
+      return data
+    default:
+      message?.warning(msg)
+      return false
+  }
 }
 
 const userMenuUrl = 'user/menus'
