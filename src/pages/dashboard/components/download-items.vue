@@ -41,7 +41,7 @@ withDefaults(defineProps<{
   >
     <div style="text-align: center">
       <n-button-group vertical size="small" class="mt-5">
-        <n-button secondary type="success" width="120">
+        <n-button round secondary type="success" width="120">
           <template #icon>
             <n-icon>
               <ArrowUpSharp />
@@ -49,7 +49,7 @@ withDefaults(defineProps<{
           </template>
           {{ renderSize(speed.up_info_speed) }}
         </n-button>
-        <n-button secondary type="warning" class="min-width-120px">
+        <n-button round secondary type="warning" class="min-width-120px">
           <template #icon>
             <n-icon>
               <ArrowDownSharp />
