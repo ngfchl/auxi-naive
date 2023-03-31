@@ -119,21 +119,21 @@ onMounted(async () => {
             <div class="flex items-center">
               <span
                 v-if="status.my_level.length > 0"
-                class="text-red-500 mr-2 flex items-center"
+                class="text-red-500 text-15px mr-2 flex items-center"
               >
+                <n-icon size="13">
+                  <Man />
+                </n-icon>
                 <n-ellipsis>
-                  <n-icon>
-                    <Man />
-                  </n-icon>
                   {{ status.my_level }}
                 </n-ellipsis>
               </span>
               <span class="text-blue-500 mr-2 flex items-center">
                 <n-ellipsis
                   v-if="status.invitation > 0"
-                  class="ml-1 flex items-center"
+                  class="ml-1 flex items-center text-15px"
                 >
-                  <n-icon><CardSharp /></n-icon>
+                  <n-icon size="13"><CardSharp /></n-icon>
                   {{ status.invitation }}
                 </n-ellipsis>
 
@@ -145,22 +145,23 @@ onMounted(async () => {
                 <n-ellipsis
                   v-if="String(status.my_hr).length > 0 && Number(status.my_hr) > 0"
                   class="ml-2 flex items-center"
-                  style="color: orangered"
+                  style="color: orangered;font-size: 16px;"
                   title="H&R"
                 >
                   <n-icon><WarningSharp /></n-icon>
                   {{ status.my_hr }}
                 </n-ellipsis>
 
-                <n-button
+                <n-ellipsis
                   v-if="status.mail > 0"
                   :href="site.url + site.page_message"
-                  style="color: darkred;font-size: 13px;"
+                  style="color: darkred;font-size: 16px;"
+                  class="flex items-center justify-center ml-2"
                   target="_blank"
                 >
-                  <n-icon><NotificationsCircleSharp /></n-icon>
+                  <n-icon size="13"><NotificationsCircleSharp /></n-icon>
                   {{ status.mail }}
-                </n-button>
+                </n-ellipsis>
               </span>
             </div>
           </div>
