@@ -229,6 +229,27 @@ export const useWebsiteStore = defineStore('website',
     }])
     const signInList = ref([])
     const siteHistory = ref()
+    const baseTotalData: SiteStatus = {
+      bonus_hour: 0,
+      seed_days: 0,
+      site: 0,
+      id: 0,
+      my_bonus: 0,
+      my_score: 0,
+      uploaded: 0,
+      downloaded: 0,
+      ratio: 1,
+      seed_volume: 0,
+      leech: 0,
+      seed: 0,
+      publish: 0,
+      invitation: 0,
+      my_level: '',
+      my_hr: '',
+      mail: 0,
+    }
+    const totalData = ref<SiteStatus>(baseTotalData)
+    const siteInfoFlag = ref(false)
 
     const getMySiteList = async () => {
       mySiteList.value = await $mySiteList()
@@ -260,6 +281,26 @@ export const useWebsiteStore = defineStore('website',
     const initData = async () => {
       siteStatusList.value = await $siteStatusNewestList()
       await siteSearch()
+    }
+
+    const getTotalData = async () => {
+      siteStatusList.value = await $siteStatusNewestList()
+      siteStatusList.value.forEach((status) => {
+        const s = status.status
+        totalData.value.bonus_hour += s.bonus_hour
+        totalData.value.seed_days += s.seed_days
+        totalData.value.my_bonus += s.my_bonus
+        totalData.value.my_score += s.my_score
+        totalData.value.uploaded += s.uploaded
+        totalData.value.downloaded += s.downloaded
+        totalData.value.seed_volume += s.seed_volume
+        totalData.value.leech += s.leech
+        totalData.value.seed += s.seed
+        totalData.value.publish += s.publish
+        totalData.value.invitation += s.invitation
+        totalData.value.mail += s.mail
+      })
+      totalData.value.ratio = totalData.value.uploaded / totalData.value.downloaded
     }
 
     /**
@@ -387,36 +428,39 @@ export const useWebsiteStore = defineStore('website',
       showAddMySite.value = false
     }
     return {
-      eDrawer,
-      drawerTitle,
       addMySiteFormRules,
-      mySite,
-      columns,
-      showAddMySite,
-      refMySiteForm,
-      siteList,
-      mySiteList,
-      showList,
-      siteStatusList,
-      mySiteForm,
-      siteInfoList,
-      searchKey,
-      sign_today,
-      signInList,
-      siteHistory,
-      getMySiteList,
-      getSiteList,
-      siteSearch,
-      initSomeData,
-      siteEChart,
-      initData,
-      editMysite,
-      saveMySite,
-      removeMySite,
-      signSite,
-      getSignList,
-      refreshSite,
       closeEditForm,
+      columns,
+      drawerTitle,
+      eDrawer,
+      editMysite,
+      getMySiteList,
+      getSignList,
+      getSiteList,
+      getTotalData,
+      initData,
+      initSomeData,
+      mySite,
+      mySiteForm,
+      mySiteList,
+      refMySiteForm,
+      refreshSite,
+      removeMySite,
+      saveMySite,
+      searchKey,
+      showAddMySite,
+      showList,
+      signInList,
+      signSite,
+      sign_today,
+      siteEChart,
+      siteHistory,
+      siteInfoFlag,
+      siteInfoList,
+      siteList,
+      siteSearch,
+      siteStatusList,
+      totalData,
       updateMySiteStatus,
     }
   })
