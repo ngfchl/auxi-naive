@@ -61,7 +61,7 @@ export interface MySite {
 
 export interface SiteStatus {
   id: number
-  updated_at: string
+  updated_at?: string
   site: number
   uploaded: number
   downloaded: number
@@ -78,7 +78,7 @@ export interface SiteStatus {
   my_level: string
   my_hr: string
   mail: number
-  updated: string
+  updated?: string
 }
 
 export interface SignInfo {
