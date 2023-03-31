@@ -19,6 +19,8 @@ export const useDownloadStore = defineStore('download', () => {
   const speedList = ref<DownloadSpeedType[]>([])
   const downloaderList = ref<Downloader[]>([])
   const timer = ref()
+  const downloadingFlag = ref(false)
+
   const setDownloadSpeedList = (value: DownloadSpeedType[]) => {
     speedList.value = value
   }
@@ -232,6 +234,7 @@ export const useDownloadStore = defineStore('download', () => {
     speedTotal,
     downloaderList,
     downloaderForm,
+    downloadingFlag,
     refDownloaderForm,
     categorySelectList,
     addDownloaderFormRules,
