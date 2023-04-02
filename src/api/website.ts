@@ -586,10 +586,6 @@ export const $parseSiteHistory = async (siteHistoryList: SiteHistoryList) => {
   return option
 }
 
-export const $getPerDayData: () => Promise<any> = async () => {
-  return await getList<null, PerDayData>('mysite/status/chart')
-}
-
 export const $todayDataList: () => Promise<any> = async () => {
   return await getList<null, TodayData[]>('mysite/status/today')
 }

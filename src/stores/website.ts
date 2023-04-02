@@ -5,7 +5,8 @@ import type { BarData, MySite, NewestStatus, PerDayData, PieData, SiteStatus, To
 import {
   $editMySite,
   $getHistoryList,
-  $getMySite, $getNewestStatus, $getPerDayData,
+  $getMySite,
+  $getNewestStatus,
   $getSignList,
   $mySiteList,
   $parseSiteHistory,
@@ -261,6 +262,44 @@ export const useWebsiteStore = defineStore('website',
     const todayDownloadedDataList = ref<PieData[]>([])
     const barOption = ref<ECBasicOption>()
     const pieOption = ref<ECBasicOption>()
+    const dataLength = ref<number>(-7)
+    const days = ref<{
+      label: string
+      value: number
+    }[]>([
+      {
+        label: '7天',
+        value: -7,
+      },
+      {
+        label: '半月',
+        value: -15,
+      },
+      {
+        label: '30天',
+        value: -30,
+      },
+      // {
+      //   label: '俩月',
+      //   value: -61,
+      // },
+      // {
+      //   label: '仨月',
+      //   value: -91,
+      // },
+      {
+        label: '半年',
+        value: -184,
+      },
+      {
+        label: '一年',
+        value: -366,
+      },
+      {
+        label: '全部',
+        value: 0,
+      },
+    ])
     const getTodayDataList = async () => {
       todayDataList.value = await $todayDataList()
       todayUploadedDataList.value.length = 0
@@ -279,12 +318,19 @@ export const useWebsiteStore = defineStore('website',
       todayDownloadedDataList.value.sort((a, b) => a.value - b.value)
       pieOption.value = {
         title: {
-          text: `今日数据：⬆${renderSize(todayDataList.value!.total_upload)} ⬇${renderSize(todayDataList.value!.total_download)}`,
+          text: `⬆${renderSize(todayDataList.value!.total_upload)} ⬇${renderSize(todayDataList.value!.total_download)}`,
           top: 5,
           left: 'center',
           textStyle: {
             fontSize: 18,
             color: 'orangered',
+          },
+        },
+        bottom: 1,
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+            restore: {},
           },
         },
         tooltip: {
@@ -368,8 +414,8 @@ export const useWebsiteStore = defineStore('website',
         ],
       }
     }
-    const getPerDayData = async () => {
-      perDayData.value = await $getPerDayData()
+    const getPerDayData = async (days?: number) => {
+      perDayData.value = await $getHistoryList({ days })
       diffUploadedList.value.length = 0
       diffDownloadedList.value.length = 0
       perDayData.value?.diff.forEach((item) => {
@@ -684,6 +730,8 @@ export const useWebsiteStore = defineStore('website',
       closeEditForm,
       columns,
       drawerTitle,
+      dataLength,
+      days,
       eDrawer,
       editMysite,
       getMySiteList,

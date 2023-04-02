@@ -10,7 +10,7 @@ const { getSpeedList } = downloadStore
 const websiteStore = useWebsiteStore()
 
 const {
-  siteInfoFlag, barOption, pieOption,
+  siteInfoFlag, barOption, pieOption, dataLength, days,
 } = storeToRefs(websiteStore)
 
 const {
@@ -33,12 +33,30 @@ onBeforeMount(async () => {
     </n-gi>
     <n-gi>
       <n-card hoverable embedded>
-        <ECharts :my-option="pieOption ? pieOption : {}" style="width: 100%" />
+        <n-radio-group
+          v-model:value="dataLength" size="small"
+          default-value="-7"
+          @change="getPerDayData(dataLength)"
+        >
+          <n-radio-button
+            v-for="day in days"
+            :key="day.value"
+            :value="day.value"
+          >
+            {{ day.label }}
+          </n-radio-button>
+        </n-radio-group>
+        <ECharts :my-option="barOption ? barOption : {}" style="width: 100%" />
       </n-card>
     </n-gi>
     <n-gi>
       <n-card hoverable embedded>
-        <ECharts :my-option="barOption ? barOption : {}" style="width: 100%" />
+        <div class="flex justify-center">
+          <n-button ghost size="small" color="#FF4500">
+            今日数据
+          </n-button>
+        </div>
+        <ECharts :my-option="pieOption ? pieOption : {}" style="width: 100%" />
       </n-card>
     </n-gi>
     <n-gi><Downloading /></n-gi>
