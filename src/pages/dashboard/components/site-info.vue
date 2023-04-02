@@ -12,7 +12,7 @@ const {
 } = storeToRefs(websiteStore)
 
 const {
-  getTotalData,
+  getTotalData, refreshSite, signSite,
 } = websiteStore
 onBeforeMount(async () => {
   await getTotalData()
@@ -22,44 +22,35 @@ onBeforeMount(async () => {
 <template>
   <n-card hoverable embedded>
     <template #header>
-      <div class="text-13px">
-        <span class="text-16px flex items-center justify-between">
-          <n-space>
-            <n-button size="small" ghost type="primary">
-              <MenuIcon icon="ReloadSharp" />
-            </n-button>
-            <n-button size="small" ghost type="info">
-              数据
-            </n-button>
-            <n-button v-if="!siteInfoFlag" size="small" ghost type="info" @click="siteInfoFlag = true">
-              列表
-            </n-button>
-            <n-button v-else size="small" ghost type="info" @click="siteInfoFlag = false">
-              收起
-            </n-button>
-          </n-space>
-        </span>
+      <n-space justify="center" class="text-16px flex items-center justify-between">
+        <n-button size="small" ghost type="primary" @click="getTotalData">
+          <MenuIcon icon="ReloadSharp" />
+        </n-button>
+        <n-button
+          v-if="totalData.invitation > 0"
+          size="small" ghost
+          class="ml-1 flex items-center text-16px"
+        >
+          <template #icon>
+            <n-icon size="13">
+              <CardSharp />
+            </n-icon>
+          </template>
+          {{ totalData.invitation }}
+        </n-button>
 
-        <div class="flex items-center">
-          <span class="text-blue-500 mr-2 flex items-center">
-            <n-ellipsis
-              v-if="totalData.invitation > 0"
-              class="ml-1 flex items-center text-16px"
-            >
-              <n-icon size="13"><CardSharp /></n-icon>
-              {{ totalData.invitation }}
-            </n-ellipsis>
-
-            <n-ellipsis
-              v-if="totalData.mail > 0"
-              style="color: darkred;font-size: 16px;"
-            >
-              <n-icon size="13"><NotificationsCircleSharp /></n-icon>
-              {{ totalData.mail }}
-            </n-ellipsis>
-          </span>
-        </div>
-      </div>
+        <n-button
+          v-if="totalData.mail > 0"
+          size="small" ghost
+        >
+          <template #icon>
+            <n-icon size="13">
+              <NotificationsCircleSharp />
+            </n-icon>
+          </template>
+          {{ totalData.mail }}
+        </n-button>
+      </n-space>
     </template>
     <template #default>
       <div>
@@ -126,63 +117,49 @@ onBeforeMount(async () => {
         </div>
       </div>
       <n-divider />
-      <p v-if="totalData.updated">
+      P龄：
+      <n-divider />
+      <p>
         最后更新时间：{{ totalData.updated }}
       </p>
     </template>
     <template #action>
-      <!--      <n-space class="mt&#45;&#45;10px mb&#45;&#45;10px"> -->
-      <!--        <n-button -->
-      <!--          v-if="my_site.get_info && site.func_get_userinfo" size="small" type="primary" -->
-      <!--          @click="refreshSite(my_site.id)" -->
-      <!--        > -->
-      <!--          刷新 -->
-      <!--        </n-button> -->
-      <!--        <n-button -->
-      <!--          v-if="my_site.get_torrents && site.func_get_torrents" size="small" type="warning" -->
-      <!--          @click="updateTorrents(my_site.id)" -->
-      <!--        > -->
-      <!--          种子 -->
-      <!--        </n-button> -->
-      <!--        <n-button v-if="my_site.hr && site.func_hr_discern" size="small" type="warning"> -->
-      <!--          H&&R -->
-      <!--        </n-button> -->
-      <!--        <n-button v-if="my_site.brush_flow && site.func_brush_flow" size="small" type="warning"> -->
-      <!--          刷流 -->
-      <!--        </n-button> -->
-      <!--        <n-button v-if="my_site.search && site.func_search_torrents" size="small" type="warning"> -->
-      <!--          聚合 -->
-      <!--        </n-button> -->
-      <!--        <n-button v-if="my_site.repeat_torrents && site.func_repeat_torrents" size="small" type="warning"> -->
-      <!--          辅种 -->
-      <!--        </n-button> -->
-
-      <!--        <n-button size="small" type="error" @click="editMysite(my_site.id)"> -->
-      <!--          编辑 -->
-      <!--        </n-button> -->
-      <!--        <n-button -->
-      <!--          v-if="my_site.sign_in && site.func_sign_in && (!sign || !sign.sign_in_today)" -->
-      <!--          size="small" -->
-      <!--          type="primary" -->
-      <!--          @click="signSite(my_site.id)" -->
-      <!--        > -->
-      <!--          签到 -->
-      <!--        </n-button> -->
-      <!--        <n-button -->
-      <!--          v-if="sign && sign.sign_in_today" size="small" type="success" ghost -->
-      <!--          @click="getSignList(my_site.id)" -->
-      <!--        > -->
-      <!--          签到 -->
-      <!--          <MenuIcon size="20" icon="CheckboxSharp" color="green" /> -->
-      <!--        </n-button> -->
-      <!--      </n-space> -->
+      <n-space class="mt--10px mb--10px" justify="center">
+        <n-button
+          size="small" type="primary"
+          @click="refreshSite"
+        >
+          刷新
+        </n-button>
+        <n-button
+          size="small" type="warning"
+        >
+          种子
+        </n-button>
+        <n-button size="small" type="warning">
+          辅种
+        </n-button>
+        <n-button
+          size="small"
+          type="primary"
+          @click="signSite"
+        >
+          签到
+        </n-button>
+        <n-button v-if="!siteInfoFlag" size="small" ghost type="info" @click="siteInfoFlag = true">
+          列表
+        </n-button>
+        <n-button v-else size="small" ghost type="info" @click="siteInfoFlag = false">
+          收起
+        </n-button>
+      </n-space>
     </template>
   </n-card>
 </template>
 
 <style scoped>
 .n-divider:not(.n-divider--vertical){
-  margin-top:2px;
-  margin-bottom: 2px;
+  margin-top: 5.5px;
+  margin-bottom: 6px;
 }
 </style>

@@ -26,6 +26,9 @@ onBeforeMount(async () => {
 <template>
   <n-grid cols="400:1 600:2" y-gap="2" x-gap="2" item-responsive>
     <n-gi>
+      <SiteInfo />
+    </n-gi>
+    <n-gi>
       <n-card hoverable embedded>
         <div class="flex justify-center">
           <n-button ghost size="small" color="#FF4500">
@@ -35,9 +38,7 @@ onBeforeMount(async () => {
         <ECharts :my-option="pieTotalOption ? pieTotalOption : {}" style="width: 100%" />
       </n-card>
     </n-gi>
-    <n-gi>
-      <SiteInfo />
-    </n-gi>
+
     <n-gi>
       <n-card hoverable embedded>
         <n-radio-group
