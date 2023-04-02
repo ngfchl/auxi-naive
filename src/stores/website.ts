@@ -1,7 +1,7 @@
 import type { ECBasicOption } from 'echarts/types/src/util/types'
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
-import type { BarData, MySite, NewestStatus, PerDayData, SiteStatus, WebSite } from '~/api/website'
+import type { BarData, MySite, NewestStatus, PerDayData, PieData, SiteStatus, TodayData, WebSite } from '~/api/website'
 import {
   $editMySite,
   $getHistoryList,
@@ -14,7 +14,7 @@ import {
   $saveMySite,
   $signSite,
   $siteInfoNewList, $siteList,
-  $siteStatusNewestList,
+  $siteStatusNewestList, $todayDataList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
@@ -256,7 +256,148 @@ export const useWebsiteStore = defineStore('website',
 
     const diffUploadedList = ref<BarData[]>([])
     const diffDownloadedList = ref<BarData[]>([])
+    const todayDataList = ref<TodayData>()
+    const todayUploadedDataList = ref<PieData[]>([])
+    const todayDownloadedDataList = ref<PieData[]>([])
     const barOption = ref<ECBasicOption>()
+    const pieOption = ref<ECBasicOption>()
+    const getTodayDataList = async () => {
+      todayDataList.value = await $todayDataList()
+      todayDataList.value?.data.forEach((todayIncreaseData) => {
+        todayUploadedDataList.value.push({
+          name: todayIncreaseData.name,
+          value: todayIncreaseData.uploaded,
+        })
+        todayDownloadedDataList.value.push({
+          name: todayIncreaseData.name,
+          value: todayIncreaseData.downloaded,
+        })
+      })
+      pieOption.value = {
+        title: {
+          text: `今日数据：⬆${renderSize(todayDataList.value!.total_upload)} ⬇${renderSize(todayDataList.value!.total_download)}`,
+          top: '12',
+          left: 'center',
+          textStyle: {
+            fontSize: '18px',
+            color: 'orangered',
+          },
+        },
+        tooltip: {
+          show: true,
+          formatter(params: { name: any; data: { value: number } }) {
+            return `${params.name}：\t${renderSize(params.data.value)}`
+          },
+          valueFormatter(value: number) {
+            return renderSize(value)
+          },
+        },
+        legend: {
+          show: false,
+        },
+        series: [
+          {
+            name: '下载量',
+            type: 'pie',
+            radius: ['30%', '45%'],
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2,
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 40,
+                fontWeight: 'bold',
+              },
+            },
+            labelLine: {
+              show: false,
+            },
+            label: {
+              // formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+              backgroundColor: '#F6F8FC',
+              borderColor: '#8C8D8E',
+              borderWidth: 1,
+              borderRadius: 4,
+              show: false,
+              formatter(params: { data: { value: number }; name: any }) {
+                if (params.data.value > 0)
+                  return `${params.name} ⬇${renderSize(params.data.value)}`
+              },
+              itemHeight: 12,
+              itemWidth: 20,
+              textStyle: {
+                fontSize: '14px',
+              },
+              // rich: {
+              //   a: {
+              //     color: '#6E7079',
+              //     lineHeight: 22,
+              //     align: 'center',
+              //   },
+              //   hr: {
+              //     borderColor: '#8C8D8E',
+              //     width: '100%',
+              //     borderWidth: 1,
+              //     height: 0,
+              //   },
+              //   b: {
+              //     color: '#4C5058',
+              //     fontSize: 14,
+              //     fontWeight: 'bold',
+              //     lineHeight: 33,
+              //   },
+              //   per: {
+              //     color: '#fff',
+              //     backgroundColor: '#4C5058',
+              //     padding: [3, 4],
+              //     borderRadius: 4,
+              //   },
+              // },
+            },
+            data: todayDownloadedDataList,
+          },
+          {
+            name: '上传量',
+            type: 'pie',
+            radius: ['50%', '70%'],
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2,
+            },
+            // roseType: 'rose',
+            selectedMode: 'single',
+            label: {
+              position: 'center',
+              formatter(params: { data: { value: number }; name: any }) {
+                if (params.data.value > 0)
+                  return `${params.name} ⬆${renderSize(params.data.value)}`
+              },
+              itemHeight: 12,
+              itemWidth: 20,
+              textStyle: {
+                fontSize: '14px',
+              },
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 40,
+                fontWeight: 'bold',
+              },
+            },
+            labelLine: {
+              show: false,
+            },
+            data: todayUploadedDataList.value,
+          },
+
+        ],
+      }
+    }
     const getPerDayData = async () => {
       perDayData.value = await $getPerDayData()
       diffUploadedList.value.length = 0
@@ -576,9 +717,10 @@ export const useWebsiteStore = defineStore('website',
       eDrawer,
       editMysite,
       getMySiteList,
+      getPerDayData,
       getSignList,
       getSiteList,
-      getPerDayData,
+      getTodayDataList,
       getTotalData,
       initData,
       initSomeData,
@@ -586,6 +728,7 @@ export const useWebsiteStore = defineStore('website',
       mySiteForm,
       mySiteList,
       perDayData,
+      pieOption,
       refMySiteForm,
       refreshSite,
       removeMySite,
@@ -603,6 +746,9 @@ export const useWebsiteStore = defineStore('website',
       siteList,
       siteSearch,
       siteStatusList,
+      todayDataList,
+      todayDownloadedDataList,
+      todayUploadedDataList,
       totalData,
       updateMySiteStatus,
     }

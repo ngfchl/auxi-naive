@@ -10,15 +10,16 @@ const { getSpeedList } = downloadStore
 const websiteStore = useWebsiteStore()
 
 const {
-  siteInfoFlag, barOption,
+  siteInfoFlag, barOption, pieOption,
 } = storeToRefs(websiteStore)
 
 const {
-  getPerDayData,
+  getPerDayData, getTodayDataList,
 } = websiteStore
 onBeforeMount(async () => {
   await getSpeedList()
   await getPerDayData()
+  await getTodayDataList()
 })
 </script>
 
@@ -28,20 +29,14 @@ onBeforeMount(async () => {
       <n-card>总数据饼图</n-card>
     </n-gi>
     <n-gi><SiteInfo /></n-gi>
-
+    <n-gi>
+      <n-card>
+        <ECharts :my-option="pieOption ? pieOption : {}" style="width: 100%" />
+      </n-card>
+    </n-gi>
     <n-gi span="24">
       <n-card>
         <ECharts :my-option="barOption ? barOption : {}" style="width: 100%" />
-      </n-card>
-    </n-gi>
-    <n-gi span="24">
-      <n-card>
-        lll
-      </n-card>
-    </n-gi>
-    <n-gi>
-      <n-card>
-        pie
       </n-card>
     </n-gi>
     <n-gi><Downloading /></n-gi>

@@ -137,6 +137,23 @@ export interface PerDayData {
   diff: MySitePerDayData[]
 }
 
+export interface TodayIncreaseData {
+  name: string
+  uploaded: number
+  downloaded: number
+}
+
+export interface TodayData {
+  total_upload: number
+  total_download: number
+  data: TodayIncreaseData[]
+}
+
+export interface PieData {
+  name: string
+  value: number
+}
+
 export interface BarData {
   name: string
   type: string
@@ -571,4 +588,8 @@ export const $parseSiteHistory = async (siteHistoryList: SiteHistoryList) => {
 
 export const $getPerDayData: () => Promise<any> = async () => {
   return await getList<null, PerDayData>('mysite/status/chart')
+}
+
+export const $todayDataList: () => Promise<any> = async () => {
+  return await getList<null, TodayData[]>('mysite/status/today')
 }
