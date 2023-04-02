@@ -8,28 +8,42 @@ const downloadStore = useDownloadStore()
 const { speedList, downloadingFlag } = storeToRefs(downloadStore)
 const { getSpeedList } = downloadStore
 const websiteStore = useWebsiteStore()
+
 const {
-  siteInfoFlag,
+  siteInfoFlag, barOption,
 } = storeToRefs(websiteStore)
+
+const {
+  getPerDayData,
+} = websiteStore
 onBeforeMount(async () => {
   await getSpeedList()
+  await getPerDayData()
 })
 </script>
 
 <template>
-  <n-grid cols="400:1 600:2" y-gap="2" x-gap="2">
+  <n-grid cols="400:1 600:2" y-gap="2" x-gap="2" item-responsive>
     <n-gi>
       <n-card>总数据饼图</n-card>
     </n-gi>
     <n-gi><SiteInfo /></n-gi>
 
-    <n-gi>
-      <n-card>今日数据饼图</n-card>
+    <n-gi span="24">
+      <n-card>
+        <ECharts :my-option="barOption ? barOption : {}" style="width: 100%" />
+      </n-card>
+    </n-gi>
+    <n-gi span="24">
+      <n-card>
+        lll
+      </n-card>
     </n-gi>
     <n-gi>
-      <n-card>每日数据柱状图</n-card>
+      <n-card>
+        pie
+      </n-card>
     </n-gi>
-
     <n-gi><Downloading /></n-gi>
     <n-gi v-if="downloadingFlag">
       <n-card hoverable embedded>

@@ -1,10 +1,11 @@
+import type { ECBasicOption } from 'echarts/types/src/util/types'
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
-import type { MySite, NewestStatus, SiteStatus, WebSite } from '~/api/website'
+import type { BarData, MySite, NewestStatus, PerDayData, SiteStatus, WebSite } from '~/api/website'
 import {
   $editMySite,
   $getHistoryList,
-  $getMySite, $getNewestStatus,
+  $getMySite, $getNewestStatus, $getPerDayData,
   $getSignList,
   $mySiteList,
   $parseSiteHistory,
@@ -16,6 +17,7 @@ import {
   $siteStatusNewestList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
+import renderSize from '~/hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import MySiteForm from '@/pages/website/components/MySiteForm.vue'
 
@@ -26,8 +28,8 @@ export const useWebsiteStore = defineStore('website',
       dialog,
     } = useGlobalConfig()
     /**
-       * 搜索字符串
-       */
+         * 搜索字符串
+         */
     const searchKey = ref('')
     const eDrawer = ref(false)
     const sign_today = ref(false)
@@ -214,8 +216,8 @@ export const useWebsiteStore = defineStore('website',
     })
 
     /**
-       * 是否打开编辑页
-       */
+         * 是否打开编辑页
+         */
     const showAddMySite = ref(false)
     const refMySiteForm = ref<FormInst>()
     const siteList = ref<WebSite[]>([])
@@ -250,6 +252,122 @@ export const useWebsiteStore = defineStore('website',
     }
     const totalData = ref<SiteStatus>(baseTotalData)
     const siteInfoFlag = ref(false)
+    const perDayData = ref<PerDayData>()
+
+    const diffUploadedList = ref<BarData[]>([])
+    const diffDownloadedList = ref<BarData[]>([])
+    const barOption = ref<ECBasicOption>()
+    const getPerDayData = async () => {
+      perDayData.value = await $getPerDayData()
+      diffUploadedList.value.length = 0
+      diffDownloadedList.value.length = 0
+      perDayData.value?.diff.forEach((item) => {
+        diffUploadedList.value.push({
+          name: item.name,
+          type: 'bar',
+          emphasis: {
+            focus: 'series',
+          },
+          stack: 'uploaded',
+          data: item.diff_uploaded_list,
+        })
+        diffDownloadedList.value.push({
+          name: item.name,
+          type: 'bar',
+          emphasis: {
+            focus: 'series',
+          },
+          stack: 'downloaded',
+          data: item.diff_downloaded_list,
+        })
+      })
+
+      barOption.value = {
+        title: {
+          text: '每日上传',
+          textStyle: {
+            color: 'orangered',
+          },
+          left: 'center',
+          top: '12',
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
+          formatter(params: { axisValue: string; value: number; color?: any; seriesName?: any }[]) {
+            // console.log(params[0].value[1])
+            let text = ''
+            let total = 0
+            params.sort((a: { value: number }, b: { value: number }) => {
+              return b.value - a.value
+            })
+            params.forEach((param) => {
+              const temp = param.value === 0
+                ? ''
+                : `<div style="display: block;height:14px;width: 48%;float:left;padding: 1%;font-size: 10px;">
+                <span style="float:left;"><i style="width: 8px;height: 8px;display: inline-block;background: ${param.color};border-radius: 8px;"></i>${param.seriesName}: </span>
+                <span style="float:right;">${renderSize(param.value)}</span>
+              </div>`
+              text += temp
+              total += param.value
+            })
+            let total_str = `<div style="display: block;height:14px;text-align: left;padding: 1%;font-size: 12px;">
+                              <span style="float: left;">
+                                    <i style="width: 8px;height: 8px;display: inline-block;background: darkorange;border-radius: 8px;">
+                                    </i>总计：${renderSize(total)}</span>
+                              <text style="float: right;">${params[0].axisValue}</text>
+                            </div>
+                            <hr>`
+            total_str += text
+            return `<div style="width: 280px;">${total_str}</div>`
+          },
+          position(point: number[]) {
+            const customVH = window.innerWidth
+            if (customVH - point[0] < 768)
+              point[0] = 12
+
+            return [12, 8]
+          },
+          order: 'valueDesc',
+          confine: false,
+          extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);', // 附加阴影样式
+        },
+        legend: {
+          show: false,
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+            dataZoom: {},
+          },
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: true,
+          axisLine: {
+            onZero: false,
+          },
+          data: perDayData.value?.date_list,
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: {
+            formatter(value: number) {
+              return renderSize(value)
+            },
+          },
+        },
+        series: diffUploadedList.value,
+      }
+    }
 
     const getMySiteList = async () => {
       mySiteList.value = await $mySiteList()
@@ -257,9 +375,10 @@ export const useWebsiteStore = defineStore('website',
     const getSiteList = async () => {
       siteList.value = await $siteList()
     }
+
     /**
-       * 搜索
-       */
+         * 搜索
+         */
     const siteSearch = async () => {
       searchKey.value === ''
         ? showList.value = siteStatusList.value
@@ -269,22 +388,43 @@ export const useWebsiteStore = defineStore('website',
             my_site,
           } = item
           return site.url.toLowerCase().includes(searchKey.value.toLowerCase())
-                  || site.name.toLowerCase().includes(searchKey.value.toLowerCase())
-                  || site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
-                  || my_site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
-                  || my_site.user_id.toLowerCase().includes(searchKey.value.toLowerCase())
+                        || site.name.toLowerCase().includes(searchKey.value.toLowerCase())
+                        || site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
+                        || my_site.nickname.toLowerCase().includes(searchKey.value.toLowerCase())
+                        || my_site.user_id.toLowerCase().includes(searchKey.value.toLowerCase())
         })
     }
     /**
-       * 初始化数据列表
-       */
+         * 初始化数据列表
+         */
     const initData = async () => {
+      siteStatusList.value.length = 0
       siteStatusList.value = await $siteStatusNewestList()
       await siteSearch()
     }
 
     const getTotalData = async () => {
+      siteStatusList.value.length = 0
       siteStatusList.value = await $siteStatusNewestList()
+      totalData.value = {
+        bonus_hour: 0,
+        seed_days: 0,
+        site: 0,
+        id: 0,
+        my_bonus: 0,
+        my_score: 0,
+        uploaded: 0,
+        downloaded: 0,
+        ratio: 1,
+        seed_volume: 0,
+        leech: 0,
+        seed: 0,
+        publish: 0,
+        invitation: 0,
+        my_level: '',
+        my_hr: '',
+        mail: 0,
+      }
       siteStatusList.value.forEach((status) => {
         const s = status.status
         totalData.value.bonus_hour += s.bonus_hour
@@ -304,9 +444,9 @@ export const useWebsiteStore = defineStore('website',
     }
 
     /**
-       * 更新数据后替换站点数据
-       * @param site_id
-       */
+         * 更新数据后替换站点数据
+         * @param site_id
+         */
     const updateMySiteStatus = async (
       site_id: number,
     ) => {
@@ -323,9 +463,9 @@ export const useWebsiteStore = defineStore('website',
     }
 
     /**
-       * 打开编辑窗口
-       * @param id
-       */
+         * 打开编辑窗口
+         * @param id
+         */
     const editMysite = async (id: number) => {
       const siteList = id === 0 ? await $siteInfoNewList() : await $siteList()
       siteList.forEach((item: WebSite) => {
@@ -353,8 +493,8 @@ export const useWebsiteStore = defineStore('website',
     }
 
     /**
-       * 签到
-       */
+         * 签到
+         */
     const signSite = async (site_id: number) => {
       const flag = await $signSite(site_id)
       if (flag)
@@ -380,8 +520,8 @@ export const useWebsiteStore = defineStore('website',
       }
     }
     /**
-       * 获取签到列表
-       */
+         * 获取签到列表
+         */
     const getSignList = async (site_id: number) => {
       const sign_list_res = await $getSignList({
         site_id,
@@ -395,16 +535,16 @@ export const useWebsiteStore = defineStore('website',
       eDrawer.value = true
     }
     /**
-       * 更新站点数据
-       */
+         * 更新站点数据
+         */
     const refreshSite = async (site_id: number) => {
       const data: SiteStatus = await $refreshSite(site_id)
       if (data) await updateMySiteStatus(site_id)
     }
 
     /**
-       * 更新站点数据
-       */
+         * 更新站点数据
+         */
     const siteEChart = async (site_id: number) => {
       const res = await $getHistoryList({ site_id })
       const item = getSite(site_id)
@@ -415,20 +555,21 @@ export const useWebsiteStore = defineStore('website',
     }
 
     /**
-       *
-       */
+         *
+         */
     const initSomeData = () => {
       siteHistory.value.length = 0
     }
     /**
-       * 关闭编辑窗口并刷新数据
-       */
+         * 关闭编辑窗口并刷新数据
+         */
     const closeEditForm = async () => {
       await initData()
       showAddMySite.value = false
     }
     return {
       addMySiteFormRules,
+      barOption,
       closeEditForm,
       columns,
       drawerTitle,
@@ -437,12 +578,14 @@ export const useWebsiteStore = defineStore('website',
       getMySiteList,
       getSignList,
       getSiteList,
+      getPerDayData,
       getTotalData,
       initData,
       initSomeData,
       mySite,
       mySiteForm,
       mySiteList,
+      perDayData,
       refMySiteForm,
       refreshSite,
       removeMySite,

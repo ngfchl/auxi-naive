@@ -125,6 +125,28 @@ export interface SiteHistoryList {
   date_list: number[]
 }
 
+// eslint-disable-next-line import/export
+export interface MySitePerDayData {
+  name: string
+  diff_uploaded_list: number[]
+  diff_downloaded_list: number[]
+}
+
+export interface PerDayData {
+  date_list: string[]
+  diff: MySitePerDayData[]
+}
+
+export interface BarData {
+  name: string
+  type: string
+  emphasis: {
+    focus: string
+  }
+  stack?: string
+  data: number[]
+}
+
 const { message } = useGlobalConfig()
 
 /**
@@ -545,4 +567,8 @@ export const $parseSiteHistory = async (siteHistoryList: SiteHistoryList) => {
     })
   }
   return option
+}
+
+export const $getPerDayData: () => Promise<any> = async () => {
+  return await getList<null, PerDayData>('mysite/status/chart')
 }
