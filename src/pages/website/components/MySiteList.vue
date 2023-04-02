@@ -314,6 +314,7 @@ onMounted(async () => {
     resizable
     height="100%"
     placement="top"
+    style="--n-body-padding:6px 6px"
   >
     <n-drawer-content closable>
       <template #header>
