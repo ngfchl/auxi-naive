@@ -254,7 +254,7 @@ export const useWebsiteStore = defineStore('website',
     const totalData = ref<SiteStatus>(baseTotalData)
     const siteInfoFlag = ref(false)
     const perDayData = ref<PerDayData>()
-
+    const currentSite = ref<number>(0)
     const diffUploadedList = ref<BarData[]>([])
     const diffDownloadedList = ref<BarData[]>([])
     const todayDataList = ref<TodayData>()
@@ -702,11 +702,12 @@ export const useWebsiteStore = defineStore('website',
     /**
          * 更新站点数据
          */
-    const siteEChart = async (site_id: number) => {
-      const res = await $getHistoryList({ site_id })
+    const siteEChart = async (site_id: number, days = -7) => {
+      const res = await $getHistoryList({ site_id, days })
       const item = getSite(site_id)
       drawerTitle.value = `${item?.my_site.nickname}  历史数据`
       siteHistory.value = await $parseSiteHistory(res)
+      currentSite.value = site_id
       sign_today.value = false
       eDrawer.value = true
     }
@@ -729,6 +730,7 @@ export const useWebsiteStore = defineStore('website',
       barOption,
       closeEditForm,
       columns,
+      currentSite,
       drawerTitle,
       dataLength,
       days,

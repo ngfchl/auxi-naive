@@ -9,6 +9,7 @@ defineEmits(['update:eDrawer'])
 const websiteStore = useWebsiteStore()
 const {
   eDrawer,
+  currentSite,
   searchKey,
   showList,
   drawerTitle,
@@ -16,6 +17,7 @@ const {
   signInList,
   siteHistory,
   siteStatusList,
+  dataLength, days,
 } = storeToRefs(websiteStore)
 
 const {
@@ -320,6 +322,22 @@ onMounted(async () => {
       <template #header>
         <h4 class="title" style="text-align: center;" v-text="drawerTitle" />
       </template>
+      <div class="flex justify-center mb-2">
+        <n-radio-group
+          v-model:value="dataLength" size="small"
+          default-value="-7"
+        >
+          <n-radio-button
+            v-for="day in days"
+            :key="day.value"
+            :value="day.value"
+            @change="siteEChart(currentSite, dataLength)"
+          >
+            {{ day.label }}
+          </n-radio-button>
+        </n-radio-group>
+      </div>
+
       <SignInList v-if="sign_today" :sign-list="signInList" />
       <ECharts v-else :my-option="siteHistory" theme="dark" style="width: 95vw;height: 80vh;" />
     </n-drawer-content>
