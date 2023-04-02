@@ -28,14 +28,16 @@ onBeforeMount(async () => {
     <n-gi>
       <n-card>总数据饼图</n-card>
     </n-gi>
-    <n-gi><SiteInfo /></n-gi>
     <n-gi>
-      <n-card>
+      <SiteInfo />
+    </n-gi>
+    <n-gi>
+      <n-card hoverable embedded>
         <ECharts :my-option="pieOption ? pieOption : {}" style="width: 100%" />
       </n-card>
     </n-gi>
-    <n-gi span="24">
-      <n-card>
+    <n-gi>
+      <n-card hoverable embedded>
         <ECharts :my-option="barOption ? barOption : {}" style="width: 100%" />
       </n-card>
     </n-gi>

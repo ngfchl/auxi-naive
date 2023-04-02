@@ -10,7 +10,6 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AppProvider: typeof import('./../src/components/app-provider/index.vue')['default']
-    Chart: typeof import('./../src/components/chart.vue')['default']
     ECharts: typeof import('./../src/components/ECharts.vue')['default']
     NaiveProvider: typeof import('./../src/components/app-provider/naive-provider.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']

@@ -86,13 +86,19 @@ const initData = () => {
   // myChart.setOption(props.myOption)
   // 在template中可以直接取props中的值，但是在script中不行，因为script是在挂载之前执行的
   setTimeout(async () => {
-    await myChart!.setOption(
+    myChart!.setOption(
       props.myOption,
       {
         notMerge: true, // 不和之前的option合并
       },
     )
   }, 300)
+
+  myChart?.resize({
+    animation: {
+      duration: 300,
+    },
+  })
 
   // 监听页面的大小
   window.addEventListener('resize', () => {
@@ -114,9 +120,12 @@ onMounted(async () => {
 /**
  * 深度监听数据变化
  */
-watch(() => props.myOption, () => {
+watch(() => props.myOption, async () => {
   initData()
-}, { deep: true })
+}, {
+  immediate: true,
+  deep: true,
+})
 </script>
 
 <template>

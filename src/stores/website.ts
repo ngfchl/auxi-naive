@@ -263,6 +263,8 @@ export const useWebsiteStore = defineStore('website',
     const pieOption = ref<ECBasicOption>()
     const getTodayDataList = async () => {
       todayDataList.value = await $todayDataList()
+      todayUploadedDataList.value.length = 0
+      todayDownloadedDataList.value.length = 0
       todayDataList.value?.data.forEach((todayIncreaseData) => {
         todayUploadedDataList.value.push({
           name: todayIncreaseData.name,
@@ -273,18 +275,20 @@ export const useWebsiteStore = defineStore('website',
           value: todayIncreaseData.downloaded,
         })
       })
+      todayUploadedDataList.value.sort((a, b) => a.value - b.value)
+      todayDownloadedDataList.value.sort((a, b) => a.value - b.value)
       pieOption.value = {
         title: {
           text: `今日数据：⬆${renderSize(todayDataList.value!.total_upload)} ⬇${renderSize(todayDataList.value!.total_download)}`,
-          top: '12',
+          top: 5,
           left: 'center',
           textStyle: {
-            fontSize: '18px',
+            fontSize: 18,
             color: 'orangered',
           },
         },
         tooltip: {
-          show: true,
+          show: false,
           formatter(params: { name: any; data: { value: number } }) {
             return `${params.name}：\t${renderSize(params.data.value)}`
           },
@@ -305,57 +309,26 @@ export const useWebsiteStore = defineStore('website',
               borderColor: '#fff',
               borderWidth: 2,
             },
+            label: {
+              show: false,
+              position: 'center',
+              formatter(params: { data: { value: number }; name: any }) {
+                if (params.data.value > 0)
+                  return `${params.name} ⬇${renderSize(params.data.value)}`
+              },
+              itemHeight: 16,
+              itemWidth: 20,
+              fontSize: 14,
+            },
             emphasis: {
               label: {
                 show: true,
-                fontSize: 40,
+                fontSize: 24,
                 fontWeight: 'bold',
               },
             },
             labelLine: {
               show: false,
-            },
-            label: {
-              // formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
-              backgroundColor: '#F6F8FC',
-              borderColor: '#8C8D8E',
-              borderWidth: 1,
-              borderRadius: 4,
-              show: false,
-              formatter(params: { data: { value: number }; name: any }) {
-                if (params.data.value > 0)
-                  return `${params.name} ⬇${renderSize(params.data.value)}`
-              },
-              itemHeight: 12,
-              itemWidth: 20,
-              textStyle: {
-                fontSize: '14px',
-              },
-              // rich: {
-              //   a: {
-              //     color: '#6E7079',
-              //     lineHeight: 22,
-              //     align: 'center',
-              //   },
-              //   hr: {
-              //     borderColor: '#8C8D8E',
-              //     width: '100%',
-              //     borderWidth: 1,
-              //     height: 0,
-              //   },
-              //   b: {
-              //     color: '#4C5058',
-              //     fontSize: 14,
-              //     fontWeight: 'bold',
-              //     lineHeight: 33,
-              //   },
-              //   per: {
-              //     color: '#fff',
-              //     backgroundColor: '#4C5058',
-              //     padding: [3, 4],
-              //     borderRadius: 4,
-              //   },
-              // },
             },
             data: todayDownloadedDataList,
           },
@@ -368,24 +341,21 @@ export const useWebsiteStore = defineStore('website',
               borderColor: '#fff',
               borderWidth: 2,
             },
-            // roseType: 'rose',
-            selectedMode: 'single',
             label: {
               position: 'center',
               formatter(params: { data: { value: number }; name: any }) {
                 if (params.data.value > 0)
                   return `${params.name} ⬆${renderSize(params.data.value)}`
               },
-              itemHeight: 12,
+              itemHeight: 16,
               itemWidth: 20,
-              textStyle: {
-                fontSize: '14px',
-              },
+              fontSize: 14,
+              show: false,
             },
             emphasis: {
               label: {
                 show: true,
-                fontSize: 40,
+                fontSize: 24,
                 fontWeight: 'bold',
               },
             },
