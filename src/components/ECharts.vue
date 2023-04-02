@@ -3,8 +3,8 @@ import type { ECBasicOption } from 'echarts/types/src/util/types'
 import { v4 as uuidv4 } from 'uuid'
 // 引入核心组件
 import * as echarts from 'echarts/core'
-import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts'
-import { BarChart, GaugeChart, LineChart } from 'echarts/charts'
+import type { BarSeriesOption, LineSeriesOption, PieSeriesOption } from 'echarts/charts'
+import { BarChart, GaugeChart, LineChart, PieChart } from 'echarts/charts'
 
 import type {
   DatasetComponentOption,
@@ -28,6 +28,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 type ECOption = echarts.ComposeOption<
     | BarSeriesOption
     | LineSeriesOption
+    | PieSeriesOption
     | TitleComponentOption
     | TooltipComponentOption
     | GridComponentOption
@@ -60,6 +61,7 @@ echarts.use([
   DatasetComponent,
   TransformComponent,
   BarChart,
+  PieChart,
   GaugeChart,
   LineChart,
   LabelLayout,
