@@ -10,7 +10,7 @@ const { getSpeedList } = downloadStore
 const websiteStore = useWebsiteStore()
 
 const {
-  siteInfoFlag, barOption, pieOption, dataLength, days,
+  siteInfoFlag, barOption, pieOption, dataLength, days, pieTotalOption,
 } = storeToRefs(websiteStore)
 
 const {
@@ -26,7 +26,14 @@ onBeforeMount(async () => {
 <template>
   <n-grid cols="400:1 600:2" y-gap="2" x-gap="2" item-responsive>
     <n-gi>
-      <n-card>总数据饼图</n-card>
+      <n-card hoverable embedded>
+        <div class="flex justify-center">
+          <n-button ghost size="small" color="#FF4500">
+            全部数据
+          </n-button>
+        </div>
+        <ECharts :my-option="pieTotalOption ? pieTotalOption : {}" style="width: 100%" />
+      </n-card>
     </n-gi>
     <n-gi>
       <SiteInfo />

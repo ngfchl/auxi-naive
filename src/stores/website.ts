@@ -262,6 +262,9 @@ export const useWebsiteStore = defineStore('website',
     const todayDownloadedDataList = ref<PieData[]>([])
     const barOption = ref<ECBasicOption>()
     const pieOption = ref<ECBasicOption>()
+    const pieTotalOption = ref<ECBasicOption>()
+    const totalUploadedDataList = ref<PieData[]>([])
+    const totalDownloadedDataList = ref<PieData[]>([])
     const dataLength = ref<number>(-7)
     const days = ref<{
       label: string
@@ -562,6 +565,8 @@ export const useWebsiteStore = defineStore('website',
 
     const getTotalData = async () => {
       siteStatusList.value.length = 0
+      totalDownloadedDataList.value.length = 0
+      totalUploadedDataList.value.length = 0
       siteStatusList.value = await $siteStatusNewestList()
       totalData.value = {
         bonus_hour: 0,
@@ -582,8 +587,8 @@ export const useWebsiteStore = defineStore('website',
         my_hr: '',
         mail: 0,
       }
-      siteStatusList.value.forEach((status) => {
-        const s = status.status
+      siteStatusList.value.forEach((siteStatus) => {
+        const s = siteStatus.status
         totalData.value.bonus_hour += s.bonus_hour
         totalData.value.seed_days += s.seed_days
         totalData.value.my_bonus += s.my_bonus
@@ -596,8 +601,113 @@ export const useWebsiteStore = defineStore('website',
         totalData.value.publish += s.publish
         totalData.value.invitation += s.invitation
         totalData.value.mail += s.mail
+        const mysite: MySite = siteStatus.my_site
+        totalUploadedDataList.value.push({
+          name: mysite.nickname,
+          value: s.uploaded,
+        })
+        totalDownloadedDataList.value.push({
+          name: mysite.nickname,
+          value: s.downloaded,
+        })
       })
       totalData.value.ratio = totalData.value.uploaded / totalData.value.downloaded
+      pieTotalOption.value = {
+        title: {
+          text: `⬆${renderSize(totalData.value.uploaded)} ⬇${renderSize(totalData.value.downloaded)}`,
+          top: 5,
+          left: 'center',
+          textStyle: {
+            fontSize: 18,
+            color: 'orangered',
+          },
+        },
+        bottom: 1,
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+            restore: {},
+          },
+        },
+        tooltip: {
+          show: false,
+          formatter(params: { name: any; data: { value: number } }) {
+            return `${params.name}：\t${renderSize(params.data.value)}`
+          },
+          valueFormatter(value: number) {
+            return renderSize(value)
+          },
+        },
+        legend: {
+          show: false,
+        },
+        series: [
+          {
+            name: '下载量',
+            type: 'pie',
+            radius: ['25%', '45%'],
+            itemStyle: {
+              borderRadius: 5,
+              borderColor: '#fff',
+              borderWidth: 1,
+            },
+            label: {
+              show: false,
+              position: 'center',
+              formatter(params: { data: { value: number }; name: any }) {
+                if (params.data.value > 0)
+                  return `${params.name} ⬇${renderSize(params.data.value)}`
+              },
+              itemHeight: 16,
+              itemWidth: 20,
+              fontSize: 14,
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 24,
+                fontWeight: 'bold',
+              },
+            },
+            labelLine: {
+              show: false,
+            },
+            data: totalDownloadedDataList.value,
+          },
+          {
+            name: '上传量',
+            type: 'pie',
+            radius: ['50%', '70%'],
+            itemStyle: {
+              borderRadius: 5,
+              borderColor: '#fff',
+              borderWidth: 1,
+            },
+            label: {
+              position: 'center',
+              formatter(params: { data: { value: number }; name: any }) {
+                if (params.data.value > 0)
+                  return `${params.name} ⬆${renderSize(params.data.value)}`
+              },
+              itemHeight: 16,
+              itemWidth: 20,
+              fontSize: 14,
+              show: false,
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 24,
+                fontWeight: 'bold',
+              },
+            },
+            labelLine: {
+              show: false,
+            },
+            data: totalUploadedDataList.value,
+          },
+        ],
+      }
     }
 
     /**
@@ -735,6 +845,7 @@ export const useWebsiteStore = defineStore('website',
       dataLength,
       days,
       eDrawer,
+      pieTotalOption,
       editMysite,
       getMySiteList,
       getPerDayData,
