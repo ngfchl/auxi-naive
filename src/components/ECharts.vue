@@ -123,7 +123,6 @@ onMounted(async () => {
 watch(() => props.myOption, async () => {
   initData()
 }, {
-  immediate: true,
   deep: true,
 })
 </script>
