@@ -21,6 +21,19 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            naiveUI: ['naive-ui'],
+            ionicons5: ['@vicons/ionicons5'],
+            lodash: ['lodash-es', '@vueuse/core'],
+            vue: ['vue', 'vue-router', 'vue-i18n', 'pinia'],
+          },
+        },
+      },
+    },
     define: {
       __VUE_I18N_FULL_INSTALL__: false,
       __VUE_I18N_LEGACY_API__: false,
