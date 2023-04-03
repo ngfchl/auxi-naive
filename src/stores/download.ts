@@ -159,9 +159,12 @@ export const useDownloadStore = defineStore('download', () => {
   }
   const interval = ref<number>(5)
   const timeout = ref<number>(10)
-  /**
-   * 刷新实时数据
-   */
+  const setIntervalValue = (value: number) => {
+    interval.value = value
+  }
+  const setTimeoutValue = (value: number) => {
+    timeout.value = value
+  }
   const getSpeedListTimer = async () => {
     clearSpeedListTimer()
     timer.value = setInterval(async () => {
@@ -254,6 +257,8 @@ export const useDownloadStore = defineStore('download', () => {
     getDownloaderList,
     editDownloader,
     saveDownloader,
+    setIntervalValue,
+    setTimeoutValue,
     removeDownloader,
   }
 })

@@ -25,7 +25,8 @@ withDefaults(defineProps<{
     v-for="speed in speedList"
     :key="speed.name"
     :circle-gap="1"
-    style="width: 110px;"
+    style="width: 130px;"
+    class="ml-2"
     type="multiple-circle"
     :stroke-width="4"
     :percentage="[
