@@ -12,19 +12,22 @@ const {
 
 <template>
   <n-card hoverable embedded>
-    <n-radio-group
-      v-model:value="dataLength" size="small"
-      default-value="-7"
-      @change="getPerDayData(dataLength)"
-    >
-      <n-radio-button
-        v-for="day in days"
-        :key="day.value"
-        :value="day.value"
+    <div class="flex justify-center">
+      <n-radio-group
+        v-model:value="dataLength" size="small"
+        default-value="-7"
+        @change="getPerDayData(dataLength)"
       >
-        {{ day.label }}
-      </n-radio-button>
-    </n-radio-group>
+        <n-radio-button
+          v-for="day in days"
+          :key="day.value"
+          :value="day.value"
+        >
+          {{ day.label }}
+        </n-radio-button>
+      </n-radio-group>
+    </div>
+
     <ECharts :my-option="barOption ? barOption : {}" style="width: 100%" />
   </n-card>
 </template>
