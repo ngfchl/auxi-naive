@@ -4,7 +4,7 @@ import renderSize from '~/hooks/renderSize'
 
 const downloadStore = useDownloadStore()
 const { getSpeedListTimer, clearSpeedListTimer, getSpeedList } = downloadStore
-const { downloadingFlag, timer, speedTotal } = storeToRefs(downloadStore)
+const { downloadingFlag, timer, speedTotal, interval, timeout } = storeToRefs(downloadStore)
 </script>
 
 <template>
@@ -12,7 +12,7 @@ const { downloadingFlag, timer, speedTotal } = storeToRefs(downloadStore)
     <n-progress
       style="width: 325px;"
       type="multiple-circle"
-      :stroke-width="4"
+      :stroke-width="8"
       :circle-gap="1"
       :gap-degree="45"
       :gap-offset-degree="225"
@@ -21,8 +21,8 @@ const { downloadingFlag, timer, speedTotal } = storeToRefs(downloadStore)
         speedTotal.dl_info_speed / (1024 * 1024),
       ]"
       :color="[
-        'ForestGreen',
-        'Crimson',
+        '#3BA272',
+        '#EE6666',
       ]"
     >
       <div style="text-align: center">
@@ -43,16 +43,20 @@ const { downloadingFlag, timer, speedTotal } = storeToRefs(downloadStore)
             </template>
             {{ `${renderSize(speedTotal.dl_info_speed)} / ${renderSize(speedTotal.dl_info_data)}` }}
           </n-button>
+          <n-button>
+            <n-input-number v-model:value="interval" :bordered="false" @change="getSpeedListTimer" />
+            <n-input-number v-model:value="timeout" :bordered="false" @change="getSpeedListTimer" />
+          </n-button>
           <n-button v-if="downloadingFlag" secondary type="error" @click="downloadingFlag = false">
             收起
           </n-button>
           <n-button v-else secondary type="success" @click="downloadingFlag = true">
             展开
           </n-button>
-          <n-button v-if="timer" round type="warning" @click="clearSpeedListTimer()">
+          <n-button v-if="timer" round type="warning" @click="clearSpeedListTimer">
             停止刷新
           </n-button>
-          <n-button v-else round type="success" @click="getSpeedListTimer()">
+          <n-button v-else round type="success" @click="getSpeedListTimer">
             刷新
           </n-button>
         </n-button-group>

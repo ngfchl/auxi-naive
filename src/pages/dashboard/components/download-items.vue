@@ -24,24 +24,22 @@ withDefaults(defineProps<{
   <n-progress
     v-for="speed in speedList"
     :key="speed.name"
-    style="width: 160px;"
+    :circle-gap="1"
+    style="width: 110px;"
     type="multiple-circle"
     :stroke-width="4"
-    :circle-gap="1"
-    :gap-degree="45"
-    :gap-offset-degree="225"
     :percentage="[
       speed.up_info_speed / (1024 * 512),
       speed.dl_info_speed / (1024 * 512),
     ]"
     :color="[
-      'ForestGreen',
-      'Crimson',
+      '#3BA272',
+      '#EE6666',
     ]"
   >
-    <div style="text-align: center">
-      <n-button-group vertical size="small" class="mt-5">
-        <n-button round secondary type="success" width="120">
+    <div class="text-8px">
+      <n-button-group vertical size="tiny" class="mt-4">
+        <n-button round secondary type="success">
           <template #icon>
             <n-icon>
               <ArrowUpSharp />
@@ -49,7 +47,7 @@ withDefaults(defineProps<{
           </template>
           {{ renderSize(speed.up_info_speed) }}
         </n-button>
-        <n-button round secondary type="warning" class="min-width-120px">
+        <n-button round secondary type="warning">
           <template #icon>
             <n-icon>
               <ArrowDownSharp />
@@ -58,7 +56,7 @@ withDefaults(defineProps<{
           {{ renderSize(speed.dl_info_speed) }}
         </n-button>
       </n-button-group>
-      <span class="flex justify-center items-center text-14px">
+      <span class="flex justify-center items-center">
         <n-image
           width="13"
           :src="speed.category === 'Qb' ? '/images/qb32.png' : '/images/tr.png'"

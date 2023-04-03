@@ -157,14 +157,20 @@ export const useDownloadStore = defineStore('download', () => {
     clearInterval(timer.value)
     timer.value = null
   }
+  const interval = ref<number>(5)
+  const timeout = ref<number>(10)
+  /**
+   * 刷新实时数据
+   */
   const getSpeedListTimer = async () => {
+    clearSpeedListTimer()
     timer.value = setInterval(async () => {
       speedList.value = await $getDownloadSpeedList()
       getSpeedTotal()
-    }, 5000)
+    }, interval.value * 1000)
     setTimeout(() => {
       clearSpeedListTimer()
-    }, 1000 * 60 * 15)
+    }, timeout.value * 1000 * 60)
   }
   const columns = ref<DataTableColumns<Downloader>>([
     {
@@ -234,6 +240,8 @@ export const useDownloadStore = defineStore('download', () => {
     speedTotal,
     downloaderList,
     downloaderForm,
+    interval,
+    timeout,
     downloadingFlag,
     refDownloaderForm,
     categorySelectList,

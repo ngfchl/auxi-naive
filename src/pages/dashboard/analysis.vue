@@ -68,7 +68,7 @@ onBeforeMount(async () => {
       </n-card>
     </n-gi>
     <n-gi><Downloading /></n-gi>
-    <n-gi v-if="downloadingFlag">
+    <n-gi v-if="downloadingFlag" span="24">
       <n-card hoverable embedded>
         <n-space justify="space-around">
           <DownloadItems :speed-list="speedList" />
