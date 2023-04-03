@@ -10,7 +10,7 @@
       </n-h2>
     </template>
     <n-image-group>
-      <n-space justify="center">
+      <n-space justify="center" class="-mt-4">
         <n-image
           width="120"
           class="b-rounded-5"
