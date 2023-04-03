@@ -10,19 +10,22 @@ const websiteStore = useWebsiteStore()
 const {
   totalData, siteInfoFlag,
 } = storeToRefs(websiteStore)
-
+const loading = ref(false)
 const {
   getTotalData, refreshSite, signSite,
 } = websiteStore
 onBeforeMount(async () => {
+  loading.value = true
   await getTotalData()
+  loading.value = false
 })
 </script>
 
 <template>
   <n-card hoverable embedded>
     <template #header>
-      <n-space justify="center" class="text-16px flex items-center justify-between">
+      <n-skeleton v-if="loading" text width="60%" />
+      <n-space v-else justify="center" class="text-16px flex items-center justify-between">
         <n-button size="small" ghost type="primary" @click="getTotalData">
           <MenuIcon icon="ReloadSharp" />
         </n-button>
@@ -53,7 +56,8 @@ onBeforeMount(async () => {
       </n-space>
     </template>
     <template #default>
-      <div>
+      <n-skeleton v-if="loading" text :repeat="6" />
+      <div v-else>
         <div class="flex items-center justify-between">
           <span class="text-#3b5769 font-bold">保种分享：</span>
           <div class="flex items-center">
@@ -115,13 +119,14 @@ onBeforeMount(async () => {
             />
           </div>
         </div>
+        <n-divider />
+        <span style="font-weight: bold;color: #3b5769;">P龄：</span>
+        <n-divider />
+        <p>
+          <span style="font-weight: bold;color: #3b5769;">最后更新时间：</span>
+          {{ totalData.updated }}
+        </p>
       </div>
-      <n-divider />
-      P龄：
-      <n-divider />
-      <p>
-        最后更新时间：{{ totalData.updated }}
-      </p>
     </template>
     <template #action>
       <n-space class="mt--10px mb--10px" justify="center">
