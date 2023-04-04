@@ -12,7 +12,7 @@ import {
   $parseSiteHistory, $refreshAllSite,
   $refreshSite,
   $removeMySite,
-  $saveMySite,
+  $saveMySite, $signAllSite,
   $signSite,
   $siteInfoNewList, $siteList,
   $siteStatusNewestList, $todayDataList,
@@ -735,13 +735,14 @@ export const useWebsiteStore = defineStore('website',
          */
     const editMysite = async (id: number) => {
       const siteList = id === 0 ? await $siteInfoNewList() : await $siteList()
+      siteInfoList.value.length = 0
       siteList.forEach((item: WebSite) => {
         siteInfoList.value.push({
           label: String(item.name),
           value: item.id,
         })
       })
-      mySiteForm.value = id === 0 ? mySite : await $getMySite({ mysite_id: id })
+      mySiteForm.value = id === 0 ? { ...mySite } : await $getMySite({ mysite_id: id })
       dialog?.info({
         title: id === 0 ? '添加站点' : `编辑站点：${mySiteForm.value.nickname}`,
         content: () => h(MySiteForm),
@@ -754,7 +755,7 @@ export const useWebsiteStore = defineStore('website',
       const flag = mySiteForm.value.id === 0 ? await $saveMySite(mySiteForm.value) : await $editMySite(mySiteForm.value)
       if (flag) {
         await updateMySiteStatus(mySiteForm.value.id)
-        mySiteForm.value = mySite
+        mySiteForm.value = { ...mySite }
         dialog?.destroyAll()
       }
     }
@@ -766,6 +767,9 @@ export const useWebsiteStore = defineStore('website',
       const flag = await $signSite(site_id)
       if (flag)
         await updateMySiteStatus(mySiteForm.value.id)
+    }
+    const signAllSite = async () => {
+      await $signAllSite()
     }
     const getSite = (site_id: number) => {
       return siteStatusList.value.find((item) => {
@@ -873,6 +877,7 @@ export const useWebsiteStore = defineStore('website',
       showList,
       signInList,
       signSite,
+      signAllSite,
       sign_today,
       siteEChart,
       siteHistory,

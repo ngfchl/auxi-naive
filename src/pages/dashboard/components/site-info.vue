@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, NotificationsCircleSharp, ShareSharp, SwapVerticalSharp,
+  CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, MailUnreadSharp, ShareSharp, SwapVerticalSharp,
 } from '@vicons/ionicons5'
 import renderSize from '../../../hooks/renderSize'
 import numberFormat from '../../../hooks/numberFormat'
@@ -12,7 +12,7 @@ const {
 } = storeToRefs(websiteStore)
 const loading = ref(false)
 const {
-  getTotalData, refreshSite, signSite, refreshAllSite,
+  getTotalData, signAllSite, refreshAllSite,
 } = websiteStore
 onBeforeMount(async () => {
   loading.value = true
@@ -48,7 +48,7 @@ onBeforeMount(async () => {
         >
           <template #icon>
             <n-icon size="13">
-              <NotificationsCircleSharp />
+              <MailUnreadSharp />
             </n-icon>
           </template>
           {{ totalData.mail }}
@@ -147,7 +147,7 @@ onBeforeMount(async () => {
         <n-button
           size="small"
           type="primary"
-          @click="signSite"
+          @click="signAllSite"
         >
           签到
         </n-button>

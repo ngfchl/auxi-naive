@@ -270,6 +270,19 @@ export const $signSite = async (site_id: number) => {
       return false
   }
 }
+
+export const $signAllSite = async () => {
+  const response = await usePost('mysite/signin/do')
+  const { code, msg } = response
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return true
+    default:
+      message?.error(msg)
+      return false
+  }
+}
 export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_id: number) => {
   const response = await usePost('mysite/status/get', { site_id })
   const { code, msg, data } = response
