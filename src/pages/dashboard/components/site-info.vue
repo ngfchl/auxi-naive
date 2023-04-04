@@ -12,7 +12,7 @@ const {
 } = storeToRefs(websiteStore)
 const loading = ref(false)
 const {
-  getTotalData, refreshSite, signSite,
+  getTotalData, refreshSite, signSite, refreshAllSite,
 } = websiteStore
 onBeforeMount(async () => {
   loading.value = true
@@ -132,7 +132,7 @@ onBeforeMount(async () => {
       <n-space class="mt--10px mb--10px" justify="center">
         <n-button
           size="small" type="primary"
-          @click="refreshSite"
+          @click="refreshAllSite"
         >
           刷新
         </n-button>

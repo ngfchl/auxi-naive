@@ -298,6 +298,18 @@ export const $refreshSite = async (site_id: number) => {
   }
 }
 
+export const $refreshAllSite = async () => {
+  const { msg, code, data } = await usePost('mysite/status/do')
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return data
+    default:
+      message?.error(msg)
+      return false
+  }
+}
+
 /**
  * 获取站点签到信息列表
  * @param params

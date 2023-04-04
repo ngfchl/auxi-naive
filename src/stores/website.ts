@@ -9,7 +9,7 @@ import {
   $getNewestStatus,
   $getSignList,
   $mySiteList,
-  $parseSiteHistory,
+  $parseSiteHistory, $refreshAllSite,
   $refreshSite,
   $removeMySite,
   $saveMySite,
@@ -808,6 +808,9 @@ export const useWebsiteStore = defineStore('website',
       const data: SiteStatus = await $refreshSite(site_id)
       if (data) await updateMySiteStatus(site_id)
     }
+    const refreshAllSite = async () => {
+      await $refreshAllSite()
+    }
 
     /**
          * 更新站点数据
@@ -862,6 +865,7 @@ export const useWebsiteStore = defineStore('website',
       pieOption,
       refMySiteForm,
       refreshSite,
+      refreshAllSite,
       removeMySite,
       saveMySite,
       searchKey,
