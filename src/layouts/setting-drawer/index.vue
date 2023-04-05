@@ -28,31 +28,39 @@ const cssVar = computed(() => {
   }
 })
 
-const layouts = ref([{
-  key: 'mix',
-  title: 'global.layout.setting.drawer.layout.mix',
-}, {
-  key: 'side',
-  title: 'global.layout.setting.drawer.layout.side',
-}, {
-  key: 'top',
-  title: 'global.layout.setting.drawer.layout.top',
-}])
-const layoutStyles = ref([{
-  id: 'light',
-  key: props.layout,
-  title: 'global.layout.setting.drawer.style.light',
-}, {
-  id: 'inverted',
-  key: props.layout,
-  inverted: true,
-  title: 'global.layout.setting.drawer.style.inverted',
-}, {
-  id: 'dark',
-  key: props.layout,
-  dark: true,
-  title: 'global.layout.setting.drawer.style.dark',
-}])
+const layouts = ref([
+  // {
+  //   key: 'mix',
+  //   title: 'global.layout.setting.drawer.layout.mix',
+  // },
+  {
+    key: 'side',
+    title: 'global.layout.setting.drawer.layout.side',
+  },
+  // {
+  //   key: 'top',
+  //   title: 'global.layout.setting.drawer.layout.top',
+  // },
+])
+const layoutStyles = ref([
+  {
+    id: 'light',
+    key: props.layout,
+    title: 'global.layout.setting.drawer.style.light',
+  },
+  {
+    id: 'inverted',
+    key: props.layout,
+    inverted: true,
+    title: 'global.layout.setting.drawer.style.inverted',
+  },
+  {
+    id: 'dark',
+    key: props.layout,
+    dark: true,
+    title: 'global.layout.setting.drawer.style.dark',
+  },
+])
 </script>
 
 <template>
