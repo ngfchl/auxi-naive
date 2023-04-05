@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, Man, NotificationsCircleSharp, RefreshSharp, SearchSharp, ShareSharp, SwapVerticalSharp, WarningSharp } from '@vicons/ionicons5'
+import { CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, MailUnreadSharp, Man, RefreshSharp, SearchSharp, ShareSharp, SwapVerticalSharp, WarningSharp } from '@vicons/ionicons5'
 import renderSize from '../../../hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useWebsiteStore } from '~/stores/website'
@@ -97,7 +97,11 @@ onMounted(async () => {
                 target="_blank"
                 type="primary"
               >
-                <img :src="site.logo" class="w-14px mr-1" alt="">
+                <n-image
+                  :src="site.logo"
+                  class="w-14px mr-1" alt=""
+                  fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
+                />
                 {{ my_site.nickname }}
                 <n-tag
                   v-for="tag in site.tags.split(',')" :key="tag"
@@ -119,52 +123,70 @@ onMounted(async () => {
             </span>
 
             <div class="flex items-center">
-              <span
+              <n-tag
                 v-if="status.my_level.length > 0"
-                class="text-red-500 text-15px mr-2 flex items-center"
+                size="small" :bordered="false" type="primary"
               >
-                <n-icon size="13">
-                  <Man />
-                </n-icon>
+                <template #icon>
+                  <n-icon>
+                    <Man />
+                  </n-icon>
+                </template>
                 <n-ellipsis>
                   {{ status.my_level }}
                 </n-ellipsis>
-              </span>
-              <span class="text-blue-500 mr-2 flex items-center">
-                <n-ellipsis
-                  v-if="status.invitation > 0"
-                  class="ml-1 flex items-center text-15px"
-                >
-                  <n-icon size="13"><CardSharp /></n-icon>
+              </n-tag>
+              <n-tag
+                v-if="status.invitation > 0"
+                type="success"
+                size="small" :bordered="false"
+              >
+                <template #icon>
+                  <n-icon>
+                    <CardSharp />
+                  </n-icon>
+                </template>
+                <n-ellipsis>
                   {{ status.invitation }}
                 </n-ellipsis>
-
+              </n-tag>
+              <n-tag
+                v-if="String(status.my_hr).length > 0 && Number(status.my_hr) > 0"
+                class="text-blue-500 mr-2"
+                size="small" :bordered="false" type="error"
+              >
                 <!--            <i :title="'加入时间：' + my_site.time_join" class="n-icon-date" -->
                 <!--               style="color: darkgreen" -->
                 <!--               v-text="' ' + site.weeks"></i> -->
                 <!--            <br v-if="status.my_hr !== 0 || status.mail > 0"> -->
+                <template #icon>
+                  <n-icon><WarningSharp /></n-icon>
+                </template>
 
                 <n-ellipsis
-                  v-if="String(status.my_hr).length > 0 && Number(status.my_hr) > 0"
-                  class="ml-2 flex items-center"
-                  style="color: orangered;font-size: 16px;"
+                  style="color: orangered;"
                   title="H&R"
                 >
-                  <n-icon><WarningSharp /></n-icon>
                   {{ status.my_hr }}
                 </n-ellipsis>
-
+              </n-tag>
+              <n-tag
+                v-if="status.mail > 0"
+                class="text-blue-500 mr-2 flex items-center"
+                size="small" :bordered="false" type="warning"
+              >
+                <template #icon>
+                  <n-icon size="13">
+                    <MailUnreadSharp />
+                  </n-icon>
+                </template>
                 <n-ellipsis
-                  v-if="status.mail > 0"
                   :href="site.url + site.page_message"
-                  style="color: darkred;font-size: 16px;"
-                  class="flex items-center justify-center ml-2"
                   target="_blank"
                 >
-                  <n-icon size="13"><NotificationsCircleSharp /></n-icon>
                   {{ status.mail }}
                 </n-ellipsis>
-              </span>
+              </n-tag>
             </div>
           </div>
         </template>
@@ -173,70 +195,101 @@ onMounted(async () => {
             <div class="flex items-center justify-between">
               <span class="text-#3b5769 font-bold">保种分享：</span>
               <div class="flex items-center">
-                <n-icon class="mr-1">
-                  <Cloudy />
-                </n-icon>
-                <span>{{ renderSize(status.seed_volume) }}</span>
+                <n-tag size="small" :bordered="false">
+                  <template #icon />
+                  <n-icon class="mr-1">
+                    <Cloudy />
+                  </n-icon>
+                  <span>{{ renderSize(status.seed_volume) }}</span>
+                </n-tag>
 
-                <n-icon class="ml-2 mr-1">
-                  <ShareSharp />
-                </n-icon>
-                <span style="color: saddlebrown" title="分享率">
-                  {{ status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞' }}
-                </span>
+                <n-tag size="small" :bordered="false">
+                  <template #icon>
+                    <n-icon class="ml-2 mr-1">
+                      <ShareSharp />
+                    </n-icon>
+                  </template>
+                  <span style="color: saddlebrown" title="分享率">
+                    {{ status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞' }}
+                  </span>
+                </n-tag>
               </div>
             </div>
             <n-divider />
             <div class="flex items-center justify-between">
               <span style="font-weight: bold;color: #3b5769;line-height: 36px">实时数据：</span>
-              <span style="text-align: right;" class="items-center">
-
-                <span style="color: green" title="做种数量">
-                  {{ status.seed }}
+              <span style="text-align: right;">
+                <span class="flex items-center justify-end">
+                  <n-tag size="small" :bordered="false">
+                    <span style="color: green" title="做种数量">
+                      {{ status.seed }}
+                    </span>
+                  </n-tag>
+                  <n-tag size="small" :bordered="false">
+                    <template #icon>
+                      <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
+                    </template>
+                    <span style="color: indianred" title="正在下载" v-text="status.leech" />
+                  </n-tag>
                 </span>
-                <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
-                <span style="color: indianred" title="正在下载" v-text="status.leech" />
                 <n-divider />
-                <span
-                  style="color: green" title="上传量"
-                  v-text="renderSize(status.uploaded)"
-                />
-                <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
-                <span
-                  style="color: indianred" title="下载量"
-                  v-text="renderSize(status.downloaded)"
-                />
+                <span style="text-align: right;" class="flex items-center justify-end">
+                  <n-tag size="small" :bordered="false">
+                    <span
+                      style="color: green" title="上传量"
+                      v-text="renderSize(status.uploaded)"
+                    />
+                  </n-tag>
+                  <n-tag size="small" :bordered="false">
+                    <template #icon>
+                      <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
+                    </template>
+                    <span
+                      style="color: indianred" title="下载量"
+                      v-text="renderSize(status.downloaded)"
+                    />
+                  </n-tag>
+                </span>
               </span>
             </div>
             <n-divider />
             <div class="flex items-center justify-between">
               <span style="font-weight: bold;color: #3b5769;">魔力/积分：</span>
               <div class="text-right">
-                <n-icon>
-                  <ColorWandOutline />
-                </n-icon>
-                <span
-                  style="color: darkorange" title="魔力/积分"
-                >
-                  <span v-text="` ${numberFormat(status.my_bonus)}`" />
-                  <span v-if="status.my_score !== 0" v-text="` / ${numberFormat(status.my_score)}`" />
-                </span>
+                <n-tag size="small" :bordered="false">
+                  <template #icon>
+                    <n-icon>
+                      <ColorWandOutline />
+                    </n-icon>
+                  </template>
+                  <span
+                    style="color: darkorange" title="魔力/积分"
+                  >
+                    <span v-text="` ${numberFormat(status.my_bonus)}`" />
+                    <span v-if="status.my_score !== 0" v-text="` / ${numberFormat(status.my_score)}`" />
+                  </span>
+                </n-tag>
+
                 <n-divider />
-                <n-icon>
-                  <ColorWandSharp />
-                </n-icon>
-                <i
-                  v-if="status.bonus_hour !== 0"
-                  style="color: coral"
-                  class="ml-1"
-                  title="时魔"
-                  v-text="`${status.bonus_hour.toFixed(2)} / ${(status.bonus_hour / site.sp_full * 100).toFixed(2)}%`"
-                />
-                <i
-                  v-else
-                  style="color: coral"
-                  title="时魔" v-text="status.bonus_hour.toFixed(2)"
-                />
+                <n-tag size="small" :bordered="false">
+                  <template #icon>
+                    <n-icon>
+                      <ColorWandSharp />
+                    </n-icon>
+                  </template>
+                  <i
+                    v-if="status.bonus_hour !== 0"
+                    style="color: coral"
+                    class="ml-1"
+                    title="时魔"
+                    v-text="`${status.bonus_hour.toFixed(2)} / ${(status.bonus_hour / site.sp_full * 100).toFixed(2)}%`"
+                  />
+                  <i
+                    v-else
+                    style="color: coral"
+                    title="时魔" v-text="status.bonus_hour.toFixed(2)"
+                  />
+                </n-tag>
               </div>
             </div>
           </div>

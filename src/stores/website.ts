@@ -714,19 +714,14 @@ export const useWebsiteStore = defineStore('website',
          * 更新数据后替换站点数据
          * @param site_id
          */
-    const updateMySiteStatus = async (
-      site_id: number,
-    ) => {
-      const index = siteStatusList.value.findIndex((item: NewestStatus) => {
-        return item.my_site.id === site_id
+    const updateMySiteStatus = async (site_id: number) => {
+      const index = siteStatusList.value.findIndex((status: NewestStatus) => {
+        return status.my_site.id === site_id
       })
 
       const item = await $getNewestStatus(site_id)
       siteStatusList.value.splice(index, 1, item)
-      return {
-        item,
-        index,
-      }
+      await siteSearch()
     }
 
     /**
@@ -766,7 +761,7 @@ export const useWebsiteStore = defineStore('website',
     const signSite = async (site_id: number) => {
       const flag = await $signSite(site_id)
       if (flag)
-        await updateMySiteStatus(mySiteForm.value.id)
+        await updateMySiteStatus(site_id)
     }
     const signAllSite = async () => {
       await $signAllSite()
