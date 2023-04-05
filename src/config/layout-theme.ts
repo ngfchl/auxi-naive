@@ -15,7 +15,7 @@ export interface LayoutTheme {
 export const layoutThemeConfig: LayoutTheme = {
   title: 'PT一下你就知道',
   layout: 'side',
-  layoutStyle: 'light',
+  layoutStyle: 'inverted',
   headerHeight: 48,
   siderWidth: 240,
   siderCollapsedWidth: 48,

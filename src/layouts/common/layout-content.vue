@@ -7,10 +7,11 @@ const attrs = useAttrs()
   <n-layout-content
     v-bind="attrs"
     style="--n-color:var(--pro-admin-layout-content-bg)"
-    class="px-1"
+    class="px-1 pt-47px"
+    position="absolute"
   >
     <MultiTab />
-    <div class="p-2">
+    <div class="px-2 mt-48px">
       <router-view />
     </div>
   </n-layout-content>

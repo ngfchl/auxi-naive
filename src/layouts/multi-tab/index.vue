@@ -60,7 +60,7 @@ const handleSelectTab = (path: string) => {
     type="card"
     animated
     tab-style="min-width: 80px;"
-    class="bg-#f0f0f0 dark:bg-transparent"
+    class="bg-#f0f0f0 dark:bg-transparent absolute z-998"
     @update:value="handleSelectTab"
     @close="handleClose"
   >

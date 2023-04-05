@@ -32,7 +32,7 @@ const onShowMenu = () => {
       v-if="layout !== 'side'"
       :inverted="inverted"
       :menu-visible="layout === 'top'"
-      class="pro-admin-mix-header flex justify-between items-center px-4 "
+      class="pro-admin-mix-header flex justify-between items-center px-4 z-999"
     >
       <template v-if="layout !== 'side'" #logo>
         <div class="flex items-center justify-center">
@@ -81,7 +81,8 @@ const onShowMenu = () => {
       <LayoutHeader
         v-if="layout === 'side'"
         :inverted="inverted"
-        class="pro-admin-mix-header flex justify-between items-center px-4"
+        position="absolute"
+        class="pro-admin-mix-header flex justify-between items-center px-4 z-999"
       >
         <template v-if="layout !== 'side'" #logo>
           <div class="flex items-center justify-center h-48px">
