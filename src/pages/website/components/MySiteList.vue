@@ -40,7 +40,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <n-space class="mb-2 flex items-center">
+  <n-space justify="start" class="z-998 absolute bg-#F0F0F0! w-100%">
     <n-button
       type="warning"
       size="small"
@@ -80,6 +80,7 @@ onMounted(async () => {
     responsive="self"
     x-gap="12"
     y-gap="8"
+    class="pt-32px"
   >
     <n-gi
       v-for="{ site, my_site, status, sign } in showList"
