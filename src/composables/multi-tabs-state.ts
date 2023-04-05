@@ -1,5 +1,4 @@
 import { omit } from 'lodash-es'
-import { useGlobalConfig } from '~/composables/gobal-config'
 import type { TabItem } from '~/layouts/multi-tab/type'
 import { MULTI_TAB_STATE_KEY } from '~/layouts/multi-tab/type'
 
@@ -22,20 +21,23 @@ export const useMultiTab = () => {
   const current = computed(() => state.current)
   const route = useRoute()
   const router = useRouter()
-  const { message } = useGlobalConfig()
   const closeTab = (path?: string) => {
     if (!path)
       path = current.value
-
+    // 只有最后一页时，关掉就替换为首页
     if (tabList.value.length <= 1) {
-      message?.error('最后一个了')
-      return
+      router.replace({
+        path: '/',
+      }).then(() => {})
+      state.tabList.splice(0, 1)
     }
+    // 关闭的不是当前页，依旧显示当前页
     const currentIndex = tabList.value.findIndex(item => item.path === path)
     if (path !== current.value) {
       state.tabList.splice(currentIndex, 1)
       return
     }
+    // 关闭当前页 是第一页就显示后面一页，不是就显示前面一页
     const targetIndex = currentIndex === 0 ? currentIndex + 1 : currentIndex - 1
     router.replace(tabList.value[targetIndex].route!).then(() => state.tabList.splice(currentIndex, 1))
   }
