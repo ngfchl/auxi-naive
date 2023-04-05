@@ -15,7 +15,7 @@ import {
   $saveMySite, $signAllSite,
   $signSite,
   $siteInfoNewList, $siteList,
-  $siteStatusNewestList, $todayDataList,
+  $siteStatusNewestList, $sortSite, $todayDataList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
@@ -170,6 +170,7 @@ export const useWebsiteStore = defineStore('website',
     ])
     const mySite = {
       id: 0,
+      sort_id: 1,
       site: 0,
       nickname: '',
       passkey: '',
@@ -537,9 +538,17 @@ export const useWebsiteStore = defineStore('website',
     }
 
     /**
-         * 搜索
-         */
+     * 搜索
+     */
     const siteSearch = async () => {
+      siteStatusList.value.sort((a, b) => {
+        if (b.status.mail === a.status.mail) {
+          if (b.my_site.sort_id === a.my_site.sort_id)
+            return b.my_site.id - a.my_site.id
+          return b.my_site.sort_id - a.my_site.sort_id
+        }
+        return b.status.mail - a.status.mail
+      })
       searchKey.value === ''
         ? showList.value = siteStatusList.value
         : showList.value = siteStatusList.value.filter((item) => {
@@ -724,6 +733,11 @@ export const useWebsiteStore = defineStore('website',
       await siteSearch()
     }
 
+    const sortMySite = async (my_site: MySite) => {
+      const flag = await $sortSite(my_site.id, my_site.sort_id)
+      if (flag) await updateMySiteStatus(my_site.id)
+    }
+
     /**
          * 打开编辑窗口
          * @param id
@@ -843,11 +857,10 @@ export const useWebsiteStore = defineStore('website',
       closeEditForm,
       columns,
       currentSite,
-      drawerTitle,
       dataLength,
       days,
+      drawerTitle,
       eDrawer,
-      pieTotalOption,
       editMysite,
       getMySiteList,
       getPerDayData,
@@ -862,17 +875,18 @@ export const useWebsiteStore = defineStore('website',
       mySiteList,
       perDayData,
       pieOption,
+      pieTotalOption,
       refMySiteForm,
-      refreshSite,
       refreshAllSite,
+      refreshSite,
       removeMySite,
       saveMySite,
       searchKey,
       showAddMySite,
       showList,
+      signAllSite,
       signInList,
       signSite,
-      signAllSite,
       sign_today,
       siteEChart,
       siteHistory,
@@ -881,6 +895,7 @@ export const useWebsiteStore = defineStore('website',
       siteList,
       siteSearch,
       siteStatusList,
+      sortMySite,
       todayDataList,
       todayDownloadedDataList,
       todayUploadedDataList,

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, MailUnreadSharp, Man, RefreshSharp, SearchSharp, ShareSharp, SwapVerticalSharp, WarningSharp } from '@vicons/ionicons5'
 import renderSize from '../../../hooks/renderSize'
+import type { MySite } from '~/api/website'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useWebsiteStore } from '~/stores/website'
 import SignInList from '~/pages/website/components/SignInList.vue'
@@ -26,6 +27,7 @@ const {
   initData,
   editMysite,
   signSite,
+  sortMySite,
   getSignList,
   refreshSite,
   updateMySiteStatus,
@@ -37,10 +39,13 @@ const {
 onMounted(async () => {
   await initData()
 })
+const handleUpdate = async (my_site: MySite) => {
+  await sortMySite(my_site)
+}
 </script>
 
 <template>
-  <n-space justify="start" class="z-998 absolute bg-#F0F0F0! w-100%">
+  <n-space justify="start" class="z-998 absolute">
     <n-button
       type="warning"
       size="small"
@@ -89,44 +94,67 @@ onMounted(async () => {
     >
       <n-card hoverable embedded>
         <template #header>
-          <div class="text-13px">
-            <span class="text-16px flex items-center justify-between">
-              <n-button
-                text
-                tag="a"
-                :href="site.url"
-                target="_blank"
-                type="primary"
-              >
-                <n-image
-                  :src="site.logo"
-                  class="w-14px mr-1" alt=""
-                  fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
-                />
-                {{ my_site.nickname }}
+          <n-space vertical class="text-13px flex">
+            <n-space justify="space-between">
+              <span class="flex items-center justify-between ">
+                <n-button
+                  text
+                  tag="a"
+                  :href="site.url"
+                  target="_blank"
+                  type="primary"
+                >
+                  <n-image
+                    :src="site.logo"
+                    class="w-14px mr-1" alt=""
+                    fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
+                  />
+                  {{ my_site.nickname ? my_site.nickname : site.name }}
+                </n-button>
                 <n-tag
                   v-for="tag in site.tags.split(',')" :key="tag"
-                  size="small" type="error" :bordered="false"
+                  size="small" type="info" :bordered="false"
                   class="ml-2 text-#3b5769"
                 >
                   {{ tag }}
                 </n-tag>
+                <n-button
+                  v-if="status.mail > 0"
+                  tag="a"
+                  target="_blank"
+                  :href="site.url + site.page_message"
+                  ghost
+                  class="text-blue-500 mr-2 flex items-center"
+                  size="tiny" :bordered="false" type="error"
+                >
+                  <template #icon>
+                    <n-icon size="13">
+                      <MailUnreadSharp />
+                    </n-icon>
+                  </template>
+                  <n-ellipsis
+                    :href="site.url + site.page_message"
+                    target="_blank"
+                  >
+                    {{ status.mail }}
+                  </n-ellipsis>
+                </n-button>
+              </span>
 
-              </n-button>
-              <n-space>
-                <n-button size="small" ghost type="primary" @click="updateMySiteStatus(my_site.id)">
+              <n-space justify="space-evenly" class="flex items-center justify-between">
+                <n-button size="tiny" ghost type="primary" @click="updateMySiteStatus(my_site.id)">
                   <MenuIcon icon="ReloadSharp" />
                 </n-button>
-                <n-button size="small" ghost type="info" @click="siteEChart(my_site.id)">
+                <n-button size="tiny" ghost type="info" @click="siteEChart(my_site.id)">
                   数据
                 </n-button>
               </n-space>
-            </span>
-
+            </n-space>
             <div class="flex items-center">
-              <n-tag
+              <n-button
                 v-if="status.my_level.length > 0"
-                size="small" :bordered="false" type="primary"
+                ghost
+                size="tiny" :bordered="false" type="primary"
               >
                 <template #icon>
                   <n-icon>
@@ -136,11 +164,11 @@ onMounted(async () => {
                 <n-ellipsis>
                   {{ status.my_level }}
                 </n-ellipsis>
-              </n-tag>
-              <n-tag
+              </n-button>
+              <n-button
                 v-if="status.invitation > 0"
-                type="success"
-                size="small" :bordered="false"
+                type="success" ghost
+                size="tiny" :bordered="false"
               >
                 <template #icon>
                   <n-icon>
@@ -150,11 +178,11 @@ onMounted(async () => {
                 <n-ellipsis>
                   {{ status.invitation }}
                 </n-ellipsis>
-              </n-tag>
-              <n-tag
+              </n-button>
+              <n-button
                 v-if="String(status.my_hr).length > 0 && Number(status.my_hr) > 0"
-                class="text-blue-500 mr-2"
-                size="small" :bordered="false" type="error"
+                class="text-blue-500 mr-2" ghost
+                size="tiny" :bordered="false" type="error"
               >
                 <!--            <i :title="'加入时间：' + my_site.time_join" class="n-icon-date" -->
                 <!--               style="color: darkgreen" -->
@@ -170,50 +198,51 @@ onMounted(async () => {
                 >
                   {{ status.my_hr }}
                 </n-ellipsis>
-              </n-tag>
-              <n-tag
-                v-if="status.mail > 0"
-                class="text-blue-500 mr-2 flex items-center"
-                size="small" :bordered="false" type="warning"
-              >
-                <template #icon>
-                  <n-icon size="13">
-                    <MailUnreadSharp />
-                  </n-icon>
-                </template>
-                <n-ellipsis
-                  :href="site.url + site.page_message"
-                  target="_blank"
+              </n-button>
+              <n-button size="tiny" type="warning" ghost :bordered="false">
+                <n-input-number
+                  v-model:value="my_site.sort_id"
+                  button-placement="right"
+                  status="warning"
+                  :bordered="false"
+                  class="w-100px text-#3b5769"
+                  size="tiny"
+                  min="1"
+                  @update:value="handleUpdate(my_site)"
                 >
-                  {{ status.mail }}
-                </n-ellipsis>
-              </n-tag>
+                  <template #prefix>
+                    <MenuIcon icon="SwapVerticalSharp" />
+                  </template>
+                </n-input-number>
+              </n-button>
             </div>
-          </div>
+          </n-space>
         </template>
         <template #default>
           <div v-if="status.updated_at">
             <div class="flex items-center justify-between">
               <span class="text-#3b5769 font-bold">保种分享：</span>
               <div class="flex items-center">
-                <n-tag size="small" :bordered="false">
-                  <template #icon />
-                  <n-icon class="mr-1">
-                    <Cloudy />
-                  </n-icon>
-                  <span>{{ renderSize(status.seed_volume) }}</span>
-                </n-tag>
-
-                <n-tag size="small" :bordered="false">
-                  <template #icon>
-                    <n-icon class="ml-2 mr-1">
-                      <ShareSharp />
+                <n-button-group>
+                  <n-button size="tiny" :bordered="false">
+                    <template #icon />
+                    <n-icon class="mr-1" color="deepskyblue">
+                      <Cloudy />
                     </n-icon>
-                  </template>
-                  <span style="color: saddlebrown" title="分享率">
-                    {{ status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞' }}
-                  </span>
-                </n-tag>
+                    <span style="color: deepskyblue">{{ renderSize(status.seed_volume) }}</span>
+                  </n-button>
+
+                  <n-button size="tiny" :bordered="false">
+                    <template #icon>
+                      <n-icon class="ml-2 mr-1">
+                        <ShareSharp />
+                      </n-icon>
+                    </template>
+                    <span style="color: saddlebrown" title="分享率">
+                      {{ status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞' }}
+                    </span>
+                  </n-button>
+                </n-button-group>
               </div>
             </div>
             <n-divider />
@@ -221,35 +250,39 @@ onMounted(async () => {
               <span style="font-weight: bold;color: #3b5769;line-height: 36px">实时数据：</span>
               <span style="text-align: right;">
                 <span class="flex items-center justify-end">
-                  <n-tag size="small" :bordered="false">
-                    <span style="color: green" title="做种数量">
-                      {{ status.seed }}
-                    </span>
-                  </n-tag>
-                  <n-tag size="small" :bordered="false">
-                    <template #icon>
-                      <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
-                    </template>
-                    <span style="color: indianred" title="正在下载" v-text="status.leech" />
-                  </n-tag>
+                  <n-button-group>
+                    <n-button size="tiny" :bordered="false">
+                      <span style="color: green" title="做种数量">
+                        {{ status.seed }}
+                      </span>
+                    </n-button>
+                    <n-button size="tiny" :bordered="false">
+                      <template #icon>
+                        <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
+                      </template>
+                      <span style="color: indianred" title="正在下载" v-text="status.leech" />
+                    </n-button>
+                  </n-button-group>
                 </span>
                 <n-divider />
                 <span style="text-align: right;" class="flex items-center justify-end">
-                  <n-tag size="small" :bordered="false">
-                    <span
-                      style="color: green" title="上传量"
-                      v-text="renderSize(status.uploaded)"
-                    />
-                  </n-tag>
-                  <n-tag size="small" :bordered="false">
-                    <template #icon>
-                      <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
-                    </template>
-                    <span
-                      style="color: indianred" title="下载量"
-                      v-text="renderSize(status.downloaded)"
-                    />
-                  </n-tag>
+                  <n-button-group>
+                    <n-button size="tiny" :bordered="false">
+                      <span
+                        style="color: green" title="上传量"
+                        v-text="renderSize(status.uploaded)"
+                      />
+                    </n-button>
+                    <n-button size="tiny" :bordered="false">
+                      <template #icon>
+                        <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
+                      </template>
+                      <span
+                        style="color: indianred" title="下载量"
+                        v-text="renderSize(status.downloaded)"
+                      />
+                    </n-button>
+                  </n-button-group>
                 </span>
               </span>
             </div>
@@ -257,7 +290,7 @@ onMounted(async () => {
             <div class="flex items-center justify-between">
               <span style="font-weight: bold;color: #3b5769;">魔力/积分：</span>
               <div class="text-right">
-                <n-tag size="small" :bordered="false">
+                <n-button size="tiny" :bordered="false">
                   <template #icon>
                     <n-icon>
                       <ColorWandOutline />
@@ -269,10 +302,9 @@ onMounted(async () => {
                     <span v-text="` ${numberFormat(status.my_bonus)}`" />
                     <span v-if="status.my_score !== 0" v-text="` / ${numberFormat(status.my_score)}`" />
                   </span>
-                </n-tag>
-
+                </n-button>
                 <n-divider />
-                <n-tag size="small" :bordered="false">
+                <n-button size="tiny" :bordered="false">
                   <template #icon>
                     <n-icon>
                       <ColorWandSharp />
@@ -290,7 +322,7 @@ onMounted(async () => {
                     style="color: coral"
                     title="时魔" v-text="status.bonus_hour.toFixed(2)"
                   />
-                </n-tag>
+                </n-button>
               </div>
             </div>
           </div>
@@ -299,7 +331,7 @@ onMounted(async () => {
           </div>
           <n-divider />
           <p v-if="status.updated">
-            最后更新时间：{{ status.updated }}
+            {{ status.updated }}
           </p>
         </template>
         <template #action>
@@ -336,6 +368,7 @@ onMounted(async () => {
               v-if="my_site.sign_in && site.func_sign_in && (!sign || !sign.sign_in_today)"
               size="small"
               type="primary"
+              ghost
               @click="signSite(my_site.id)"
             >
               签到

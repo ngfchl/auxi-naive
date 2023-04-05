@@ -43,6 +43,7 @@ export interface UserLevelRule {
 
 export interface MySite {
   id: number
+  sort_id: number
   site: number
   nickname: string
   passkey: string
@@ -317,6 +318,18 @@ export const $refreshAllSite = async () => {
     case 0:
       message?.success(msg)
       return data
+    default:
+      message?.error(msg)
+      return false
+  }
+}
+
+export const $sortSite = async (site_id: number, sort_id: number) => {
+  const { msg, code } = await usePost('mysite/sort', { site_id, sort_id })
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return true
     default:
       message?.error(msg)
       return false
