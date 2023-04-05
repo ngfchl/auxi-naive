@@ -8,6 +8,7 @@ const {
   content,
   currentLog,
   logList,
+  loading,
   currentLogContent,
 } = storeToRefs(logStore)
 const {
@@ -17,22 +18,16 @@ const {
   removeLog,
 } = logStore
 
-const loading = ref(false)
 onMounted(async () => {
   await getNames()
   await getLogContent(currentLog.value)
 })
 const handleRequireMore = async (from: 'top') => {
-  if (from === 'top') {
-    loading.value = true
+  if (from === 'top')
     await getLogContent(currentLog.value)
-    loading.value = false
-  }
 }
 const handleChangeLog = async () => {
-  loading.value = true
   await getLogContent(currentLog.value)
-  loading.value = false
 }
 </script>
 
@@ -44,10 +39,10 @@ const handleChangeLog = async () => {
       style="min-width:50vw;"
       @update:value="handleChangeLog"
     />
-    <n-button type="primary">
-      下载
-    </n-button>
-    <n-button type="error">
+    <!--    <n-button type="primary" @click="downloadLog"> -->
+    <!--      下载 -->
+    <!--    </n-button> -->
+    <n-button type="error" @click="removeLog">
       删除
     </n-button>
   </n-space>
@@ -57,7 +52,7 @@ const handleChangeLog = async () => {
     :rows="40"
     :hljs="hljs"
     class="px mt-2"
-    line-height="2"
+    :line-height="2"
     @require-more="handleRequireMore"
   />
 </template>

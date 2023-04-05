@@ -6,6 +6,7 @@ export const useLogStore = defineStore('logs', () => {
   const content = ref<string[]>()
   const currentLog = ref<string>('logs.log')
   const currentLogContent = ref<string>('')
+  const loading = ref(false)
   const logList = ref<SelectOption[]>([{
     label: '请选择',
   }])
@@ -19,15 +20,25 @@ export const useLogStore = defineStore('logs', () => {
     })
   }
   const getLogContent = async (file_name: string) => {
+    loading.value = true
+    currentLogContent.value = ''
     currentLogContent.value = await $getLogContent(file_name)
+    loading.value = false
   }
 
-  const downloadLog = async (file_name: string) => {
-    await $downloadLog(file_name)
+  const downloadLog = async () => {
+    await $downloadLog(currentLog.value)
   }
 
-  const removeLog = async (file_name: string) => {
-    await $removeLog(file_name)
+  const removeLog = async () => {
+    loading.value = true
+    const flag = await $removeLog(currentLog.value)
+    if (flag) {
+      await getNames()
+      currentLog.value = 'logs.log'
+      await getLogContent(currentLog.value)
+    }
+    loading.value = false
   }
   return {
     names,
@@ -35,6 +46,7 @@ export const useLogStore = defineStore('logs', () => {
     currentLog,
     currentLogContent,
     logList,
+    loading,
     getNames,
     getLogContent,
     downloadLog,
