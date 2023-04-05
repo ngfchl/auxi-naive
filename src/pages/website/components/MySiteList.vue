@@ -98,17 +98,20 @@ const handleUpdate = async (my_site: MySite) => {
             <n-space justify="space-between">
               <span class="flex items-center justify-between ">
                 <n-button
-                  text
                   tag="a"
+                  secondary strong
+                  size="small"
                   :href="site.url"
                   target="_blank"
                   type="primary"
                 >
-                  <n-image
-                    :src="site.logo"
-                    class="w-14px mr-1" alt=""
-                    fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
-                  />
+                  <template #icon>
+                    <n-image
+                      :src="site.logo"
+                      class="w-14px mr-1" alt=""
+                      fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
+                    />
+                  </template>
                   {{ my_site.nickname ? my_site.nickname : site.name }}
                 </n-button>
                 <n-tag
