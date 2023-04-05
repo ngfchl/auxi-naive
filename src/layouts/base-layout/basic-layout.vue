@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { MenuOutline } from '@vicons/ionicons5'
 import { HeaderLogo, HeaderTitle, LayoutContent, LayoutHeader, LayoutSider } from '../common'
-import DrawerMenu from '../common/drawer-menu/index.vue'
 const props = withDefaults(defineProps<{
   headerHeight?: number
   logo?: string
@@ -32,7 +31,7 @@ const onShowMenu = () => {
       v-if="layout !== 'side'"
       :inverted="inverted"
       :menu-visible="layout === 'top'"
-      class="pro-admin-mix-header flex justify-between items-center px-4 z-999"
+      class="pro-admin-mix-header flex justify-between items-center px-4 z-99"
     >
       <template v-if="layout !== 'side'" #logo>
         <div class="flex items-center justify-center">
@@ -82,7 +81,7 @@ const onShowMenu = () => {
         v-if="layout === 'side'"
         :inverted="inverted"
         position="absolute"
-        class="pro-admin-mix-header flex justify-between items-center px-4 z-999"
+        class="pro-admin-mix-header flex justify-between items-center px-4 z-99"
       >
         <template v-if="layout !== 'side'" #logo>
           <div class="flex items-center justify-center h-48px">

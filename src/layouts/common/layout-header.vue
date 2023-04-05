@@ -28,7 +28,7 @@ const { active } = useMenuState()
   <n-layout-header
     :inverted="inverted"
     position="absolute"
-    class="flex justify-between items-center z-9999"
+    class="flex justify-between items-center z-99"
   >
     <slot name="logo" />
     <div>
