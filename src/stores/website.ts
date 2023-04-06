@@ -24,10 +24,7 @@ import MySiteForm from '@/pages/website/components/MySiteForm.vue'
 
 export const useWebsiteStore = defineStore('website',
   () => {
-    const {
-      message,
-      dialog,
-    } = useGlobalConfig()
+    const { dialog } = useGlobalConfig()
     /**
          * 搜索字符串
          */
@@ -45,11 +42,22 @@ export const useWebsiteStore = defineStore('website',
         title: '名称',
         key: 'name',
         minWidth: 65,
-      },
-      {
-        title: '昵称',
-        key: 'nickname',
-        minWidth: 65,
+        render(row: WebSite) {
+          return h(
+            NButton,
+            {
+              tag: 'a',
+              href: row.url,
+              target: '_blank',
+              secondary: true,
+              type: 'primary',
+              size: 'small',
+            },
+            {
+              default: () => `${row.name} - ${row.nickname}`,
+            },
+          )
+        },
       },
       {
         title: '标签',
@@ -122,9 +130,11 @@ export const useWebsiteStore = defineStore('website',
               return h(
                 NSwitch,
                 {
-                  size: 'small',
-                  round: false,
-                  value: ability.support,
+                  'size': 'small',
+                  'round': false,
+                  'value': ability.support,
+                  // 'disabled': true,
+                  'onUpdate:value': async () => {},
                 },
                 {
                   'checked': () => ability.name,
@@ -152,21 +162,21 @@ export const useWebsiteStore = defineStore('website',
       //   title: '更新',
       //   key: 'updated',
       // },
-      {
-        key: 'actions',
-        title: '操作',
-        render(row: WebSite) {
-          return h(
-            NButton,
-            {
-              size: 'small',
-              onClick: () => message?.warning(`站点ID：${row.id}`),
-            },
-            { default: () => '操作' },
-          )
-        },
-        align: 'center',
-      },
+      // {
+      //   key: 'actions',
+      //   title: '操作',
+      //   render(row: WebSite) {
+      //     return h(
+      //       NButton,
+      //       {
+      //         size: 'small',
+      //         onClick: () => message?.warning(`站点ID：${row.id}`),
+      //       },
+      //       { default: () => '操作' },
+      //     )
+      //   },
+      //   align: 'center',
+      // },
     ])
     const mySite = {
       id: 0,
