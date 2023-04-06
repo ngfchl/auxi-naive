@@ -10,6 +10,7 @@ defineEmits(['update:eDrawer'])
 const websiteStore = useWebsiteStore()
 const {
   eDrawer,
+  spinShow,
   currentSite,
   searchKey,
   showList,
@@ -87,6 +88,14 @@ const handleUpdate = async (my_site: MySite) => {
     y-gap="8"
     class="pt-32px"
   >
+    <n-gi v-if="spinShow" span="24" class="mx-auto mt-30%">
+      <n-spin :show="spinShow" size="large">
+        <template #description>
+          你不知道你有多幸运
+        </template>
+      </n-spin>
+    </n-gi>
+
     <n-gi
       v-for="{ site, my_site, status, sign } in showList"
       :key="my_site.id"
@@ -95,63 +104,52 @@ const handleUpdate = async (my_site: MySite) => {
       <n-card hoverable embedded>
         <template #header>
           <n-space vertical class="text-13px flex">
-            <n-space justify="space-between">
-              <span class="flex items-center justify-between ">
-                <n-button
-                  tag="a"
-                  secondary strong
-                  size="small"
-                  :href="site.url"
-                  target="_blank"
-                  type="primary"
-                >
-                  <template #icon>
-                    <n-image
-                      :src="site.logo"
-                      class="w-14px mr-1" alt=""
-                      fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
-                    />
-                  </template>
-                  {{ my_site.nickname ? my_site.nickname : site.name }}
-                </n-button>
-                <n-tag
-                  v-for="tag in site.tags.split(',')" :key="tag"
-                  size="small" type="info" :bordered="false"
-                  class="ml-2 text-#3b5769"
-                >
-                  {{ tag }}
-                </n-tag>
-                <n-button
-                  v-if="status.mail > 0"
-                  tag="a"
-                  target="_blank"
+            <n-space justify="start">
+              <n-button
+                tag="a"
+                secondary strong
+                size="tiny"
+                :href="site.url"
+                target="_blank"
+                type="primary"
+              >
+                <template #icon>
+                  <n-image
+                    :src="site.logo"
+                    class="w-14px mr-1" alt=""
+                    fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
+                  />
+                </template>
+                {{ my_site.nickname ? my_site.nickname : site.name }}
+              </n-button>
+              <n-tag
+                v-for="tag in site.tags.split(',')" :key="tag"
+                size="small" type="info" :bordered="false"
+                class="ml-2 text-#3b5769"
+              >
+                {{ tag }}
+              </n-tag>
+              <n-button
+                v-if="status.mail > 0"
+                tag="a"
+                target="_blank"
+                :href="site.url + site.page_message"
+                ghost
+                class="text-blue-500 mr-2 absolute"
+                size="tiny" :bordered="false" type="error"
+              >
+                <template #icon>
+                  <n-icon size="13">
+                    <MailUnreadSharp />
+                  </n-icon>
+                </template>
+                <n-ellipsis
                   :href="site.url + site.page_message"
-                  ghost
-                  class="text-blue-500 mr-2 flex items-center"
-                  size="tiny" :bordered="false" type="error"
+                  target="_blank"
                 >
-                  <template #icon>
-                    <n-icon size="13">
-                      <MailUnreadSharp />
-                    </n-icon>
-                  </template>
-                  <n-ellipsis
-                    :href="site.url + site.page_message"
-                    target="_blank"
-                  >
-                    {{ status.mail }}
-                  </n-ellipsis>
-                </n-button>
-              </span>
-
-              <n-space justify="space-evenly" class="flex items-center justify-between">
-                <n-button size="tiny" ghost type="primary" @click="updateMySiteStatus(my_site.id)">
-                  <MenuIcon icon="ReloadSharp" />
-                </n-button>
-                <n-button size="tiny" ghost type="info" @click="siteEChart(my_site.id)">
-                  数据
-                </n-button>
-              </n-space>
+                  {{ status.mail }}
+                </n-ellipsis>
+              </n-button>
             </n-space>
             <div class="flex items-center">
               <n-button
@@ -333,62 +331,69 @@ const handleUpdate = async (my_site: MySite) => {
             这个站点还没有数据历史记录呀，快去刷新一下吧
           </div>
           <n-divider />
-          <p v-if="status.updated">
+          <p v-if="status.updated" class="text-8px text-right text-#3b5769">
             {{ status.updated }}
           </p>
+          <n-divider />
         </template>
         <template #action>
-          <n-space class="mt--10px mb--10px">
-            <n-button
-              v-if="my_site.get_info && site.func_get_userinfo" size="small" type="primary"
-              @click="refreshSite(my_site.id)"
-            >
-              刷新
-            </n-button>
-            <n-button
-              v-if="my_site.get_torrents && site.func_get_torrents" size="small" type="warning"
-              @click="updateTorrents(my_site.id)"
-            >
-              种子
-            </n-button>
-            <n-button v-if="my_site.hr && site.func_hr_discern" size="small" type="warning">
-              H&&R
-            </n-button>
-            <n-button v-if="my_site.brush_flow && site.func_brush_flow" size="small" type="warning">
-              刷流
-            </n-button>
-            <n-button v-if="my_site.search && site.func_search_torrents" size="small" type="warning">
-              聚合
-            </n-button>
-            <n-button v-if="my_site.repeat_torrents && site.func_repeat_torrents" size="small" type="warning">
-              辅种
-            </n-button>
+          <n-space justify="center" class="mt--10px mb--10px mx-auto">
+            <n-button-group size="small">
+              <n-button type="info" secondary @click="siteEChart(my_site.id)">
+                图表
+              </n-button>
+              <n-button
+                v-if="my_site.get_info && site.func_get_userinfo" type="error"
+                secondary @click="refreshSite(my_site.id)"
+              >
+                刷新
+              </n-button>
+              <n-button v-if="my_site.hr && site.func_hr_discern" type="warning" secondary>
+                H&&R
+              </n-button>
+              <n-button v-if="my_site.brush_flow && site.func_brush_flow" type="warning" secondary>
+                刷流
+              </n-button>
+              <n-button v-if="my_site.search && site.func_search_torrents" type="warning" secondary>
+                聚合
+              </n-button>
+              <n-button v-if="my_site.repeat_torrents && site.func_repeat_torrents" type="warning" secondary>
+                辅种
+              </n-button>
 
-            <n-button size="small" type="error" @click="editMysite(my_site.id)">
-              编辑
-            </n-button>
-            <n-button
-              v-if="my_site.sign_in && site.func_sign_in && (!sign || !sign.sign_in_today)"
-              size="small"
-              type="primary"
-              ghost
-              @click="signSite(my_site.id)"
-            >
-              签到
-            </n-button>
-            <n-button
-              v-if="sign && sign.sign_in_today" size="small" type="success" ghost
-              @click="getSignList(my_site.id)"
-            >
-              签到
-              <MenuIcon size="20" icon="CheckboxSharp" color="green" />
-            </n-button>
+              <n-button
+                v-if="my_site.sign_in && site.func_sign_in && (!sign || !sign.sign_in_today)"
+                type="warning" secondary
+                @click="signSite(my_site.id)"
+              >
+                签到
+              </n-button>
+              <n-button
+                v-if="sign && sign.sign_in_today" type="success"
+                secondary @click="getSignList(my_site.id)"
+              >
+                签到
+                <!--                <MenuIcon size="20" icon="CheckboxSharp" color="green" /> -->
+              </n-button>
+
+              <!--              <n-button -->
+              <!--                v-if="my_site.get_torrents && site.func_get_torrents" type="primary" -->
+              <!--                secondary @click="updateTorrents(my_site.id)" -->
+              <!--              > -->
+              <!--                种子 -->
+              <!--              </n-button> -->
+              <n-button type="warning" secondary @click="updateMySiteStatus(my_site.id)">
+                <MenuIcon icon="ReloadSharp" />
+              </n-button>
+              <n-button type="error" secondary @click="editMysite(my_site.id)">
+                <MenuIcon icon="Pencil" />
+              </n-button>
+            </n-button-group>
           </n-space>
         </template>
       </n-card>
     </n-gi>
   </n-grid>
-
   <!--  <el-dialog -->
   <!--    v-model="showAddMySite" -->
   <!--    :title="title" -->

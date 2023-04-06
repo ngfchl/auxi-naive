@@ -30,6 +30,7 @@ export const useWebsiteStore = defineStore('website',
          */
     const searchKey = ref('')
     const eDrawer = ref(false)
+    const spinShow = ref(false)
     const sign_today = ref(false)
     const drawerTitle = ref('详情')
     const columns = ref<DataTableColumns<WebSite>>([
@@ -590,9 +591,11 @@ export const useWebsiteStore = defineStore('website',
          * 初始化数据列表
          */
     const initData = async () => {
+      spinShow.value = true
       siteStatusList.value.length = 0
       siteStatusList.value = await $siteStatusNewestList()
       await siteSearch()
+      spinShow.value = false
     }
 
     const getTotalData = async () => {
@@ -845,7 +848,9 @@ export const useWebsiteStore = defineStore('website',
       if (data) await updateMySiteStatus(site_id)
     }
     const refreshAllSite = async () => {
+      spinShow.value = true
       await $refreshAllSite()
+      spinShow.value = false
     }
 
     /**
@@ -919,6 +924,7 @@ export const useWebsiteStore = defineStore('website',
       siteSearch,
       siteStatusList,
       sortMySite,
+      spinShow,
       todayDataList,
       todayDownloadedDataList,
       todayUploadedDataList,
