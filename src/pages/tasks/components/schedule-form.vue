@@ -45,6 +45,9 @@ const handleSave = async () => {
         show-word-limit
       />
     </n-form-item>
+    <n-form-item label="开启" path="enabled" required inline>
+      <n-switch v-model:value="scheduleForm.enabled" :round="false" />
+    </n-form-item>
     <n-form-item label="分钟" path="crontab.minute" required>
       <n-input
         v-model:value="scheduleForm.crontab.minute"

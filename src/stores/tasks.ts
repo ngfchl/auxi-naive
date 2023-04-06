@@ -28,6 +28,7 @@ export const useTaskStore = defineStore('task', () => {
     id: 0,
     name: '',
     task: '',
+    enabled: true,
     crontab: {
       minute: '10',
       hour: '8',
@@ -94,8 +95,6 @@ export const useTaskStore = defineStore('task', () => {
       const schedule = await $schedule({ schedule_id })
       const crontab = crontabList.value?.find(item => item.id === schedule.crontab)
       scheduleForm.value = schedule
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       scheduleForm.value.crontab = crontab
     }
     dialog?.info({
@@ -204,9 +203,14 @@ export const useTaskStore = defineStore('task', () => {
         return h(
           NSwitch,
           {
-            size: 'small',
-            round: false,
-            value: row.enabled,
+            'size': 'small',
+            'round': false,
+            'value': row.enabled,
+            'onUpdate:value': async (value) => {
+              row.enabled = value
+              const flag = await $editSchedule(row)
+              if (flag) await getTaskList()
+            },
           },
           {
             'checked': () => '开启',
@@ -228,12 +232,12 @@ export const useTaskStore = defineStore('task', () => {
     {
       title: '次数',
       key: 'total_run_count',
-      minWidth: 35,
+      width: 55,
     },
     {
       title: '上次运行',
       key: 'last_run_at',
-      minWidth: 135,
+      minWidth: 165,
     },
     // {
     //   title: '备注',

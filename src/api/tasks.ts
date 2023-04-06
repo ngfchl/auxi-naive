@@ -29,7 +29,8 @@ export interface ScheduleForm {
   id: number
   name: String
   task: String
-  crontab: Crontab
+  enabled?: boolean
+  crontab?: Crontab | number
 }
 
 export const $taskList: () => Promise<any> = async () => {
