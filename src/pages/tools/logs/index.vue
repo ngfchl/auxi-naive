@@ -32,7 +32,7 @@ const handleChangeLog = async () => {
 </script>
 
 <template>
-  <n-space justify="start" class="px">
+  <n-space justify="start" class="px pt-5px mb-2px">
     <n-select
       v-model:value="currentLog"
       :options="logList"
@@ -51,12 +51,25 @@ const handleChangeLog = async () => {
     :log="currentLogContent"
     :rows="40"
     :hljs="hljs"
-    class="px mt-2"
+    class="px mt-2 code"
     :line-height="2"
     @require-more="handleRequireMore"
   />
 </template>
 
 <style scoped>
-
+.code {
+  color: #F2F6FC;
+  background-color: #1f2c39 !important;
+  font-size: 13px;
+  font-family: 'Heiti SC';
+  line-height: 18px;
+  word-break: break-word;
+  border: 1px solid #eee;
+  height: 75vh;
+  width: 98%;
+  margin: auto;
+  border-radius: 5px;
+  overflow-y: scroll;
+}
 </style>

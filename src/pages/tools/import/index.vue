@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { JSZipObject } from 'jszip'
 import JSZip from 'jszip'
-import type { UploadProps } from 'naive-ui'
-import type { FileInfo, SettledFileInfo } from 'naive-ui/es/upload/src/interface'
+import type { SettledFileInfo } from 'naive-ui/es/upload/src/interface'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import { useImportStore } from '~/stores/tools/import'
 
@@ -105,13 +104,30 @@ const handlePreview = (uploadFile: SettledFileInfo) => {
       <h3 class="text-center">
         用户信息
       </h3>
-      <n-input v-model:value="userinfo.info" type="textarea" :rows="30" readonly />
+      <n-input
+        v-model:value="userinfo.info"
+        class="code" type="textarea"
+        :rows="30" readonly
+        placeholder=""
+      />
     </div>
     <div class="w-49% h-100%">
       <h3 class="text-center">
         网站Cookies
       </h3>
-      <n-input v-model:value="userinfo.cookies" type="textarea" :rows="30" readonly />
+      <n-input
+        v-model:value="userinfo.cookies"
+        class="code" type="textarea"
+        :rows="30" readonly
+        placeholder=""
+      />
     </div>
   </div>
 </template>
+
+<style scoped>
+.code{
+  color: #F2F6FC;
+  background-color: #1f2c39 !important;
+}
+</style>

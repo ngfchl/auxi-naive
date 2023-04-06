@@ -21,7 +21,7 @@ export const useLogStore = defineStore('logs', () => {
   }
   const getLogContent = async (file_name: string) => {
     loading.value = true
-    currentLogContent.value = ''
+    // currentLogContent.value = ''
     currentLogContent.value = await $getLogContent(file_name)
     loading.value = false
   }
