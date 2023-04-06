@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataTableColumns, DropdownOption } from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import { useSettingsStore } from '~/stores/settings'
 
