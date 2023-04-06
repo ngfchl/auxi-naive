@@ -16,17 +16,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <n-card class="box-card">
+  <n-card hoverable embedded>
     <template #header>
-      <div class="card-header">
+      <n-space justify="space-between">
         <span>下载器</span>
-        <div class="flex-grow" />
-        <span class="header-button">
-          <NButton type="success" @click="editDownloader(0)">
-            添加
-          </NButton>
-        </span>
-      </div>
+        <NButton type="success" size="small" @click="editDownloader(0)">
+          添加
+        </NButton>
+      </n-space>
     </template>
     <div style="height: 100%;">
       <n-data-table

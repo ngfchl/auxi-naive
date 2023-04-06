@@ -179,29 +179,57 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '名称',
       key: 'name',
-      width: 150,
+      minWidth: 100,
     },
     {
       title: '地址',
       key: 'host',
-      width: 150,
+      minWidth: 50,
+      align: 'center',
+      render(row: Downloader) {
+        const url = `${row.host}:${row.port}`
+        return h(
+          NButton,
+          {
+            tag: 'a',
+            href: url,
+            target: '_blank',
+            secondary: true,
+            type: 'primary',
+            size: 'small',
+          },
+          {
+            default: () => '访问',
+          },
+        )
+      },
     },
     {
       title: '类型',
       key: 'category',
-      width: 150,
+      align: 'center',
+      minWidth: 60,
     },
     {
       title: '开启',
       key: 'enable',
-      width: 150,
+      minWidth: 80,
+      align: 'center',
       render(row: Downloader) {
         return h(
           NSwitch,
           {
-            size: 'small',
-            round: false,
-            value: row.enable,
+            'size': 'small',
+            'round': false,
+            'checked-value': true,
+            'unchecked-value': false,
+            'value': row.enable,
+            'onUpdate:value': async (value) => {
+              const downloader = await $getDownloader({ downloader_id: row.id })
+              downloader.enable = value
+              const flag = await $editDownloader(downloader)
+              if (flag) await getDownloaderList()
+            },
           },
           {
             'checked': () => '开启',
@@ -222,6 +250,8 @@ export const useDownloadStore = defineStore('download', () => {
     {
       key: 'actions',
       title: '操作',
+      minWidth: 50,
+      align: 'center',
       render(row: Downloader) {
         return h(
           NButton,
@@ -232,8 +262,6 @@ export const useDownloadStore = defineStore('download', () => {
           { default: () => '编辑' },
         )
       },
-      width: 150,
-      align: 'center',
     },
   ])
   return {
