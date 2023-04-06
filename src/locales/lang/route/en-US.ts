@@ -17,6 +17,7 @@ export default {
   'pages.settings.system.title': 'system',
   'pages.settings.hosts.title': 'HOSTS',
   'pages.settings.supervisor.title': 'supervisor',
+  'pages.settings.flower.title': 'flower',
   'pages.tools.title': 'tools',
   'pages.tools.shell.title': 'shell',
   'pages.tools.logs.title': 'logs',

@@ -17,6 +17,7 @@ export default {
   'pages.settings.system.title': '系统配置',
   'pages.settings.hosts.title': 'HOSTS',
   'pages.settings.supervisor.title': '进程管理',
+  'pages.settings.flower.title': '任务查看',
   'pages.tools.title': '工具箱',
   'pages.tools.shell.title': '终端',
   'pages.tools.logs.title': '日志',

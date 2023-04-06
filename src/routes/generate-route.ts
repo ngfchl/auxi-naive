@@ -207,6 +207,16 @@ export const generateRoute = async () => {
       keepAlive: true,
     },
     {
+      id: 18,
+      pid: 11,
+      path: '/settings/flower',
+      name: 'flower',
+      component: 'FlowerSetting',
+      title: 'pages.settings.flower.title',
+      icon: 'Apps',
+      keepAlive: true,
+    },
+    {
       id: 14,
       pid: null,
       path: '/tools',
