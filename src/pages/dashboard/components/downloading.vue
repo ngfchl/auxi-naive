@@ -96,7 +96,7 @@ const setTimeoutDefault = () => {
               placeholder="刷新间隔"
               title="刷新间隔"
               @blur="setIntervalDefault"
-              @change="getSpeedListTimer"
+              @update:value="getSpeedListTimer"
             />
           </template>
           <span>实时数据刷新间隔，最小1，最大5，单位：秒</span>
@@ -112,7 +112,7 @@ const setTimeoutDefault = () => {
               placeholder="刷新持续时间"
               title="刷新持续时间"
               @blur="setTimeoutDefault"
-              @change="getSpeedListTimer"
+              @update:value="getSpeedListTimer"
             />
           </template>
           <span>刷新持续时间，最小1，最大15，单位：分钟</span>
