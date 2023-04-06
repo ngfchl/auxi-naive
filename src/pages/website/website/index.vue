@@ -10,9 +10,11 @@ const {
   siteList,
 } = storeToRefs(websiteStore)
 const rowKey = (row: RowData) => row.id
-
+const loading = ref<Boolean>(false)
 onMounted(async () => {
+  loading.value = true
   await getSiteList()
+  loading.value = false
 })
 </script>
 
@@ -22,6 +24,7 @@ onMounted(async () => {
     :data="siteList"
     :row-key="rowKey"
     size="small"
+    :loading="loading"
     bordered
     striped
   />
