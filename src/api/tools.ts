@@ -29,3 +29,24 @@ export const $removeLog = async (file_name: string) => {
       return false
   }
 }
+
+export const $sendCommand = async (command: string) => {
+  const {
+    code,
+    msg,
+    data,
+  } = await useGet<object>('config/shell', { command })
+  switch (code) {
+    case 0:
+      if (msg.length > 0) message?.success(msg, { keepAliveOnHover: true })
+      return data
+    default:
+      message?.warning(
+        msg,
+        {
+          keepAliveOnHover: true,
+        },
+      )
+      return false
+  }
+}
