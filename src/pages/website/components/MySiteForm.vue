@@ -4,6 +4,12 @@ import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 const websiteStore = useWebsiteStore()
 const { refMySiteForm, mySiteForm, siteInfoList, addMySiteFormRules } = storeToRefs(websiteStore)
 const { saveMySite, removeMySite } = websiteStore
+const loading = ref(false)
+const handleSaveMySite = async () => {
+  loading.value = true
+  await saveMySite()
+  loading.value = false
+}
 </script>
 
 <template>
@@ -186,7 +192,10 @@ const { saveMySite, removeMySite } = websiteStore
         确定删除此站点信息吗？
       </n-popconfirm>
 
-      <n-button type="primary" @click="saveMySite">
+      <n-button
+        type="primary" :loading="loading"
+        @click="handleSaveMySite"
+      >
         保存
       </n-button>
     </n-space>

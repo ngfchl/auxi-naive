@@ -10,6 +10,12 @@ const {
   saveSchedule,
   removeSchedule,
 } = taskStore
+const loading = ref(false)
+const handleSave = async () => {
+  loading.value = true
+  await saveSchedule()
+  loading.value = false
+}
 </script>
 
 <template>
@@ -69,7 +75,10 @@ const {
       确定删除此任务吗？
     </n-popconfirm>
 
-    <n-button type="primary" @click="saveSchedule">
+    <n-button
+      type="primary" :loading="loading"
+      @click="handleSave"
+    >
       保存
     </n-button>
   </n-space>

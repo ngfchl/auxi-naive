@@ -13,9 +13,12 @@ const {
   getScheduleList,
   editSchedule,
 } = taskStore
+const loading = ref<Boolean>(false)
 const rowKey = (row: RowData) => row.task
 onBeforeMount(async () => {
+  loading.value = true
   await getScheduleList()
+  loading.value = false
 })
 </script>
 
@@ -41,6 +44,7 @@ onBeforeMount(async () => {
     :columns="columns"
     :data="scheduleList"
     :row-key="rowKey"
+    :loading="loading"
     size="small"
     bordered
     striped
