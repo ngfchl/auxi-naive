@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import type { DataTableColumns } from 'naive-ui'
-import { NButton, NSwitch } from 'naive-ui'
-import type { Downloader } from '~/api/download'
+import { NButton } from 'naive-ui'
 import { useGlobalConfig } from '~/composables/gobal-config'
-import type { Schedule } from '~/api/tasks'
-import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
 const downloadStore = useDownloadStore()
 const { getDownloaderList, editDownloader } = downloadStore
 const { downloaderList, columns } = storeToRefs(downloadStore)
 const { message } = useGlobalConfig()
+const loading = ref<Boolean>(false)
 
 onMounted(async () => {
+  loading.value = true
   await getDownloaderList()
+  loading.value = false
 })
 </script>
 
@@ -33,6 +32,7 @@ onMounted(async () => {
       <n-data-table
         :columns="columns"
         :data="downloaderList"
+        :loading="loading"
         striped
         bordered
       />
