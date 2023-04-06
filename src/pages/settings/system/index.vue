@@ -2,21 +2,41 @@
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import { useSettingsStore } from '~/stores/settings'
+
 const { message } = useGlobalConfig()
-const { getSettingsToml } = useSettingsStore()
-const { treeData } = storeToRefs(useSettingsStore())
-const showDropdownRef = ref(false)
-const xRef = ref(0)
-const yRef = ref(0)
-const handleSelect = () => {
-  showDropdownRef.value = false
-}
-const onClickOutside = () => {
-  showDropdownRef.value = false
-}
+const {
+  getSettingsFile,
+  saveSettingsFile,
+  getSettingsToml,
+  setContent,
+} = useSettingsStore()
+const editFlag = ref(false)
+const {
+  treeData,
+  content,
+} = storeToRefs(useSettingsStore())
+
 onMounted(async () => {
   await getSettingsToml()
 })
+
+let c = ''
+/**
+ * 未修改内容的话取消编辑回复原样
+ * @param value
+ */
+const handleEdit = async (value: boolean) => {
+  await getSettingsFile('ptools.toml')
+  editFlag.value = value
+  if (value)
+    c = `${content.value}`
+  else if (content.value !== c) await setContent(c)
+}
+const handleSave = async () => {
+  await saveSettingsFile('ptools.toml')
+  editFlag.value = false
+  await getSettingsToml()
+}
 const rowKey = (row: RowData) => row.index
 const columns: DataTableColumns<RowData> = [
   {
@@ -31,54 +51,40 @@ const columns: DataTableColumns<RowData> = [
     key: 'name',
   },
 ]
-const options: DropdownOption[] = [
-  {
-    label: '编辑',
-    key: 'edit',
-  },
-  {
-    label: () => h('span', { style: { color: 'red' } }, '删除'),
-    key: 'delete',
-  },
-]
-const rowProps = (row: ParentNode) => {
-  return {
-    onContextmenu: (e: MouseEvent) => {
-      e.preventDefault()
-      if (row.children.length > 0) {
-        message?.info(JSON.stringify(row, null, 2))
-        showDropdownRef.value = false
-        nextTick().then(() => {
-          showDropdownRef.value = true
-          xRef.value = e.clientX
-          yRef.value = e.clientY
-        })
-      }
-    },
-  }
-}
 </script>
 
 <template>
+  <n-space justify="end">
+    <n-button :type="editFlag ? 'warning' : 'primary'" @click="handleEdit(!editFlag)">
+      <span v-text="!editFlag ? '编辑' : '取消'" />
+    </n-button>
+    <n-button v-if="editFlag" type="success" @click="handleSave">
+      保存
+    </n-button>
+  </n-space>
+  <n-input v-if="editFlag" v-model:value="content" class="code mt-2" type="textarea" placeholder="" />
   <n-data-table
+    v-else
     :columns="columns"
     :data="treeData.children"
     :row-key="rowKey"
-    :row-props="rowProps"
     default-expand-all
-  />
-  <n-dropdown
-    placement="bottom-start"
-    trigger="manual"
-    :x="xRef"
-    :y="yRef"
-    :options="options"
-    :show="showDropdownRef"
-    :on-clickoutside="onClickOutside"
-    @select="handleSelect"
   />
 </template>
 
 <style scoped>
-
+.code {
+    color: #F2F6FC;
+    /*background-color: #1f2c39 !important;*/
+    font-size: 16px;
+    font-family: 'Heiti SC';
+    line-height: 20px;
+    word-break: break-word;
+    /*border: 1px solid #eee;*/
+    height: 75vh;
+    width: 98%;
+    border-radius: 5px;
+    overflow-y: scroll;
+    z-index: 999;
+}
 </style>
