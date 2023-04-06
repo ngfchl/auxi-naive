@@ -305,32 +305,45 @@ export const useWebsiteStore = defineStore('website',
       },
     ])
     const getTodayDataList = async () => {
-      todayDataList.value = await $todayDataList()
       todayUploadedDataList.value.length = 0
       todayDownloadedDataList.value.length = 0
+      pieOption.value = {}
+      let downloadTotal = 0
+      todayDataList.value = await $todayDataList()
       todayDataList.value?.data.forEach((todayIncreaseData) => {
-        todayUploadedDataList.value.push({
-          name: todayIncreaseData.name,
-          value: todayIncreaseData.uploaded,
-        })
-        todayDownloadedDataList.value.push({
-          name: todayIncreaseData.name,
-          value: todayIncreaseData.downloaded,
-        })
+        if (todayIncreaseData.uploaded > 0) {
+          todayUploadedDataList.value.push({
+            name: todayIncreaseData.name,
+            value: todayIncreaseData.uploaded,
+          })
+        }
+        if (todayIncreaseData.downloaded > 0) {
+          todayDownloadedDataList.value.push({
+            name: todayIncreaseData.name,
+            value: todayIncreaseData.downloaded,
+          })
+          downloadTotal += todayIncreaseData.downloaded
+        }
       })
+      if (downloadTotal <= 0) {
+        todayDownloadedDataList.value.push({
+          name: '今日无下载',
+          value: 0,
+        })
+      }
       todayUploadedDataList.value.sort((a, b) => a.value - b.value)
       todayDownloadedDataList.value.sort((a, b) => a.value - b.value)
       pieOption.value = {
         title: {
           text: `⬆${renderSize(todayDataList.value!.total_upload)} ⬇${renderSize(todayDataList.value!.total_download)}`,
-          top: 5,
+          top: 15,
           left: 'center',
           textStyle: {
             fontSize: 18,
             color: 'orangered',
           },
         },
-        bottom: 1,
+        bottom: 0,
         toolbox: {
           feature: {
             saveAsImage: {},
@@ -339,7 +352,7 @@ export const useWebsiteStore = defineStore('website',
         },
         tooltip: {
           show: false,
-          formatter(params: { name: any; data: { value: number } }) {
+          formatter(params: { name: string; data: { value: number } }) {
             return `${params.name}：\t${renderSize(params.data.value)}`
           },
           valueFormatter(value: number) {
@@ -353,16 +366,16 @@ export const useWebsiteStore = defineStore('website',
           {
             name: '下载量',
             type: 'pie',
-            radius: ['30%', '45%'],
+            radius: ['25%', '45%'],
             itemStyle: {
-              borderRadius: 10,
+              borderRadius: 5,
               borderColor: '#fff',
-              borderWidth: 2,
+              borderWidth: 1,
             },
             label: {
               show: false,
               position: 'center',
-              formatter(params: { data: { value: number }; name: any }) {
+              formatter(params: { data: { value: number }; name: string }) {
                 if (params.data.value > 0)
                   return `${params.name} ⬇${renderSize(params.data.value)}`
               },
@@ -387,9 +400,9 @@ export const useWebsiteStore = defineStore('website',
             type: 'pie',
             radius: ['50%', '70%'],
             itemStyle: {
-              borderRadius: 10,
+              borderRadius: 5,
               borderColor: '#fff',
-              borderWidth: 2,
+              borderWidth: 1,
             },
             label: {
               position: 'center',
@@ -620,7 +633,7 @@ export const useWebsiteStore = defineStore('website',
           value: s.downloaded,
         })
       })
-      totalData.value.ratio = totalData.value.uploaded / totalData.value.downloaded
+      totalData.value.ratio = totalData.value.downloaded > 0 ? totalData.value.uploaded / totalData.value.downloaded : 0
       pieTotalOption.value = {
         title: {
           text: `⬆${renderSize(totalData.value.uploaded)} ⬇${renderSize(totalData.value.downloaded)}`,
@@ -631,7 +644,7 @@ export const useWebsiteStore = defineStore('website',
             color: 'orangered',
           },
         },
-        bottom: 1,
+        bottom: 0,
         toolbox: {
           feature: {
             saveAsImage: {},
@@ -640,7 +653,7 @@ export const useWebsiteStore = defineStore('website',
         },
         tooltip: {
           show: false,
-          formatter(params: { name: any; data: { value: number } }) {
+          formatter(params: { name: string; data: { value: number } }) {
             return `${params.name}：\t${renderSize(params.data.value)}`
           },
           valueFormatter(value: number) {
@@ -663,7 +676,7 @@ export const useWebsiteStore = defineStore('website',
             label: {
               show: false,
               position: 'center',
-              formatter(params: { data: { value: number }; name: any }) {
+              formatter(params: { data: { value: number }; name: string }) {
                 if (params.data.value > 0)
                   return `${params.name} ⬇${renderSize(params.data.value)}`
               },

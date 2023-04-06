@@ -4,12 +4,13 @@ const websiteStore = useWebsiteStore()
 const {
   pieTotalOption,
 } = storeToRefs(websiteStore)
+const { getTotalData } = websiteStore
 </script>
 
 <template>
   <n-card hoverable embedded>
     <div class="flex justify-center">
-      <n-button ghost size="small" color="#FF4500">
+      <n-button ghost size="small" color="#FF4500" @click="getTotalData">
         全部数据
       </n-button>
     </div>

@@ -273,7 +273,7 @@ export const $signSite = async (site_id: number) => {
 }
 
 export const $signAllSite = async () => {
-  const response = await usePost('mysite/signin/do')
+  const response = await usePost('mysite/sign/do')
   const { code, msg } = response
   switch (code) {
     case 0:

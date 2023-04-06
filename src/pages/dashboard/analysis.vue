@@ -21,9 +21,9 @@ const {
   getPerDayData, getTodayDataList,
 } = websiteStore
 onBeforeMount(async () => {
-  await getSpeedList()
   await getPerDayData()
   await getTodayDataList()
+  await getSpeedList()
 })
 </script>
 
