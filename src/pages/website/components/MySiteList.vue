@@ -1,11 +1,25 @@
 <script lang="ts" setup>
-import { CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, MailUnreadSharp, Man, RefreshSharp, SearchSharp, ShareSharp, SwapVerticalSharp, WarningSharp } from '@vicons/ionicons5'
+import {
+  CardSharp,
+  Cloudy,
+  ColorWandOutline,
+  ColorWandSharp,
+  MailUnreadSharp,
+  Man,
+  RefreshSharp,
+  SearchSharp,
+  ShareSharp,
+  SwapVerticalSharp,
+  WarningSharp,
+} from '@vicons/ionicons5'
 import renderSize from '../../../hooks/renderSize'
+import renderBit from '../../../hooks/renderBit'
 import type { MySite } from '~/api/website'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useWebsiteStore } from '~/stores/website'
 import SignInList from '~/pages/website/components/SignInList.vue'
 import numberFormat from '~/hooks/numberFormat'
+
 defineEmits(['update:eDrawer'])
 const websiteStore = useWebsiteStore()
 const {
@@ -97,7 +111,7 @@ const handleUpdate = async (my_site: MySite) => {
     </n-gi>
 
     <n-gi
-      v-for="{ site, my_site, status, sign } in showList"
+      v-for="{ site, my_site, status, sign, level, next_level } in showList"
       :key="my_site.id"
       :timestamp="`加入时间: ${my_site.joined.replace('T', ' ')}`"
     >
@@ -152,20 +166,180 @@ const handleUpdate = async (my_site: MySite) => {
               </n-button>
             </n-space>
             <div class="flex items-center">
-              <n-button
+              <n-popover
                 v-if="status.my_level.length > 0"
-                ghost
-                size="tiny" :bordered="false" type="primary"
+                placement="bottom"
+                trigger="hover"
+                :show-arrow="false"
+                :scrollable="true"
+                width="320"
+                style="max-height: 240px"
               >
-                <template #icon>
-                  <n-icon>
-                    <Man />
-                  </n-icon>
+                <template #trigger>
+                  <n-button
+                    ghost
+                    size="tiny" :bordered="false" type="primary"
+                  >
+                    <template #icon>
+                      <n-icon>
+                        <Man />
+                      </n-icon>
+                    </template>
+                    <n-ellipsis>
+                      {{ status.my_level }}
+                    </n-ellipsis>
+                  </n-button>
                 </template>
-                <n-ellipsis>
-                  {{ status.my_level }}
-                </n-ellipsis>
-              </n-button>
+                <table style="font-size: 10px;font-family: 'Heiti SC';margin-right: 5px;">
+                  <tr v-if="level">
+                    <th class="w-70px">
+                      当前等级：
+                    </th>
+                    <td class="complete">
+                      <n-text type="success">
+                        {{ level.level }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="next_level">
+                    <th class="w-70px">
+                      下一等级：
+                    </th>
+                    <td class="incomplete">
+                      <n-text type="error">
+                        {{ next_level.level }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="site.upgrade_day">
+                    <th>升级时间：</th>
+                    <td>
+                      <!--     todo: 完成升级时间的计算                   -->
+                      <span
+                        class="incomplete"
+                        v-text="site.upgrade_day.replace('T', ' ')"
+                      />
+                    </td>
+                  </tr>
+                  <tr v-if="next_level && renderBit(next_level.uploaded) > status.uploaded">
+                    <th>上传量：</th>
+                    <td>
+                      <n-text type="success">
+                        {{ renderSize(status.uploaded) }}
+                      </n-text>
+                      /
+                      <n-text type="error">
+                        {{ renderSize(renderBit(next_level.downloaded) * next_level.ratio) }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="next_level && renderBit(next_level.downloaded) > status.downloaded">
+                    <th>下载量：</th>
+                    <td>
+                      <n-text type="success">
+                        {{ renderSize(status.downloaded) }}
+                      </n-text>
+                      /
+                      <n-text type="error">
+                        {{ next_level.downloaded }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="next_level && next_level.bonus !== 0 && next_level.bonus > status.my_bonus">
+                    <th>魔力：</th>
+                    <td>
+                      <n-text type="success">
+                        {{ numberFormat(status.my_bonus) }}
+                      </n-text>
+                      /
+                      <n-text type="error">
+                        {{ numberFormat(next_level.my_bonus) }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="next_level && next_level.score !== 0 && next_level.score > status.my_score">
+                    <th>
+                      积分：
+                    </th>
+                    <td>
+                      <n-text type="success">
+                        {{ numberFormat(status.my_score) }}
+                      </n-text>
+                      /
+                      <n-text type="error">
+                        {{ numberFormat(next_level.my_score) }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="status.ratio !== '∞' && next_level && next_level.ratio !== 0 && next_level.ratio > status.ratio">
+                    <th>分享率：</th>
+                    <td>
+                      <n-text type="success">
+                        {{ status.ratio }}
+                      </n-text>
+                      /
+                      <n-text type="error">
+                        {{ next_level.ratio }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr v-if="next_level && next_level.torrents !== 0 && next_level.torrents > (status.torrents ? status.torrents : 0)">
+                    <th>
+                      发种数：
+                    </th>
+                    <td>
+                      <n-text type="success">
+                        {{ status.torrents ? status.torrents : 0 }}
+                      </n-text>
+                      /
+                      <n-text type="error">
+                        {{ next_level.torrents }}
+                      </n-text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th colspan="2" style="text-align: center">
+                      <h3>权益：</h3>
+                    </th>
+                  </tr>
+                  <tr v-if="next_level">
+                    <th>
+                      即将拥有：
+                    </th>
+                    <td>
+                      <n-text
+                        type="error"
+                        class="text-8px"
+                      >
+                        {{ next_level.rights }}
+                      </n-text>
+                    </td>
+                    <td />
+                  </tr>
+                  <tr>
+                    <th>已拥有：</th>
+                    <td>
+                      <div v-if="level">
+                        <n-text
+                          v-for="(value, index) in level.rights.split('||')"
+                          :key="index"
+                          type="success"
+                          class="text-8px"
+                          style="color: darkgreen;font-size: 8px;"
+                        >
+                          {{ `${index + 1}：${value.trim()}` }}
+                        </n-text>
+                      </div>
+                      <!--                      <div v-else> -->
+                      <!--                        <i -->
+                      <!--                          class="el-icon-star-on" -->
+                      <!--                          v-text="level.rights" -->
+                      <!--                        /> -->
+                      <!--                      </div> -->
+                    </td>
+                  </tr>
+                </table>
+              </n-popover>
               <n-button
                 v-if="status.invitation > 0"
                 type="success" ghost
@@ -190,7 +364,9 @@ const handleUpdate = async (my_site: MySite) => {
                 <!--               v-text="' ' + site.weeks"></i> -->
                 <!--            <br v-if="status.my_hr !== 0 || status.mail > 0"> -->
                 <template #icon>
-                  <n-icon><WarningSharp /></n-icon>
+                  <n-icon>
+                    <WarningSharp />
+                  </n-icon>
                 </template>
 
                 <n-ellipsis
@@ -240,7 +416,9 @@ const handleUpdate = async (my_site: MySite) => {
                       </n-icon>
                     </template>
                     <span style="color: saddlebrown" title="分享率">
-                      {{ status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞' }}
+                      {{
+                        status.downloaded > 0 ? numberFormat(Number((status.uploaded / status.downloaded).toFixed(2))) : '∞'
+                      }}
                     </span>
                   </n-button>
                 </n-button-group>
@@ -357,7 +535,10 @@ const handleUpdate = async (my_site: MySite) => {
               <n-button v-if="my_site.search && site.func_search_torrents" type="warning" secondary>
                 聚合
               </n-button>
-              <n-button v-if="my_site.repeat_torrents && site.func_repeat_torrents" type="warning" secondary>
+              <n-button
+                v-if="my_site.repeat_torrents && site.func_repeat_torrents" type="warning"
+                secondary
+              >
                 辅种
               </n-button>
 
@@ -440,8 +621,8 @@ const handleUpdate = async (my_site: MySite) => {
 </template>
 
 <style scoped>
-.n-divider:not(.n-divider--vertical){
-  margin-top:2px;
-  margin-bottom: 2px;
+.n-divider:not(.n-divider--vertical) {
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 </style>
