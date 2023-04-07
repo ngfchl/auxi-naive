@@ -3,7 +3,11 @@ import { getList } from '~/hooks/getList'
 export interface ParentNode {
   index: string
   name: string
-  children: []
+  children: ParentNode[]
+}
+
+export interface ParentData {
+  [key: string]: string | number | boolean | ParentData
 }
 const { message } = useGlobalConfig()
 export const $getSettingsToml: () => Promise<any> = async () => {
