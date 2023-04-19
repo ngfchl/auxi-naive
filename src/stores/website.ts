@@ -33,6 +33,8 @@ export const useWebsiteStore = defineStore('website',
     const spinShow = ref(false)
     const sign_today = ref(false)
     const drawerTitle = ref('详情')
+    const page = ref(1)
+    const pageSize = ref(8)
     const columns = ref<DataTableColumns<WebSite>>([
       {
         title: 'id',
@@ -135,7 +137,8 @@ export const useWebsiteStore = defineStore('website',
                   'round': false,
                   'value': ability.support,
                   // 'disabled': true,
-                  'onUpdate:value': async () => {},
+                  'onUpdate:value': async () => {
+                  },
                 },
                 {
                   'checked': () => ability.name,
@@ -562,13 +565,14 @@ export const useWebsiteStore = defineStore('website',
     }
 
     /**
-     * 搜索
-     */
+         * 搜索
+         */
     const siteSearch = async () => {
       siteStatusList.value.sort((a, b) => {
         if (b.status.mail === a.status.mail) {
           if (b.my_site.sort_id === a.my_site.sort_id)
             return b.my_site.id - a.my_site.id
+
           return b.my_site.sort_id - a.my_site.sort_id
         }
         return b.status.mail - a.status.mail
@@ -857,7 +861,10 @@ export const useWebsiteStore = defineStore('website',
          * 更新站点数据
          */
     const siteEChart = async (site_id: number, days = -7) => {
-      const res = await $getHistoryList({ site_id, days })
+      const res = await $getHistoryList({
+        site_id,
+        days,
+      })
       const item = getSite(site_id)
       drawerTitle.value = `${item?.my_site.nickname}  历史数据`
       siteHistory.value = await $parseSiteHistory(res)
@@ -904,6 +911,8 @@ export const useWebsiteStore = defineStore('website',
       perDayData,
       pieOption,
       pieTotalOption,
+      page,
+      pageSize,
       refMySiteForm,
       refreshAllSite,
       refreshSite,

@@ -34,6 +34,7 @@ const {
   siteHistory,
   siteStatusList,
   dataLength, days,
+  page, pageSize,
 } = storeToRefs(websiteStore)
 
 const {
@@ -53,6 +54,11 @@ const {
  */
 onMounted(async () => {
   await initData()
+})
+const list = computed(() => {
+  const start = (page.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return showList.value.slice(start, end)
 })
 const handleUpdate = async (my_site: MySite) => {
   await sortMySite(my_site)
@@ -94,13 +100,21 @@ const handleUpdate = async (my_site: MySite) => {
       </template>
     </n-input>
   </n-space>
-
+  <n-pagination
+    v-model:page="page"
+    v-model:page-size="pageSize"
+    class="absolute z-998 mt-8"
+    size="small" simple
+    :item-count="siteStatusList.length"
+    show-size-picker
+    :page-sizes="[6, 8, 10, 20, 30, 40]"
+  />
   <n-grid
     cols="400:1 600:2 900:3 1200:4"
     responsive="self"
     x-gap="12"
     y-gap="8"
-    class="pt-32px"
+    class="pt-58px"
   >
     <n-gi v-if="spinShow" span="24" class="mx-auto mt-30%">
       <n-spin :show="spinShow" size="large">
@@ -111,7 +125,7 @@ const handleUpdate = async (my_site: MySite) => {
     </n-gi>
 
     <n-gi
-      v-for="{ site, my_site, status, sign, level, next_level } in showList"
+      v-for="{ site, my_site, status, sign, level, next_level } in list"
       :key="my_site.id"
       :timestamp="`加入时间: ${my_site.joined.replace('T', ' ')}`"
     >
@@ -575,6 +589,7 @@ const handleUpdate = async (my_site: MySite) => {
       </n-card>
     </n-gi>
   </n-grid>
+
   <!--  <el-dialog -->
   <!--    v-model="showAddMySite" -->
   <!--    :title="title" -->
