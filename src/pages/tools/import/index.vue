@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { JSZipObject } from 'jszip'
 import JSZip from 'jszip'
-import type { SettledFileInfo } from 'naive-ui/es/upload/src/interface'
+import type { UploadFileInfo } from 'naive-ui'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import { useImportStore } from '~/stores/tools/import'
 
@@ -13,10 +13,11 @@ const { userinfo } = storeToRefs(importStore)
 //
 /**
  * 解析压缩文件，并获取需要的文件内容
- * @param uploadFile
+ * @param options
  */
-const handlePreview = (uploadFile: SettledFileInfo) => {
-  const fileInfo = uploadFile.file?.file
+const handlePreview = (options: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
+  const { file } = options
+  const fileInfo = file.file
   if (!fileInfo) {
     message?.error('文件读取错误！')
     return
@@ -52,35 +53,14 @@ const handlePreview = (uploadFile: SettledFileInfo) => {
               })
           }
         }
-        // if (fileName.includes("userdatas.json")) {
-        //   let file = res.file(obj.name)
-        //   if (file) {
-        //     file.async('text')
-        //         .then(response => {
-        //           let ptpp = JSON.parse(response);
-        //           userinfo.value.userdata = JSON.stringify(ptpp, null, "    ")
-        //         })
-        //   }
-        // }
       }
     })
   })
 }
-
-/**
- * 替换当前选中的文件
- * @param files
- */
-// const handleExceed: UploadProps['onExceed'] = (files) => {
-//   upload.value!.clearFiles()
-//   const file = files[0] as UploadRawFile
-//   file.uid = genFileId()
-//   upload.value!.handleStart(file)
-// }
 </script>
 
 <template>
-  <n-space>
+  <n-space justify="space-between" class="px-5">
     <n-upload
       :default-upload="false"
       @change="handlePreview"
@@ -99,30 +79,34 @@ const handlePreview = (uploadFile: SettledFileInfo) => {
     </n-button>
   </n-space>
 
-  <div class="flex justify-between px-5">
-    <div class="w-49% h-100%">
+  <n-grid class="flex justify-between px-5" x-gap="5">
+    <n-gi span="12">
       <h3 class="text-center">
         用户信息
       </h3>
       <n-input
         v-model:value="userinfo.info"
-        class="code" type="textarea"
-        :rows="30" readonly
+        :rows="30"
+        class="code"
         placeholder=""
+        readonly
+        type="textarea"
       />
-    </div>
-    <div class="w-49% h-100%">
+    </n-gi>
+    <n-gi span="12">
       <h3 class="text-center">
         网站Cookies
       </h3>
       <n-input
         v-model:value="userinfo.cookies"
-        class="code" type="textarea"
-        :rows="30" readonly
+        :rows="30"
+        class="code"
         placeholder=""
+        readonly
+        type="textarea"
       />
-    </div>
-  </div>
+    </n-gi>
+  </n-grid>
 </template>
 
 <style scoped>
