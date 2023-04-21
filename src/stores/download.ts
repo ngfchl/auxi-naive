@@ -1,18 +1,21 @@
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
-import { NButton, NSwitch } from 'naive-ui'
+import { NButton, NProgress, NSwitch } from 'naive-ui'
 import type {
   DownloadSpeedType,
-  Downloader,
+  Downloader, Downloading, Torrent,
 } from '~/api/download'
 import {
   $addDownloader,
   $editDownloader,
   $getDownloadSpeedList,
-  $getDownloader,
-  $getDownloaderList, $removeDownloader,
+  $getDownloader, $getDownloaderList,
+  $getDownloading, $removeDownloader,
 } from '~/api/download'
+import numberFormat from '~/hooks/numberFormat'
+import timeFormat from '~/hooks/timeFormat'
 import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+import renderSize from '~/hooks/renderSize'
 
 export const useDownloadStore = defineStore('download', () => {
   const { dialog } = useGlobalConfig()
@@ -20,7 +23,259 @@ export const useDownloadStore = defineStore('download', () => {
   const downloaderList = ref<Downloader[]>([])
   const timer = ref()
   const downloadingFlag = ref(false)
+  const downloading = ref<Downloading>({
+    categories: [],
+    torrents: [],
+  })
+  const download_state = {
+    uploading: '正在上传',
+    downloading: '正在下载',
+    pausedUP: '完成上传',
+    pausedDL: '暂停下载',
+    checkingUP: '正在校验',
+    forcedDL: '强制下载',
+    stalledUP: '正在做种',
+    stalledDL: '等待下载',
+    missingFiles: '文件丢失',
+    forcedUP: '强制做种',
+    moving: '正在移动',
+    queuedDL: '下载队列中',
+    queuedUP: '上传队列中',
+    error: '错误',
+    unknown: '未知',
+    allocating: '分配',
+    metaDL: '下载元数据',
+    checkingDL: '下载校验中',
+    checkingResumeData: '校验恢复数据',
+    forcedMetaDL: '强制下载元数据',
+  }
+  const downloadingColumns = ref<DataTableColumns<Torrent>>([
+    {
+      type: 'selection',
+      fixed: 'left',
+    },
+    {
+      title: '名称',
+      key: 'name',
+      fixed: 'left',
+      minWidth: 120,
+      width: 200,
+      maxWidth: 300,
+      resizable: true,
+      sorter: 'default',
+      ellipsis: {
+        tooltip: true,
+      },
+    },
+    {
+      title: '分类',
+      key: 'category',
+      minWidth: 150,
+      width: 150,
+      maxWidth: 200,
+      resizable: true,
+    },
+    {
+      title: '大小',
+      key: 'size',
+      minWidth: 100,
+      width: 150,
+      maxWidth: 150,
+      resizable: true,
+      sorter: (row1, row2) => row1.size - row2.size,
+      render(row: Torrent) {
+        return renderSize(row.size)
+      },
+    },
+    { title: '保存路径', key: 'save_path', width: 200 },
+    {
+      title: '状态',
+      key: 'state',
+      minWidth: 100,
+      maxWidth: 150,
+      width: 150,
+      resizable: true,
+      filterOptions: Object.entries(download_state).map(([value, label]) => ({ value, label })),
+      filter(value, row) {
+        return !!~row.state.indexOf(value.toString())
+      },
+      render(row: Torrent): string {
+        return download_state[row.state]
+      },
+    },
+    {
+      title: '进度',
+      key: 'progress',
+      minWidth: 60,
+      maxWidth: 120,
+      resizable: true,
+      sorter: (row1, row2) => row1.progress - row2.progress,
+      render(row: Torrent) {
+        return h(
+          NProgress,
+          {
+            'type': 'line',
+            'indicator-placement': 'inside',
+            'percentage': Number((row.progress * 100).toFixed(2)),
+            'height': 20,
+            'borderRadius': 4,
+            'fill-border-radius': 0,
+          },
+        )
+      },
+    },
+    {
+      title: '添加时间',
+      key: 'added_on',
+      width: 220,
+      minWidth: 200,
+      maxWidth: 300,
+      resizable: true,
+      sorter: 'default',
+    },
+    {
+      title: '下载速度',
+      key: 'dlspeed',
+      minWidth: 100,
+      maxWidth: 150,
+      width: 150,
+      resizable: true,
+      sorter: (row1, row2) => row1.dlspeed - row2.dlspeed,
+      render(row: Torrent) {
+        return `${renderSize(row.dlspeed)}/s`
+      },
+    },
+    {
+      title: '已上传',
+      key: 'uploaded',
+      minWidth: 100,
+      maxWidth: 150,
+      width: 150,
+      resizable: true,
+      sorter: (row1, row2) => row1.uploaded - row2.uploaded,
+      render(row: Torrent) {
+        return renderSize(row.uploaded)
+      },
+    },
+    {
+      title: '上传速度',
+      key: 'upspeed',
+      minWidth: 100,
+      maxWidth: 150,
+      width: 150,
+      resizable: true,
+      sorter: (row1, row2) => row1.upspeed - row2.upspeed,
+      render(row: Torrent) {
+        return `${renderSize(row.upspeed)}/s`
+      },
+    },
+    {
+      title: '已下载',
+      key: 'completed',
+      minWidth: 100,
+      maxWidth: 150,
+      width: 150,
+      resizable: true,
+      sorter: (row1, row2) => row1.completed - row2.completed,
+      render(row: Torrent) {
+        return renderSize(row.completed)
+      },
+    },
+    {
+      title: '完成于',
+      key: 'completion_on',
+      width: 220,
+      minWidth: 200,
+      maxWidth: 300,
+      resizable: true,
+      sorter: 'default',
+    },
+    // { title: '文件路径', key: 'content_path', minWidth: 100 },
+    {
+      title: '最后活动',
+      key: 'last_activity',
+      width: 200,
+      minWidth: 100,
+      maxWidth: 250,
+      resizable: true,
+      render(row: Torrent) {
+        return timeFormat(row.last_activity)
+      },
+    },
+    // { title: '下载链接', key: 'magnet_uri', minWidth: 100 },
+    {
+      title: '种子',
+      key: 'num_complete',
+      sorter: (row1, row2) => row1.num_complete - row2.num_complete,
+      minWidth: 85,
+      maxWidth: 150,
+      resizable: true,
+      render(row: Torrent) {
+        return `${row.num_complete}(${row.num_seeds})`
+      },
+    },
+    {
+      title: '未完成',
+      key: 'num_incomplete',
+      sorter: (row1, row2) => row1.num_incomplete - row2.num_incomplete,
+      minWidth: 65,
+      maxWidth: 100,
+      resizable: true,
+    },
+    {
+      title: '下载中',
+      key: 'num_leechs',
+      sorter: (row1, row2) => row1.num_leechs - row2.num_leechs,
+      minWidth: 65,
+      maxWidth: 100,
+      resizable: true,
+    },
+    // {
+    //   title: '做种中',
+    //   key: 'num_seeds',
+    //   sorter: (row1, row2) => row1.num_seeds - row2.num_seeds,
+    //   minWidth: 100,
+    // },
+    {
+      title: '分享率',
+      key: 'ratio',
+      minWidth: 75,
+      maxWidth: 100,
+      resizable: true,
+      sorter: (row1, row2) => row1.ratio - row2.ratio,
+      render(row: Torrent) {
+        return numberFormat(row.ratio)
+      },
+    },
+    // { title: '做种时间', key: 'seeding_time', minWidth: 100 },
+    // { title: '最后完整可见', key: 'seen_complete', minWidth: 100 },
+    // { title: '标签', key: 'tags', minWidth: 100 },
+    // {
+    //   title: '活动时间',
+    //   key: 'time_active',
+    //   width: 120,
+    //   minWidth: 100,
+    //   maxWidth: 180,
+    //   resizable: true,
+    //   render(row: Torrent) {
+    //     return timeFormat(row.time_active)
+    //   },
+    // },
+    {
+      title: '总大小',
+      key: 'total_size',
+      sorter: (row1, row2) => row1.total_size - row2.total_size,
+      minWidth: 100,
+      maxWidth: 150,
+      width: 150,
+      resizable: true,
+      render(row: Torrent) {
+        return renderSize(row.uploaded)
+      },
+    },
+    // { title: 'Tracker', key: 'tracker', minWidth: 100 },
 
+  ])
   const setDownloadSpeedList = (value: DownloadSpeedType[]) => {
     speedList.value = value
   }
@@ -157,6 +412,9 @@ export const useDownloadStore = defineStore('download', () => {
     clearInterval(timer.value)
     timer.value = null
   }
+  const getDownloading = async (downloader_id: number) => {
+    downloading.value = await $getDownloading({ downloader_id })
+  }
   const interval = ref<number>(5)
   const timeout = ref<number>(10)
   const setIntervalValue = (value: number) => {
@@ -265,28 +523,31 @@ export const useDownloadStore = defineStore('download', () => {
     },
   ])
   return {
-    timer,
-    columns,
-    speedList,
-    speedTotal,
-    downloaderList,
-    downloaderForm,
-    interval,
-    timeout,
-    downloadingFlag,
-    refDownloaderForm,
-    categorySelectList,
     addDownloaderFormRules,
-    getSpeedListTimer,
-    setDownloadSpeedList,
+    categorySelectList,
     clearSpeedListTimer,
-    getSpeedTotal,
-    getSpeedList,
-    getDownloaderList,
+    columns,
+    downloaderForm,
+    downloaderList,
+    downloading,
+    downloadingColumns,
+    downloadingFlag,
     editDownloader,
+    getDownloaderList,
+    getDownloading,
+    getSpeedList,
+    getSpeedListTimer,
+    getSpeedTotal,
+    interval,
+    refDownloaderForm,
+    removeDownloader,
     saveDownloader,
+    setDownloadSpeedList,
     setIntervalValue,
     setTimeoutValue,
-    removeDownloader,
+    speedList,
+    speedTotal,
+    timeout,
+    timer,
   }
 })
