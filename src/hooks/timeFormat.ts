@@ -29,10 +29,10 @@ export default (seconds: number) => {
       }
     }
     else {
-      return `${time.minute}分${time.second}秒`
+      return `${time.minute}分${time.second.toFixed(2)}秒`
     }
   }
   else {
-    return `${seconds}秒`
+    return `${seconds.toFixed(2)}秒`
   }
 }
