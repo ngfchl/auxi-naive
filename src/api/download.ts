@@ -13,7 +13,7 @@ export interface DownloadSpeedType {
 export interface Downloader {
   id: number
   name: string
-  usernames?: string
+  username?: string
   password?: string
   host: string
   port?: number
