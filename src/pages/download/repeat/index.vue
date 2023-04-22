@@ -155,6 +155,7 @@ const rowProps = (row: Torrent) => {
   return {
     onContextmenu: (e: MouseEvent) => {
       message?.info(JSON.stringify(row.hash, null, 2))
+      currentRow.value.length = 0
       e.preventDefault()
       currentRow.value.push(row)
       showDropdown.value = false
