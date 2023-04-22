@@ -1,8 +1,8 @@
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NProgress, NSwitch } from 'naive-ui'
 import type {
-  DownloadSpeedType,
-  Downloader, Downloading, Torrent,
+  DownloadSpeedType, Downloader,
+  Downloading, Torrent,
 } from '~/api/download'
 import {
   $addDownloader,
@@ -10,12 +10,14 @@ import {
   $getDownloadSpeedList,
   $getDownloader, $getDownloaderList,
   $getDownloading, $removeDownloader,
+
 } from '~/api/download'
 import numberFormat from '~/hooks/numberFormat'
 import timeFormat from '~/hooks/timeFormat'
 import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import renderSize from '~/hooks/renderSize'
+import torrent from '~/pages/download/repeat/components/torrent.vue'
 
 export const useDownloadStore = defineStore('download', () => {
   const { dialog } = useGlobalConfig()
@@ -55,6 +57,18 @@ export const useDownloadStore = defineStore('download', () => {
       fixed: 'left',
     },
     {
+      type: 'expand',
+      fixed: 'left',
+      renderExpand: (rowData) => {
+        return h(
+          torrent,
+          {
+            torrent: rowData,
+          },
+        )
+      },
+    },
+    {
       title: '名称',
       key: 'name',
       fixed: 'left',
@@ -73,40 +87,88 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 150,
       width: 150,
       maxWidth: 200,
+      sorter: 'default',
       resizable: true,
     },
     {
       title: '大小',
       key: 'size',
-      minWidth: 100,
-      width: 150,
+      minWidth: 80,
+      width: 80,
       maxWidth: 150,
       resizable: true,
-      sorter: (row1, row2) => row1.size - row2.size,
+      sorter: 'default',
       render(row: Torrent) {
         return renderSize(row.size)
       },
     },
-    { title: '保存路径', key: 'save_path', width: 200 },
+    // { title: '保存路径', key: 'save_path', width: 200 },
+    // {
+    //   title: 'tracker',
+    //   key: 'status',
+    //   width: 200,
+    //   sorter: 'default',
+    //   render(row: Torrent) {
+    //     const trackers = row.trackers
+    //     if (trackers && trackers.length > 0) {
+    //       return h(
+    //         NTag,
+    //         {
+    //           type: () => {
+    //             let t = 'success'
+    //             const state = trackers[0] ? trackers[0].status : 2
+    //             switch (state) {
+    //               case 0:
+    //               case 4:
+    //                 t = 'error'
+    //                 break
+    //               case 1:
+    //               case 3:
+    //                 t = 'warning'
+    //                 break
+    //               default:
+    //                 return 'success'
+    //             }
+    //             return t
+    //           },
+    //           size: 'small',
+    //         },
+    //         {
+    //           default: () => {
+    //             return trackerStatus[trackers[0].status]
+    //           },
+    //         },
+    //       )
+    //     }
+    //     else {
+    //       return ''
+    //     }
+    //   },
+    // },
     {
-      title: '状态',
-      key: 'state',
-      minWidth: 100,
-      maxWidth: 150,
-      width: 150,
-      resizable: true,
-      filterOptions: Object.entries(download_state).map(([value, label]) => ({ value, label })),
       filter(value, row) {
         return !!~row.state.indexOf(value.toString())
       },
+      filterOptions: Object.entries(download_state).map(([value, label]) => ({
+        value,
+        label,
+      })),
+      key: 'state',
+      maxWidth: 150,
+      minWidth: 80,
       render(row: Torrent): string {
         return download_state[row.state]
       },
+      resizable: true,
+      sorter: 'default',
+      title: '状态',
+      width: 80,
     },
     {
       title: '进度',
       key: 'progress',
-      minWidth: 60,
+      minWidth: 80,
+      width: 88,
       maxWidth: 120,
       resizable: true,
       sorter: (row1, row2) => row1.progress - row2.progress,
@@ -124,21 +186,13 @@ export const useDownloadStore = defineStore('download', () => {
         )
       },
     },
-    {
-      title: '添加时间',
-      key: 'added_on',
-      width: 220,
-      minWidth: 200,
-      maxWidth: 300,
-      resizable: true,
-      sorter: 'default',
-    },
+
     {
       title: '下载速度',
       key: 'dlspeed',
-      minWidth: 100,
+      minWidth: 80,
       maxWidth: 150,
-      width: 150,
+      width: 100,
       resizable: true,
       sorter: (row1, row2) => row1.dlspeed - row2.dlspeed,
       render(row: Torrent) {
@@ -148,9 +202,9 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '已上传',
       key: 'uploaded',
-      minWidth: 100,
+      minWidth: 80,
       maxWidth: 150,
-      width: 150,
+      width: 80,
       resizable: true,
       sorter: (row1, row2) => row1.uploaded - row2.uploaded,
       render(row: Torrent) {
@@ -160,9 +214,9 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '上传速度',
       key: 'upspeed',
-      minWidth: 100,
+      minWidth: 80,
       maxWidth: 150,
-      width: 150,
+      width: 100,
       resizable: true,
       sorter: (row1, row2) => row1.upspeed - row2.upspeed,
       render(row: Torrent) {
@@ -172,13 +226,36 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '已下载',
       key: 'completed',
-      minWidth: 100,
+      minWidth: 80,
       maxWidth: 150,
-      width: 150,
+      width: 80,
       resizable: true,
       sorter: (row1, row2) => row1.completed - row2.completed,
       render(row: Torrent) {
         return renderSize(row.completed)
+      },
+    },
+    {
+      title: '分享率',
+      key: 'ratio',
+      minWidth: 75,
+      maxWidth: 100,
+      resizable: true,
+      sorter: (row1, row2) => row1.ratio - row2.ratio,
+      render(row: Torrent) {
+        return numberFormat(row.ratio)
+      },
+    },
+    {
+      title: '总大小',
+      key: 'total_size',
+      sorter: (row1, row2) => row1.total_size - row2.total_size,
+      minWidth: 80,
+      maxWidth: 150,
+      width: 80,
+      resizable: true,
+      render(row: Torrent) {
+        return renderSize(row.uploaded)
       },
     },
     {
@@ -194,7 +271,7 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '最后活动',
       key: 'last_activity',
-      width: 200,
+      width: 100,
       minWidth: 100,
       maxWidth: 250,
       resizable: true,
@@ -236,17 +313,7 @@ export const useDownloadStore = defineStore('download', () => {
     //   sorter: (row1, row2) => row1.num_seeds - row2.num_seeds,
     //   minWidth: 100,
     // },
-    {
-      title: '分享率',
-      key: 'ratio',
-      minWidth: 75,
-      maxWidth: 100,
-      resizable: true,
-      sorter: (row1, row2) => row1.ratio - row2.ratio,
-      render(row: Torrent) {
-        return numberFormat(row.ratio)
-      },
-    },
+
     // { title: '做种时间', key: 'seeding_time', minWidth: 100 },
     // { title: '最后完整可见', key: 'seen_complete', minWidth: 100 },
     // { title: '标签', key: 'tags', minWidth: 100 },
@@ -261,17 +328,15 @@ export const useDownloadStore = defineStore('download', () => {
     //     return timeFormat(row.time_active)
     //   },
     // },
+
     {
-      title: '总大小',
-      key: 'total_size',
-      sorter: (row1, row2) => row1.total_size - row2.total_size,
-      minWidth: 100,
-      maxWidth: 150,
-      width: 150,
+      title: '添加时间',
+      key: 'added_on',
+      width: 220,
+      minWidth: 200,
+      maxWidth: 300,
       resizable: true,
-      render(row: Torrent) {
-        return renderSize(row.uploaded)
-      },
+      sorter: 'default',
     },
     // { title: 'Tracker', key: 'tracker', minWidth: 100 },
 

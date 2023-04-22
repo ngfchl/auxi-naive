@@ -1,7 +1,22 @@
 <script setup lang="ts">
-import type { DropdownOption } from 'naive-ui'
+import type { DropdownOption, GlobalThemeOverrides } from 'naive-ui'
+import { NConfigProvider } from 'naive-ui'
 import type { Torrent } from '~/api/download'
 
+const themeOverrides: GlobalThemeOverrides = {
+  DataTable: {
+    paginationMargin: '40px 0 0 0',
+    peers: {
+      Empty: {
+        textColor: '#cc1a1a',
+      },
+      Pagination: {
+        itemTextColor: '#ccc',
+      },
+    },
+  },
+  // ...
+}
 const { message } = useGlobalConfig()
 const downloadStore = useDownloadStore()
 const {
@@ -55,6 +70,23 @@ const handleUpdateValue = async (value: number) => {
   await getDownloading(value)
   loading.value = false
 }
+const rowClassName = (row: Torrent) => {
+  const trackers = row.trackers
+  let cls = ''
+  if (trackers && trackers.length > 0) {
+    switch (trackers[0].status) {
+      case 0:
+      case 4:
+        cls = 'tracker-error'
+        break
+      case 1:
+      case 3:
+        cls = 'tracker-warning'
+        break
+    }
+  }
+  return cls
+}
 onMounted(async () => {
   loading.value = true
   await getDownloaderList()
@@ -69,9 +101,7 @@ onMounted(async () => {
   <n-card hoverable embedded>
     <n-tabs
       v-model:value="defaultDownloader"
-      :tabs-padding="20"
       justify-content="space-around"
-      pane-style="padding: 20px;"
       size="small"
       type="line"
       @update:value="handleUpdateValue"
@@ -85,18 +115,23 @@ onMounted(async () => {
     </n-tabs>
 
     <div style="height: 100%;">
-      <n-data-table
-        :columns="downloadingColumns"
-        :data="downloading.torrents"
-        :loading="loading"
-        :max-height="750"
-        :row-key="rowKey"
-        :row-props="rowProps"
-        bordered
-        class="text-8px!"
-        size="small"
-        striped
-      />
+      <NConfigProvider :theme-overrides="themeOverrides">
+        <n-data-table
+          :columns="downloadingColumns"
+          :data="downloading.torrents"
+          :loading="loading"
+          :max-height="750"
+          :row-class-name="rowClassName"
+          :row-key="rowKey"
+          :row-props="rowProps"
+          sticky-expanded-rows
+          bordered
+          class="text-10px!"
+          size="small"
+          striped
+          virtual-scroll
+        />
+      </NConfigProvider>
     </div>
   </n-card>
   <n-dropdown
@@ -112,4 +147,18 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+:deep(.tracker-error td) {
+    background-color: rgba(255, 0, 0, 0.75) !important;
+}
+:deep(td) {
+    padding: 1px !important;
+    font-size: 8px !important;
+}
+:deep(th) {
+    padding: 1px !important;
+    font-size: 8px !important;
+}
+:deep(.tracker-warning td) {
+    background-color: rgba(246, 181, 15, 0.75) !important;
+}
 </style>
