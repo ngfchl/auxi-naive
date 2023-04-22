@@ -168,7 +168,7 @@ onMounted(async () => {
 
 <style scoped>
 :deep(.tracker-error td) {
-    background-color: rgba(255, 0, 0, 0.75) !important;
+    background-color: rgba(255, 0, 0, 0.85) !important;
 }
 :deep(td) {
     padding: 1px !important;
@@ -179,6 +179,6 @@ onMounted(async () => {
     font-size: 8px !important;
 }
 :deep(.tracker-warning td) {
-    background-color: rgba(246, 181, 15, 0.75) !important;
+    background-color: rgba(246, 181, 15, 0.85) !important;
 }
 </style>

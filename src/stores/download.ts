@@ -97,6 +97,21 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 200,
       sorter: 'default',
       resizable: true,
+      render: (row) => {
+        if (row.category) {
+          return h(
+            NTag,
+            {
+              type: 'info',
+              size: 'small',
+              bordered: false,
+            },
+            {
+              default: () => row.category,
+            },
+          )
+        }
+      },
     },
     {
       title: '大小',
@@ -107,7 +122,18 @@ export const useDownloadStore = defineStore('download', () => {
       resizable: true,
       sorter: 'default',
       render(row: Torrent) {
-        return renderSize(row.size)
+        if (row.category) {
+          return h(
+            NTag,
+            {
+              type: 'info',
+              size: 'small',
+            },
+            {
+              default: () => renderSize(row.size),
+            },
+          )
+        }
       },
     },
     // { title: '保存路径', key: 'save_path', width: 200 },
@@ -167,8 +193,29 @@ export const useDownloadStore = defineStore('download', () => {
       key: 'state',
       maxWidth: 150,
       minWidth: 80,
-      render(row: Torrent): string {
-        return download_state[row.state]
+      render(row: Torrent) {
+        return h(
+          NTag,
+          {
+            type: (() => {
+              const state = row.state
+              if ([
+                'error', 'missingFiles', 'unknown', 'metaDL', 'forcedMetaDL', '',
+              ].includes(state))
+                return 'error'
+              else if ([
+                'queuedUP', 'queuedDL', 'forcedDL', 'stalledUP', 'uploading', 'downloading', 'checkingUP',
+              ].includes(state))
+                return 'success'
+              else
+                return 'warning'
+            })(),
+            size: 'small',
+          },
+          {
+            default: () => download_state[row.state],
+          },
+        )
       },
       resizable: true,
       sorter: 'default',
