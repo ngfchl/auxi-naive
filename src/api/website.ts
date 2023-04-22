@@ -301,11 +301,11 @@ export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_i
  * @param site_id
  */
 export const $refreshSite = async (site_id: number) => {
-  const { msg, code, data } = await usePost('mysite/status', { site_id })
+  const { msg, code } = await usePost('mysite/status', { site_id })
   switch (code) {
     case 0:
       message?.success(msg)
-      return data
+      return true
     default:
       message?.error(msg)
       return false
