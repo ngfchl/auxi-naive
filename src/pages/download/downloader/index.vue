@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { NButton } from 'naive-ui'
-import { useGlobalConfig } from '~/composables/gobal-config'
 
 const downloadStore = useDownloadStore()
 const { getDownloaderList, editDownloader } = downloadStore
@@ -30,6 +29,7 @@ onMounted(async () => {
         :columns="columns"
         :data="downloaderList"
         :loading="loading"
+        size="small"
         striped
         bordered
       />
