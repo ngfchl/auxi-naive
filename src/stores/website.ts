@@ -848,7 +848,7 @@ export const useWebsiteStore = defineStore('website',
          * 更新站点数据
          */
     const refreshSite = async (site_id: number) => {
-      const data: SiteStatus = await $refreshSite(site_id)
+      const data = await $refreshSite(site_id)
       if (data) await updateMySiteStatus(site_id)
     }
     const refreshAllSite = async () => {
