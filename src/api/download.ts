@@ -50,7 +50,7 @@ export interface Tracker {
 }
 export interface Torrent {
   // 添加事件
-  added_on: string
+  added_on: number
   // 剩余要下载的大小
   amount_left: number
   // 种子自动管理
@@ -62,7 +62,7 @@ export interface Torrent {
   // 已下载
   completed: number
   // 完成于
-  completion_on: string
+  completion_on: number
   // 文件路径
   content_path: string
   // 下载限速
@@ -112,7 +112,7 @@ export interface Torrent {
   seeding_time: number
   // 做种时间限制
   seeding_time_limit: number
-  // 最后完成课件
+  // 最后完整可见
   seen_complete: number
   // 启用队列
   seq_dl: boolean
@@ -131,7 +131,7 @@ export interface Torrent {
   total_size: number
   // Tracker
   tracker: string
-  trackes: Tracker[]
+  trackers: Tracker[]
   // Tracker计数
   trackers_count: number
   // 上传限制
@@ -143,61 +143,61 @@ export interface Torrent {
   // 上传速度
   upspeed: number
   // 连接信息
-  peerList: Peer[]
+  peerList?: Peer[]
   // 添加此种子的时间
-  'addition_date': number
+  addition_date?: number
   // 备注
-  'comment': string
+  comment?: string
   // 种子完成日期
-  'completion_date': number
+  completion_date?: number
   // 创建者
-  'created_by': string
+  created_by?: string
   // 种子创建日期
-  'creation_date': number
+  creation_date?: number
   // 下载速度
-  'dl_speed': number
+  dl_speed?: number
   // 平均下载速度
-  'dl_speed_avg': number
+  dl_speed_avg?: number
   // 上次查看的完整日期
-  'last_seen': number
+  last_seen?: number
   // 种子连接计数
-  'nb_connections': number
+  nb_connections?: number
   // 种子连接计数限制
-  'nb_connections_limit': number
+  nb_connections_limit?: number
   // 连接到的节点
-  'peers': number
+  peers?: number
   // 节点总数
-  'peers_total': number
+  peers_total?: number
   // 区块大小
-  'piece_size': number
+  piece_size?: number
   // 已下载区块数
-  'pieces_have': number
+  pieces_have?: number
   // 区块总数
-  'pieces_num': number
+  pieces_num?: number
   // 距离下次汇报时间
-  'reannounce': number
+  reannounce?: number
   // 连接到的种子数
-  'seeds': number
+  seeds?: number
   // 种子总数
-  'seeds_total': number
+  seeds_total?: number
   // 分享率
-  'share_ratio': number
+  share_ratio?: number
   // 种子运行时间
-  'time_elapsed': number
+  time_elapsed?: number
   // 总下载
-  'total_downloaded': number
+  total_downloaded?: number
   // 本次会话下载
-  'total_downloaded_session': number
+  total_downloaded_session?: number
   // 总上传
-  'total_uploaded': number
+  total_uploaded?: number
   // 会话上传
-  'total_uploaded_session': number
+  total_uploaded_session?: number
   // 已丢弃
-  'total_wasted': number
+  total_wasted?: number
   // 上传速度
-  'up_speed': number
+  up_speed?: number
   // 平均上传速度
-  'up_speed_avg': number
+  up_speed_avg?: number
 }
 
 export interface Category {
@@ -262,6 +262,9 @@ export const $getDownloading: (params: object) => Promise<any> = async (params: 
   return await getList<object, Downloading>('download/downloaders/downloading', params)
 }
 
+export const $getTorrentProp: (params: object) => Promise<any> = async (params: object) => {
+  return await getList<object, Downloading>('download/downloaders/torrent/props', params)
+}
 export const $addDownloader = async (downloader: Downloader) => {
   const { msg, code } = await usePost('download/downloader', downloader)
   switch (code) {

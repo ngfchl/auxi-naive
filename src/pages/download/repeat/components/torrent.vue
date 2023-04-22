@@ -2,6 +2,7 @@
 import numberFormat from '../../../../hooks/numberFormat'
 import renderSize from '../../../../hooks/renderSize'
 import timeFormat from '../../../../hooks/timeFormat'
+import timestampToBeijingTime from '~/hooks/timestampToBeijingTime'
 import type { Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
@@ -87,19 +88,19 @@ const trackerStatus = [
                 <template #label>
                   添加于
                 </template>
-                {{ torrent.addition_date }}
+                {{ timestampToBeijingTime(torrent.addition_date) }}
               </n-descriptions-item>
               <n-descriptions-item>
                 <template #label>
                   完成于
                 </template>
-                {{ torrent.completion_date }}
+                {{ timestampToBeijingTime(torrent.completion_date) }}
               </n-descriptions-item>
               <n-descriptions-item>
                 <template #label>
                   创建于
                 </template>
-                {{ torrent.creation_date }}
+                {{ timestampToBeijingTime(torrent.creation_date) }}
               </n-descriptions-item>
               <n-descriptions-item>
                 <template #label>
@@ -132,7 +133,7 @@ const trackerStatus = [
                 <template #label>
                   剩余时间
                 </template>
-                {{ torrent.time_active }}
+                {{ timeFormat(torrent.amount_left / torrent.dl_speed) }}
               </n-descriptions-item>
               <n-descriptions-item>
                 <template #label>
@@ -170,12 +171,7 @@ const trackerStatus = [
                 </template>
                 {{ `${renderSize(torrent.up_speed)}/s(平均：${renderSize(torrent.up_speed_avg)}/s)` }}
               </n-descriptions-item>
-              <n-descriptions-item>
-                <template #label>
-                  剩余时间
-                </template>
-                {{ timeFormat(torrent.time_active) }}
-              </n-descriptions-item>
+
               <n-descriptions-item>
                 <template #label>
                   用户
@@ -210,14 +206,13 @@ const trackerStatus = [
                 <template #label>
                   下次汇报
                 </template>
-                49 分钟
                 {{ timeFormat(torrent.reannounce) }}
               </n-descriptions-item>
               <n-descriptions-item>
                 <template #label>
                   最后完整可见
                 </template>
-                {{ torrent.last_seen }}
+                {{ timestampToBeijingTime(torrent.last_seen) }}
               </n-descriptions-item>
             </n-descriptions>
           </n-tab-pane>

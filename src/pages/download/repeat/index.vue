@@ -22,6 +22,7 @@ const downloadStore = useDownloadStore()
 const {
   getDownloading,
   getDownloaderList,
+  getTorrentProp,
 } = downloadStore
 const {
   downloading,
@@ -41,6 +42,7 @@ const options: DropdownOption[] = [
     key: 'delete',
   },
 ]
+const expandRowKeys = ref<string[]>([])
 const showDropdown = ref(false)
 const x = ref(0)
 const y = ref(0)
@@ -87,12 +89,27 @@ const rowClassName = (row: Torrent) => {
   }
   return cls
 }
+const handleExpandedRowKeys = async (keys: Array<string>) => {
+  if (keys.length === 1) {
+    await getTorrentProp(defaultDownloader.value, keys[0])
+    expandRowKeys.value = keys
+  }
+  else {
+    expandRowKeys.value = []
+  }
+}
+
 onMounted(async () => {
   loading.value = true
   await getDownloaderList()
-  const downloader_id = downloaderList.value[0].id
-  defaultDownloader.value = downloader_id
-  await getDownloading(downloader_id)
+  if (downloaderList.value.length > 0) {
+    const downloader_id = downloaderList.value[0].id
+    defaultDownloader.value = downloader_id
+    await getDownloading(downloader_id)
+  }
+  else {
+    message?.error('请先添加下载器，然后重试！')
+  }
   loading.value = false
 })
 </script>
@@ -103,7 +120,7 @@ onMounted(async () => {
       v-model:value="defaultDownloader"
       justify-content="space-around"
       size="small"
-      type="line"
+      type="card"
       @update:value="handleUpdateValue"
     >
       <n-tab
@@ -117,6 +134,7 @@ onMounted(async () => {
     <div style="height: 100%;">
       <NConfigProvider :theme-overrides="themeOverrides">
         <n-data-table
+          ref="downloadingRef"
           :columns="downloadingColumns"
           :data="downloading.torrents"
           :loading="loading"
@@ -124,12 +142,14 @@ onMounted(async () => {
           :row-class-name="rowClassName"
           :row-key="rowKey"
           :row-props="rowProps"
+          :expanded-row-keys="expandRowKeys"
           sticky-expanded-rows
           bordered
           class="text-10px!"
           size="small"
           striped
           virtual-scroll
+          @update:expanded-row-keys="handleExpandedRowKeys"
         />
       </NConfigProvider>
     </div>
