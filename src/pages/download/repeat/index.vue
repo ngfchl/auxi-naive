@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { DropdownOption, GlobalThemeOverrides } from 'naive-ui'
-import { NConfigProvider } from 'naive-ui'
+import { NConfigProvider, NTag } from 'naive-ui'
 import type { Torrent } from '~/api/download'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
 const themeOverrides: GlobalThemeOverrides = {
   DataTable: {
@@ -34,19 +35,117 @@ const rowKey = (row: Torrent) => row.hash
 const defaultDownloader = ref<number>(0)
 const options: DropdownOption[] = [
   {
-    label: '编辑',
-    key: 'edit',
+    label: '继续',
+    key: 'resume',
+    icon: () => h(MenuIcon, { icon: 'Play' }),
   },
   {
-    label: () => h('span', { style: { color: 'red' } }, '删除'),
-    key: 'delete',
+    label: '强制继续',
+    key: 'set_force_start',
+    icon: () => h(MenuIcon, { icon: 'PlayForward' }),
   },
+  {
+    label: '暂停',
+    key: 'pause',
+    icon: () => h(MenuIcon, { icon: 'Pause' }),
+  },
+  {
+    type: 'divider',
+    key: 'd1',
+  },
+  {
+    label: '删除',
+    key: 'deleteForm',
+    icon: () => h(MenuIcon, { icon: 'Trash' }),
+  },
+  {
+    label: '分类',
+    key: 'categoryForm',
+    icon: () => h(MenuIcon, { icon: 'Document' }),
+  },
+  {
+    label: '自动管理',
+    key: 'set_auto_management',
+    icon: () => h(MenuIcon, { icon: 'Car' }),
+  },
+  {
+    label: '超级做种',
+    key: 'set_super_seeding',
+    icon: () => h(MenuIcon, { icon: 'Flash' }),
+  },
+  {
+    type: 'divider',
+    key: 'd2',
+  },
+  {
+    label: '重新校验',
+    key: 'recheck',
+    icon: () => h(MenuIcon, { icon: 'CheckmarkDoneCircle' }),
+  },
+  {
+    label: '重新汇报',
+    key: 'reannounce',
+    icon: () => h(MenuIcon, { icon: 'Mic' }),
+  },
+  {
+    type: 'divider',
+    key: 'd3',
+  },
+  {
+    label: '清除',
+    key: 'clear',
+    icon: () => h(MenuIcon, { icon: 'CalendarClear' }),
+    children: [
+      {
+        label: '清除排序',
+        key: 'clearSort',
+        icon: () => h(MenuIcon, { icon: 'SwapVertical' }),
+      },
+      {
+        label: '清除筛选',
+        key: 'clearFilter',
+        icon: () => h(MenuIcon, { icon: 'Filter' }),
+      },
+      {
+        label: '清除选中',
+        key: 'clearChecked',
+        icon: () => h(MenuIcon, { icon: 'Checkbox' }),
+      },
+    ],
+  },
+  {
+    label: '复制',
+    key: 'copy',
+    icon: () => h(MenuIcon, { icon: 'Copy' }),
+    children: [
+      {
+        label: '名称',
+        key: 'name',
+        icon: () => h(MenuIcon, { icon: 'Duplicate' }),
+      },
+      {
+        label: 'HASH',
+        key: 'hash',
+        icon: () => h(MenuIcon, { icon: 'DuplicateOutline' }),
+      },
+      {
+        label: '链接',
+        key: 'magnet_uri',
+        icon: () => h(MenuIcon, { icon: 'Magnet' }),
+      },
+    ],
+  },
+  // {
+  //   label: () => h(NTag, { style: { color: 'red' } }, '删除'),
+  //   key: 'delete',
+  // },
 ]
 const expandRowKeys = ref<string[]>([])
 const showDropdown = ref(false)
+const currentRow = ref([])
 const x = ref(0)
 const y = ref(0)
-const handleSelect = () => {
+const handleSelect = (key: string | number, option: DropdownOption) => {
   showDropdown.value = false
 }
 const onClickOutside = () => {
@@ -57,6 +156,7 @@ const rowProps = (row: Torrent) => {
     onContextmenu: (e: MouseEvent) => {
       message?.info(JSON.stringify(row.hash, null, 2))
       e.preventDefault()
+      currentRow.value.push(row)
       showDropdown.value = false
       nextTick().then(() => {
         showDropdown.value = true
@@ -138,7 +238,7 @@ onMounted(async () => {
           :columns="downloadingColumns"
           :data="downloading.torrents"
           :loading="loading"
-          :max-height="750"
+          :max-height="720"
           :row-class-name="rowClassName"
           :row-key="rowKey"
           :row-props="rowProps"
@@ -157,6 +257,7 @@ onMounted(async () => {
   <n-dropdown
     placement="bottom-start"
     trigger="manual"
+    size="small"
     :x="x"
     :y="y"
     :options="options"
