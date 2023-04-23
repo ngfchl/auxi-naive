@@ -140,9 +140,9 @@ const options: DropdownOption[] = [
   //   key: 'delete',
   // },
 ]
-const expandRowKeys = ref<string[]>([])
+const expandRowKeys = ref<string[] | number[]>([])
 const showDropdown = ref(false)
-const currentRow = ref([])
+const currentRow = ref<string[]>([])
 const x = ref(0)
 const y = ref(0)
 const handleSelect = (key: string | number, option: DropdownOption) => {
@@ -157,7 +157,7 @@ const rowProps = (row: Torrent) => {
       message?.info(JSON.stringify(row.hash, null, 2))
       currentRow.value.length = 0
       e.preventDefault()
-      currentRow.value.push(row)
+      currentRow.value.push(row.hash)
       showDropdown.value = false
       nextTick().then(() => {
         showDropdown.value = true
@@ -199,8 +199,7 @@ const handleExpandedRowKeys = async (keys: Array<string>) => {
     expandRowKeys.value = []
   }
 }
-
-onMounted(async () => {
+onBeforeMount(async () => {
   loading.value = true
   await getDownloaderList()
   if (downloaderList.value.length > 0) {
@@ -233,21 +232,26 @@ onMounted(async () => {
     </n-tabs>
 
     <div style="height: 100%;">
+      <n-space>
+        <n-button size="tiny">
+          filter
+        </n-button>
+      </n-space>
       <NConfigProvider :theme-overrides="themeOverrides">
         <n-data-table
           ref="downloadingRef"
           :columns="downloadingColumns"
           :data="downloading.torrents"
+          :expanded-row-keys="expandRowKeys"
           :loading="loading"
           :max-height="720"
           :row-class-name="rowClassName"
           :row-key="rowKey"
           :row-props="rowProps"
-          :expanded-row-keys="expandRowKeys"
-          sticky-expanded-rows
           bordered
           class="text-10px!"
           size="small"
+          sticky-expanded-rows
           striped
           virtual-scroll
           @update:expanded-row-keys="handleExpandedRowKeys"

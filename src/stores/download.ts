@@ -1,8 +1,9 @@
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NProgress, NSwitch, NTag } from 'naive-ui'
 import type {
-  DownloadSpeedType, Downloader,
-  Downloading, Torrent,
+  Category, DownloadSpeedType,
+  Downloader, Downloading,
+  Torrent,
 } from '~/api/download'
 import {
   $addDownloader,
@@ -81,7 +82,7 @@ export const useDownloadStore = defineStore('download', () => {
       key: 'name',
       fixed: 'left',
       minWidth: 120,
-      width: 200,
+      width: 150,
       maxWidth: 300,
       resizable: true,
       sorter: 'default',
@@ -97,6 +98,13 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 200,
       sorter: 'default',
       resizable: true,
+      filter(value, row) {
+        return !!~row.category.indexOf(value.toString())
+      },
+      filterOptions: downloading.value.categories.map((item: Category) => ({
+        label: item.name,
+        value: item.name,
+      })),
       render: (row) => {
         if (row.category) {
           return h(
