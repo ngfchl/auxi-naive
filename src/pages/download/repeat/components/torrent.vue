@@ -34,7 +34,7 @@ const trackerStatus = [
 <template>
   <n-row>
     <n-col :span="24" />
-    <n-thing>
+    <n-thing class="w-100%">
       <!--      <template #avatar> -->
       <!--        <n-avatar> -->
       <!--          <MenuIcon icon="Magnet" /> -->
@@ -59,6 +59,33 @@ const trackerStatus = [
         </n-button>
       </template>
       <template #description>
+        <n-space justify="center">
+          <n-button size="tiny" type="success">
+            <template #icon>
+              <MenuIcon icon="Play" />
+            </template>
+            开始
+          </n-button>
+          <n-button size="tiny" type="warning">
+            <template #icon>
+              <MenuIcon icon="Pause" />
+            </template>
+            暂停
+          </n-button>
+
+          <n-button size="tiny" type="primary">
+            <template #icon>
+              <MenuIcon icon="Copy" />
+            </template>
+            辅种
+          </n-button>
+          <n-button size="tiny" type="error">
+            <template #icon>
+              <MenuIcon icon="Trash" />
+            </template>
+            删除
+          </n-button>
+        </n-space>
         <n-space>
           <!--          <n-tag type="primary" size="small"> -->
           <!--            hash：{{ torrent.hash }} -->
@@ -66,10 +93,6 @@ const trackerStatus = [
           <!--        <n-tag type="primary"> -->
           <!--          路径：{{ torrent.save_path }} -->
           <!--        </n-tag> -->
-
-          <n-tag v-if="torrent.tags" size="small">
-            标签：{{ torrent.tags }}
-          </n-tag>
         </n-space>
       </template>
       <div>
@@ -77,6 +100,7 @@ const trackerStatus = [
           <n-tabs
             type="line"
             size="small"
+            justify-content="space-around"
           >
             <n-tab-pane name="信息">
               <n-descriptions
@@ -127,6 +151,12 @@ const trackerStatus = [
                     分类
                   </template>
                   {{ torrent.category }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="torrent.tags">
+                  <template #label>
+                    分类
+                  </template>
+                  {{ torrent.tags }}
                 </n-descriptions-item>
                 <n-descriptions-item>
                   <template #label>
@@ -254,13 +284,13 @@ const trackerStatus = [
                 class="text-8px!"
                 bordered
               >
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.tier">
                   <template #label>
                     层级
                   </template>
                   {{ tracker.tier }}
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.url">
                   <template #label>
                     url
                   </template>
@@ -268,37 +298,37 @@ const trackerStatus = [
                     {{ tracker.url }}
                   </n-ellipsis>
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.status">
                   <template #label>
                     状态
                   </template>
                   {{ trackerStatus[tracker.status] }}
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_peers">
                   <template #label>
                     用户
                   </template>
                   {{ tracker.num_peers }}
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_seeds">
                   <template #label>
                     种子
                   </template>
                   {{ tracker.num_seeds }}
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_leeches">
                   <template #label>
                     下载
                   </template>
                   {{ tracker.num_leeches }}
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_downloaded">
                   <template #label>
                     吸血
                   </template>
                   {{ tracker.num_downloaded }}
                 </n-descriptions-item>
-                <n-descriptions-item>
+                <n-descriptions-item v-if="tracker.msg">
                   <template #label>
                     消息
                   </template>
@@ -387,35 +417,7 @@ const trackerStatus = [
         </n-card>
       </div>
       <template #footer />
-      <template #action>
-        <n-space justify="center">
-          <n-button size="tiny" type="success">
-            <template #icon>
-              <MenuIcon icon="Play" />
-            </template>
-            开始
-          </n-button>
-          <n-button size="tiny" type="warning">
-            <template #icon>
-              <MenuIcon icon="Pause" />
-            </template>
-            暂停
-          </n-button>
-
-          <n-button size="tiny" type="primary">
-            <template #icon>
-              <MenuIcon icon="Copy" />
-            </template>
-            辅种
-          </n-button>
-          <n-button size="tiny" type="error">
-            <template #icon>
-              <MenuIcon icon="Trash" />
-            </template>
-            删除
-          </n-button>
-        </n-space>
-      </template>
+      <template #action />
     </n-thing>
   </n-row>
 </template>
