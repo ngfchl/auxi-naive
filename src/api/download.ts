@@ -261,7 +261,17 @@ export const $getDownloader: (params: object) => Promise<any> = async (params: o
 export const $getDownloading: (params: object) => Promise<any> = async (params: object) => {
   return await getList<object, Downloading>('download/downloaders/downloading', params)
 }
-
+export const $controlTorrent: (params: object) => Promise<any> = async (params) => {
+  const { msg, code } = await usePost('download/control', params)
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return true
+    default:
+      message?.error(msg)
+      return false
+  }
+}
 export const $getTorrentProp: (params: object) => Promise<any> = async (params: object) => {
   return await getList<object, Downloading>('download/downloaders/torrent/props', params)
 }
