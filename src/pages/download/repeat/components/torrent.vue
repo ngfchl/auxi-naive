@@ -1,15 +1,23 @@
 <script lang="ts" setup>
-import numberFormat from '../../../../hooks/numberFormat'
 import renderSize from '../../../../hooks/renderSize'
 import timeFormat from '../../../../hooks/timeFormat'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 import timestampToBeijingTime from '~/hooks/timestampToBeijingTime'
 import type { Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
-defineProps<{
+const props = defineProps<{
   torrent: Torrent
+  downloader_id: number
 }>()
-
+const downloadStore = useDownloadStore()
+const {
+  handleSelected,
+} = downloadStore
+const {
+  categories,
+  deleteModal,
+  trackerStatus,
+} = storeToRefs(downloadStore)
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 const columns = ref(3)
 watchEffect(() => {
@@ -22,13 +30,6 @@ watchEffect(() => {
   if (isMobile.value)
     columns.value = 1
 })
-const trackerStatus = [
-  'Tracker已禁用（用于 DHT、PeX 和 LSD）',
-  'Tracker未联系',
-  '工作中',
-  '正在更新',
-  '出错啦',
-]
 </script>
 
 <template>
@@ -48,29 +49,78 @@ const trackerStatus = [
         </n-ellipsis>
       </template>
       <template #header-extra>
-        <n-button
-          circle
-          size="tiny"
-          :type="torrent.super_seeding ? 'success' : 'warning'"
-        >
-          <template #icon>
-            <MenuIcon icon="Flash" />
-          </template>
-        </n-button>
+        <!--        <n-button -->
+        <!--          v-if="torrent.super_seeding" -->
+        <!--          circle -->
+        <!--          size="tiny" -->
+        <!--          :type="torrent.super_seeding ? 'success' : 'warning'" -->
+        <!--        > -->
+        <!--          <template #icon> -->
+        <!--            <MenuIcon icon="Flash" /> -->
+        <!--          </template> -->
+        <!--        </n-button> -->
       </template>
       <template #description>
         <n-space justify="center">
-          <n-button size="tiny" type="success">
+          <n-button
+            size="tiny"
+            type="success"
+            @click="handleSelected('resume')"
+          >
             <template #icon>
               <MenuIcon icon="Play" />
             </template>
             开始
           </n-button>
-          <n-button size="tiny" type="warning">
+          <n-button
+            size="tiny"
+            type="warning"
+            @click="handleSelected('pause')"
+          >
             <template #icon>
               <MenuIcon icon="Pause" />
             </template>
             暂停
+          </n-button>
+          <n-button
+            size="tiny"
+            type="success"
+            @click="handleSelected('set_auto_management')"
+          >
+            <template #icon>
+              <MenuIcon icon="Play" />
+            </template>
+            自动
+          </n-button>
+          <n-button
+            size="tiny"
+            type="warning"
+            @click="handleSelected('set_force_start')"
+          >
+            <template #icon>
+              <MenuIcon icon="Pause" />
+            </template>
+            强制继续
+          </n-button>
+          <n-button
+            size="tiny"
+            type="success"
+            @click="handleSelected('recheck')"
+          >
+            <template #icon>
+              <MenuIcon icon="Play" />
+            </template>
+            强制校验
+          </n-button>
+          <n-button
+            size="tiny"
+            type="warning"
+            @click="handleSelected('reannounce')"
+          >
+            <template #icon>
+              <MenuIcon icon="Pause" />
+            </template>
+            强制汇报
           </n-button>
 
           <n-button size="tiny" type="primary">
@@ -79,7 +129,10 @@ const trackerStatus = [
             </template>
             辅种
           </n-button>
-          <n-button size="tiny" type="error">
+          <n-button
+            size="tiny" type="error"
+            @click="deleteModal = true"
+          >
             <template #icon>
               <MenuIcon icon="Trash" />
             </template>
@@ -184,7 +237,7 @@ const trackerStatus = [
               <template #label>
                 活动时间
               </template>
-              {{ timeFormat(torrent.time_active) }}
+              {{ torrent.time_active ? timeFormat(torrent.time_active) : 0 }}
             </n-descriptions-item>
             <n-descriptions-item>
               <template #label>
@@ -239,37 +292,37 @@ const trackerStatus = [
               <template #label>
                 下载限制
               </template>
-              {{ torrent.dl_limit < 0 ? '' : `${renderSize(torrent.dl_limit)}/s` }}
+              {{ (torrent.dl_limit && torrent.dl_limit < 0) ? '' : `${renderSize(torrent.dl_limit)}/s` }}
             </n-descriptions-item>
             <n-descriptions-item>
               <template #label>
                 上传限制
               </template>
-              {{ torrent.up_limit < 0 ? '' : `${renderSize(torrent.up_limit)}/s` }}
+              {{ (torrent.up_limit && torrent.up_limit < 0) ? '' : `${renderSize(torrent.up_limit)}/s` }}
             </n-descriptions-item>
             <n-descriptions-item>
               <template #label>
                 已丢弃
               </template>
-              {{ renderSize(torrent.total_wasted) }}
+              {{ torrent.total_wasted ? renderSize(torrent.total_wasted) : 0 }}
             </n-descriptions-item>
             <n-descriptions-item>
               <template #label>
                 分享率
               </template>
-              {{ torrent.ratio.toFixed(2) }}
+              {{ torrent.ratio ? torrent.ratio.toFixed(2) : 0 }}
             </n-descriptions-item>
             <n-descriptions-item>
               <template #label>
                 下次汇报
               </template>
-              {{ timeFormat(torrent.reannounce) }}
+              {{ torrent.reannounce ? timeFormat(torrent.reannounce) : 0 }}
             </n-descriptions-item>
             <n-descriptions-item>
               <template #label>
                 最后完整可见
               </template>
-              {{ timestampToBeijingTime(torrent.last_seen) }}
+              {{ torrent.last_seen ? timestampToBeijingTime(torrent.last_seen) : 0 }}
             </n-descriptions-item>
           </n-descriptions>
           <n-descriptions
