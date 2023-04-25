@@ -154,7 +154,7 @@ const trackerStatus = [
                 </n-descriptions-item>
                 <n-descriptions-item v-if="torrent.tags">
                   <template #label>
-                    分类
+                    标签
                   </template>
                   {{ torrent.tags }}
                 </n-descriptions-item>
@@ -163,6 +163,12 @@ const trackerStatus = [
                     保存路径
                   </template>
                   {{ torrent.save_path }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    HASH
+                  </template>
+                  {{ torrent.hash }}
                 </n-descriptions-item>
                 <n-descriptions-item>
                   <template #label>

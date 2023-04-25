@@ -1,17 +1,16 @@
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NProgress, NSwitch, NTag } from 'naive-ui'
 import type {
-  Category, DownloadSpeedType,
+  DownloadSpeedType,
   Downloader, Downloading,
   Torrent,
 } from '~/api/download'
 import {
   $addDownloader,
   $editDownloader,
-  $getDownloadSpeedList,
-  $getDownloader, $getDownloaderList,
-  $getDownloading, $getTorrentProp,
-  $removeDownloader,
+  $getDownloadSpeedList, $getDownloader,
+  $getDownloaderList, $getDownloading,
+  $getTorrentProp, $removeDownloader,
 } from '~/api/download'
 import numberFormat from '~/hooks/numberFormat'
 import timeFormat from '~/hooks/timeFormat'
@@ -60,7 +59,7 @@ export const useDownloadStore = defineStore('download', () => {
     '更新中',
     '出错啦',
   ]
-  const downloadingColumns = ref<DataTableColumns<Torrent>>([
+  const downloadingColumns = shallowRef<DataTableColumns<Torrent>>([
     {
       type: 'selection',
       fixed: 'left',
@@ -90,37 +89,37 @@ export const useDownloadStore = defineStore('download', () => {
         tooltip: true,
       },
     },
-    {
-      title: '分类',
-      key: 'category',
-      minWidth: 150,
-      width: 150,
-      maxWidth: 200,
-      sorter: 'default',
-      resizable: true,
-      filter(value, row) {
-        return !!~row.category.indexOf(value.toString())
-      },
-      filterOptions: downloading.value.categories.map((item: Category) => ({
-        label: item.name,
-        value: item.name,
-      })),
-      render: (row) => {
-        if (row.category) {
-          return h(
-            NTag,
-            {
-              type: 'info',
-              size: 'small',
-              bordered: false,
-            },
-            {
-              default: () => row.category,
-            },
-          )
-        }
-      },
-    },
+    // {
+    //   title: '分类',
+    //   key: 'category',
+    //   minWidth: 150,
+    //   width: 150,
+    //   maxWidth: 200,
+    //   sorter: 'default',
+    //   resizable: true,
+    //   filter(value, row) {
+    //     return !!~row.category.indexOf(value.toString())
+    //   },
+    //   filterOptions: downloading.value.categories.map((item: Category) => ({
+    //     label: item.name,
+    //     value: item.name,
+    //   })),
+    //   render: (row) => {
+    //     if (row.category) {
+    //       return h(
+    //         NTag,
+    //         {
+    //           type: 'info',
+    //           size: 'small',
+    //           bordered: false,
+    //         },
+    //         {
+    //           default: () => row.category,
+    //         },
+    //       )
+    //     }
+    //   },
+    // },
     {
       title: '大小',
       key: 'size',
@@ -560,7 +559,6 @@ export const useDownloadStore = defineStore('download', () => {
     timer.value = null
   }
   const getDownloading = async (downloader_id: number) => {
-    downloading.value = { categories: [], torrents: [] }
     downloading.value = await $getDownloading({ downloader_id })
   }
   const interval = ref<number>(5)
