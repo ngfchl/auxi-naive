@@ -1,35 +1,43 @@
 <script setup lang="ts">
+import { isNaN } from 'lodash-es'
 import type { DataTableRowKey, DropdownOption, SelectOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import type { Category, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { $controlTorrent } from '~/api/download'
+import torrent from '~/pages/download/repeat/components/torrent.vue'
 
-const { message, dialog } = useGlobalConfig()
+const {
+  message,
+  dialog,
+} = useGlobalConfig()
 const downloadStore = useDownloadStore()
 const {
-  getDownloading,
+  handleSelected,
   getDownloaderList,
   getTorrentProp,
+  handleDefaultDownloader,
+  handleDelete,
+  handleUpdateDownloading,
+  startFresh,
+  handleDeleteModal,
+  clearTimer,
+  handleCheckRows,
 } = downloadStore
 const {
   downloading,
   downloadingColumns,
   downloaderList,
+  defaultDownloader,
+  rightOptions,
+  categories,
+  deleteFiles,
+  currentCategory,
+  checkedRowKeys,
+  timer, deleteModal,
 } = storeToRefs(downloadStore)
 const loading = ref(false)
-const defaultDownloader = ref<number>(0)
 const timeout = ref<number>(1000 * 60)
-const selectedCategories = ref<DropdownOption[]>([
-  {
-    label: '清除分类',
-    key: 'clearCategory',
-  },
-  {
-    label: '移除未使用',
-    key: 'clearNotUsed',
-  },
-])
 const railStyle = ({
   focused,
   checked,
@@ -50,128 +58,14 @@ const railStyle = ({
   }
   return style
 }
-const options: DropdownOption[] = [
-  {
-    label: '继续',
-    key: 'resume',
-    icon: () => h(MenuIcon, { icon: 'Play' }),
-  },
-  {
-    label: '强制继续',
-    key: 'set_force_start',
-    icon: () => h(MenuIcon, { icon: 'PlayForward' }),
-  },
-  {
-    label: '暂停',
-    key: 'pause',
-    icon: () => h(MenuIcon, { icon: 'Pause' }),
-  },
-  {
-    type: 'divider',
-    key: 'd1',
-  },
-  {
-    label: '删除',
-    key: 'deleteForm',
-    icon: () => h(MenuIcon, { icon: 'Trash' }),
-  },
-  {
-    label: '分类',
-    key: 'categoryForm',
-    icon: () => h(MenuIcon, { icon: 'Document' }),
-    children: selectedCategories.value,
-  },
-  {
-    label: '自动管理',
-    key: 'set_auto_management',
-    icon: () => h(MenuIcon, { icon: 'Car' }),
-  },
-  {
-    label: '超级做种',
-    key: 'set_super_seeding',
-    icon: () => h(MenuIcon, { icon: 'Flash' }),
-  },
-  {
-    type: 'divider',
-    key: 'd2',
-  },
-  {
-    label: '重新校验',
-    key: 'recheck',
-    icon: () => h(MenuIcon, { icon: 'CheckmarkDoneCircle' }),
-  },
-  {
-    label: '重新汇报',
-    key: 'reannounce',
-    icon: () => h(MenuIcon, { icon: 'Mic' }),
-  },
-  {
-    type: 'divider',
-    key: 'd3',
-  },
-  {
-    label: '清除',
-    key: 'clear',
-    icon: () => h(MenuIcon, { icon: 'CalendarClear' }),
-    children: [
-      {
-        label: '清除排序',
-        key: 'clearSort',
-        icon: () => h(MenuIcon, { icon: 'SwapVertical' }),
-      },
-      {
-        label: '清除筛选',
-        key: 'clearFilter',
-        icon: () => h(MenuIcon, { icon: 'Filter' }),
-      },
-      {
-        label: '清除选中',
-        key: 'clearChecked',
-        icon: () => h(MenuIcon, { icon: 'Checkbox' }),
-      },
-    ],
-  },
-  {
-    label: '复制',
-    key: 'copy',
-    icon: () => h(MenuIcon, { icon: 'Copy' }),
-    children: [
-      {
-        label: '名称',
-        key: 'name',
-        icon: () => h(MenuIcon, { icon: 'Duplicate' }),
-      },
-      {
-        label: 'HASH',
-        key: 'hash',
-        icon: () => h(MenuIcon, { icon: 'DuplicateOutline' }),
-      },
-      {
-        label: '链接',
-        key: 'magnet_uri',
-        icon: () => h(MenuIcon, { icon: 'Magnet' }),
-      },
-    ],
-  },
-  // {
-  //   label: () => h(NTag, { style: { color: 'red' } }, '删除'),
-  //   key: 'delete',
-  // },
-]
+
 const expandRowKeys = ref<string[] | number[]>([])
 const showDropdown = ref(false)
-const deleteFiles = ref(false)
+
 const currentRow = ref<Torrent>()
-const currentCategory = ref<string>('')
-const checkedRowKeys = ref<DataTableRowKey[]>([])
-const timer = ref({})
-const categories = ref<SelectOption[]>([{
-  label: '请选择',
-  value: '',
-}])
+
 const x = ref(0)
 const y = ref(0)
-const deleteModal = ref(false)
 
 const onClickOutside = () => {
   showDropdown.value = false
@@ -192,112 +86,48 @@ const rowProps = (row: Torrent) => {
   }
 }
 
-const handleUpdateValue = async (value: number) => {
-  categories.value.length = 1
-  selectedCategories.value.length = 2
-  currentCategory.value = ''
-  loading.value = true
-  await getDownloading(!isNaN(value) ? value : defaultDownloader.value)
-  const options = downloading.value.categories.map((category: Category) => (
-    {
-      label: category.name,
-      value: category.name,
-    }))
-  const selectedCategoriesOptions = downloading.value.categories.map((category: Category) => (
-    {
-      label: category.name,
-      key: `setCategory?${category.name}`,
-    }))
-  categories.value.push(...options)
-  selectedCategories.value.push(...selectedCategoriesOptions)
-  loading.value = false
-}
 const rowClassName = (row: Torrent) => {
   const trackers = row.trackers
-  let cls = ''
+  let cls = 'double-click'
   if (trackers && trackers.length > 0) {
     switch (trackers[0].status) {
       case 0:
       case 4:
-        cls = 'tracker-error'
+        cls += 'tracker-error'
         break
       case 1:
       case 3:
-        cls = 'tracker-warning'
+        cls += 'tracker-warning'
         break
     }
   }
   if (row.super_seeding)
-    cls = 'super-seeding'
+    cls += 'super-seeding'
+
   return cls
 }
 
-const handleCheckRows = (rowKeys: DataTableRowKey[]) => {
-  checkedRowKeys.value = rowKeys
-}
-const handleExpandedRowKeys = async (keys: Array<string>) => {
-  if (keys.length === 1) {
-    await getTorrentProp(defaultDownloader.value, keys[0])
-    expandRowKeys.value = keys
-  }
-  else {
-    expandRowKeys.value = []
-  }
-}
-
-const handleSelected = async (
-  command: string, category = '', delete_files = false, enable = true,
-) => {
-  const data = {
-    ids: checkedRowKeys.value,
-    command,
-    enable,
-    category,
-    delete_files,
-    downloader_id: defaultDownloader.value,
-  }
-  deleteModal.value = false
-  const flag = await $controlTorrent(data)
-  if (flag)
-    await getDownloading(defaultDownloader.value)
-  return flag
-}
-const handleDelete = async () => {
-  await handleExpandedRowKeys([])
-  const flag = await handleSelected(
-    'delete',
-    '',
-    deleteFiles.value,
-  )
-  if (flag)
-    expandRowKeys.value = []
-}
-const setCategory = () => {
-  handleSelected('set_category', this.category)
-  this.categoryForm = false
-  this.category = ''
-}
-const handleDeleteForm = () => {
-  deleteModal.value = true
-}
-const handleSetCategory = () => {
-  dialog?.info({
-    title: '设置分类',
-    content: () => h(
-      handleForm,
-      {
-        command: 'set_category',
-        downloader_id: defaultDownloader.value,
-        torrent_hashes: checkedRowKeys.value,
-      },
-    ),
-    closable: true,
-  })
-}
-const handleSelect = (key: string, option: DropdownOption) => {
+const handleSelect = async (key: string, option: DropdownOption) => {
   if (checkedRowKeys.value.length <= 0)
-    checkedRowKeys.value.push(currentRow.value?.hash)
+    checkedRowKeys.value.push(currentRow.value.hash)
+
   switch (key) {
+    case 'prop':
+      dialog?.info({
+        title: '种子详情',
+        content: () => h(
+          torrent,
+          {
+            torrent: getTorrentProp(defaultDownloader.value, currentRow.value.hash),
+            downloader_id: defaultDownloader.value,
+          },
+        ),
+        style: {
+          width: '100%',
+        },
+        closable: true,
+      })
+      break
     case 'copy':
     case 'name':
     case 'hash':
@@ -310,20 +140,17 @@ const handleSelect = (key: string, option: DropdownOption) => {
     case 'set_auto_management':
     case 'recheck':
     case 'reannounce':
-      handleSelected(key)
+      await handleSelected(key)
       break
     case 'set_super_seeding':
-      handleSelected(
+      await handleSelected(
         key, '',
         false,
         !currentRow.value?.super_seeding || false,
       )
       break
     case 'deleteForm':
-      handleDeleteForm()
-      break
-    case 'categoryForm':
-      handleSetCategory()
+      await handleDeleteModal(true)
       break
     case 'clearSort':
       message?.warning('正在开发哦！')
@@ -334,6 +161,13 @@ const handleSelect = (key: string, option: DropdownOption) => {
     case 'clearCheckboxRow':
       message?.warning('正在开发哦！')
       break
+    case 'clearCategory':
+      await handleSelected('set_category', '')
+      break
+    case 'removeCategories':
+      // await handleSelected('removeCategories', '')
+      message?.warning('正在开发哦！')
+      break
     case 'setAllCheckboxRow':
       message?.warning('正在开发哦！')
       break
@@ -342,31 +176,21 @@ const handleSelect = (key: string, option: DropdownOption) => {
       break
     default:
       if (key.startsWith('setCategory')) {
-        message?.warning(key.replace('setCategory?', ''))
+        await handleSelected('set_category', key.replace('setCategory?', ''))
         break
       }
       message?.warning('正在开发哦！')
   }
   showDropdown.value = false
 }
-const clearTimer = async () => {
-  clearInterval(timer.value)
-  timer.value = {}
-}
+
 onBeforeMount(async () => {
   loading.value = true
   await getDownloaderList()
   if (downloaderList.value.length > 0) {
-    defaultDownloader.value = downloaderList.value[0].id
-    await handleUpdateValue(defaultDownloader.value)
-    timer.value = setInterval(async () => {
-      await getDownloading(defaultDownloader.value)
-      if (expandRowKeys.value.length > 0)
-        await getTorrentProp(defaultDownloader.value, expandRowKeys.value[0])
-    }, 3000)
-    setTimeout(async () => {
-      await clearTimer()
-    }, timeout.value)
+    await handleDefaultDownloader(downloaderList.value[0].id)
+    await handleUpdateDownloading(defaultDownloader.value)
+    await startFresh()
   }
   else {
     message?.error('请先添加下载器，然后重试！')
@@ -381,7 +205,7 @@ onBeforeMount(async () => {
       v-model:value="defaultDownloader"
       size="small"
       type="card"
-      @update:value="handleUpdateValue"
+      @update:value="handleUpdateDownloading"
     >
       <n-tab
         v-for="downloader in downloaderList"
@@ -393,12 +217,13 @@ onBeforeMount(async () => {
 
     <div style="height: 100%;">
       <n-space>
-        <n-button v-if="timer !== {}" size="tiny" type="error" @click="clearTimer">
-          停止
-        </n-button>
-        <n-button v-else size="tiny" type="success" @click="handleUpdateValue(defaultDownloader)">
+        <n-button v-if="isNaN(timer)" size="tiny" type="success" @click="startFresh">
           刷新
         </n-button>
+        <n-button v-else size="tiny" type="error" @click="clearTimer">
+          停止
+        </n-button>
+
         <n-select
           v-model:value="currentCategory"
           filterable
@@ -411,7 +236,6 @@ onBeforeMount(async () => {
         ref="downloadingRef"
         :columns="downloadingColumns"
         :data="downloading.torrents"
-        :expanded-row-keys="expandRowKeys"
         :loading="loading"
         :max-height="720"
         :row-class-name="rowClassName"
@@ -425,7 +249,6 @@ onBeforeMount(async () => {
         striped
         virtual-scroll
         @update:checked-row-keys="handleCheckRows"
-        @update:expanded-row-keys="handleExpandedRowKeys"
       />
     </div>
   </n-card>
@@ -435,7 +258,7 @@ onBeforeMount(async () => {
     size="small"
     :x="x"
     :y="y"
-    :options="options"
+    :options="rightOptions"
     :show="showDropdown"
     :on-clickoutside="onClickOutside"
     @select="handleSelect"
