@@ -7,7 +7,7 @@ import router from '~/routes'
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API || '/',
-  timeout: 60000,
+  timeout: 120000,
 })
 const requestHandler = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig<any> | any> => {
   const authorization = useAuthorization()
