@@ -1,17 +1,16 @@
-import type { DataTableColumns, DataTableRowKey, DropdownOption, FormInst, FormRules, SelectOption } from 'naive-ui'
+import type { DataTableColumns, DropdownOption, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NProgress, NSwitch, NTag, NTooltip } from 'naive-ui'
 import type {
   Category,
   DownloadSpeedType, Downloader,
-  Downloading,
   Torrent,
 } from '~/api/download'
 import {
   $addDownloader,
   $controlTorrent,
-  $editDownloader, $getDownloadSpeedList,
-  $getDownloader, $getDownloaderList,
-  $getDownloading, $getTorrentProp, $removeDownloader,
+  $editDownloader, $getCategoryList,
+  $getDownloadSpeedList,
+  $getDownloader, $getDownloaderList, $getTorrentList, $getTorrentProp, $removeDownloader,
 } from '~/api/download'
 import numberFormat from '~/hooks/numberFormat'
 import timeFormat from '~/hooks/timeFormat'
@@ -21,22 +20,18 @@ import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import renderSize from '~/hooks/renderSize'
 
 export const useDownloadStore = defineStore('download', () => {
-  const { dialog, message } = useGlobalConfig()
+  const { dialog } = useGlobalConfig()
   const speedList = ref<DownloadSpeedType[]>([])
   const downloaderList = ref<Downloader[]>([])
   const timer = ref()
   const downloadingFlag = ref(false)
   const defaultDownloader = ref<number>(0)
-  const checkedRowKeys = ref<DataTableRowKey[]>([])
+  const checkedRowKeys = ref<string[]>([])
   const deleteModal = ref(false)
   const deleteFiles = ref(false)
-  const downloading = ref<Downloading>({
-    categories: [],
-    torrents: [],
-  })
-  const downloadingTableRef = ref()
+  const torrentList = ref<Torrent[]>([])
+  const downloadingTableRef = ref(null)
   const downloadLoading = ref(false)
-
   const download_state = {
     uploading: '正在上传',
     downloading: '正在下载',
@@ -209,8 +204,18 @@ export const useDownloadStore = defineStore('download', () => {
     clearInterval(timer.value)
     timer.value = null
   }
-  const getDownloading = async (downloader_id: number, prop = false) => {
-    downloading.value = await $getDownloading({ downloader_id, prop })
+  /**
+   * 获取下载器种子列表
+   * @param downloader_id
+   * @param prop
+   * @param torrent_hashes
+   */
+  const getTorrentList = async (downloader_id: number, prop = false, torrent_hashes = '') => {
+    return await $getTorrentList({
+      downloader_id,
+      prop,
+      torrent_hashes,
+    })
   }
   const interval = ref<number>(5)
   const timeout = ref<number>(10)
@@ -230,7 +235,8 @@ export const useDownloadStore = defineStore('download', () => {
       clearSpeedListTimer()
     }, timeout.value * 1000 * 60)
   }
-  const categories = ref<SelectOption[]>([{
+  const categoryList = ref<Category[]>()
+  const categories = ref<{ label: string; value: string | number }[]>([{
     label: '请选择',
     value: '',
   }])
@@ -357,36 +363,49 @@ export const useDownloadStore = defineStore('download', () => {
 
   const clearTimer = async () => {
     clearInterval(timer.value)
-    timer.value = {}
+    timer.value = null
   }
 
   const startFresh = async () => {
     timer.value = setInterval(async () => {
-      await getDownloading(defaultDownloader.value, true)
+      const showDataHashes = downloadingTableRef.value!.paginatedData.map((row: { key: string }) => row.key)
+      const showData = await getTorrentList(defaultDownloader.value, true, showDataHashes.join('|'))
+      showData.forEach((torrent: Torrent) => {
+        const index = torrentList.value.findIndex(item => item.hash === torrent.hash)
+        torrentList.value.splice(index, 1, torrent)
+      })
     }, 5000)
     setTimeout(async () => {
       await clearTimer()
     }, timeout.value)
   }
+  /**
+     * 获取下载器分类列表
+     * @param downloader_id
+     */
+  const getDownloaderCategoryList = async (downloader_id: number) => {
+    categoryList.value = await $getCategoryList(downloader_id)
+  }
   const handleUpdateDownloading = async (value: number) => {
+    downloadLoading.value = true
     categories.value.length = 1
     selectedCategories.value.length = 2
     if (!isNaN(value))
       defaultDownloader.value = value
+    await getDownloaderCategoryList(defaultDownloader.value)
+    torrentList.value = await getTorrentList(defaultDownloader.value)
 
-    await getDownloading(defaultDownloader.value)
-    const options = downloading.value.categories.map((category: Category) => (
-      {
+    categoryList.value?.forEach((category: Category) => {
+      categories.value.push({
         label: category.name,
         value: category.name,
-      }))
-    const selectedCategoriesOptions = downloading.value.categories.map((category: Category) => (
-      {
+      })
+      selectedCategories.value.push({
         label: category.name,
         key: `setCategory?${category.name}`,
-      }))
-    categories.value.push(...options)
-    selectedCategories.value.push(...selectedCategoriesOptions)
+      })
+    })
+    downloadLoading.value = false
     await startFresh()
   }
   const handleSelected = async (
@@ -394,7 +413,6 @@ export const useDownloadStore = defineStore('download', () => {
     category = '',
     delete_files = false,
     enable = true,
-
   ) => {
     const data = {
       ids: checkedRowKeys.value,
@@ -407,7 +425,7 @@ export const useDownloadStore = defineStore('download', () => {
     deleteModal.value = false
     const flag = await $controlTorrent(data)
     if (flag)
-      await getDownloading(defaultDownloader.value)
+      await getTorrentList(defaultDownloader.value)
 
     return flag
   }
@@ -460,17 +478,7 @@ export const useDownloadStore = defineStore('download', () => {
       filter(value, row) {
         return !!~row.category.indexOf(value.toString())
       },
-      filterOptions: downloading.value.categories.map((item: Category) => ({
-        label: item.name,
-        value: item.name,
-      })),
-      // renderFilter: (options: { active: boolean; show: boolean }) => {
-      //   console.log(options)
-      // },
-      renderFilterMenu: (actions) => {
-        // todo
-        console.log(actions)
-      },
+      filterOptions: categories.value,
       render: (row) => {
         if (row.category) {
           return h(
@@ -684,6 +692,7 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '分享率',
       key: 'ratio',
+      width: 75,
       minWidth: 75,
       maxWidth: 100,
       resizable: true,
@@ -710,6 +719,7 @@ export const useDownloadStore = defineStore('download', () => {
       title: '种子',
       key: 'num_complete',
       sorter: (row1, row2) => row1.num_complete - row2.num_complete,
+      width: 85,
       minWidth: 85,
       maxWidth: 150,
       resizable: true,
@@ -721,6 +731,7 @@ export const useDownloadStore = defineStore('download', () => {
       title: '未完成',
       key: 'num_incomplete',
       sorter: (row1, row2) => row1.num_incomplete - row2.num_incomplete,
+      width: 65,
       minWidth: 65,
       maxWidth: 100,
       resizable: true,
@@ -729,6 +740,7 @@ export const useDownloadStore = defineStore('download', () => {
       title: '下载中',
       key: 'num_leechs',
       sorter: (row1, row2) => row1.num_leechs - row2.num_leechs,
+      width: 65,
       minWidth: 65,
       maxWidth: 100,
       resizable: true,
@@ -883,7 +895,7 @@ export const useDownloadStore = defineStore('download', () => {
       },
     },
   ])
-  const handleCheckRows = (rowKeys: DataTableRowKey[]) => {
+  const handleCheckRows = (rowKeys: string[]) => {
     checkedRowKeys.value = rowKeys
   }
   const handleDeleteModal = (value: boolean) => {
@@ -897,35 +909,36 @@ export const useDownloadStore = defineStore('download', () => {
   }
   return {
     addDownloaderFormRules,
-    handleDefaultDownloader,
     categories,
-    handleDeleteModal,
     categorySelectList,
     checkedRowKeys,
     clearSpeedListTimer,
     clearTimer,
-    handleCheckRows,
     columns,
     currentCategory,
     defaultDownloader,
     deleteFiles,
     deleteModal,
+    downloadLoading,
     downloaderForm,
     downloaderList,
-    downloading,
-    downloadLoading,
+    torrentList,
     downloadingColumns,
     downloadingFlag,
+    downloadingTableRef,
     editDownloader,
     getDownloaderList,
-    getDownloading,
+    getDownloading: getTorrentList,
     getSpeedList,
     getSpeedListTimer,
     getSpeedTotal,
     getTorrentProp,
+    handleCheckRows,
+    handleDefaultDownloader,
     handleDelete,
-    handleSelected,
+    handleDeleteModal,
     handleDownloadLoading,
+    handleSelected,
     handleUpdateDownloading,
     interval,
     refDownloaderForm,
@@ -941,6 +954,5 @@ export const useDownloadStore = defineStore('download', () => {
     timeout,
     timer,
     trackerStatus,
-    downloadingTableRef,
   }
 })

@@ -2,10 +2,13 @@
 import { isNaN } from 'lodash-es'
 import type { DataTableRowKey, DropdownOption, SelectOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
+import { useClipboard } from '@v-c/utils'
 import type { Category, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import torrent from '~/pages/download/repeat/components/torrent.vue'
-const { text, copy, copied, isSupported } = useClipboard()
+import { useQueryBreakPoints } from '~/composables/query-breakpoints'
+
+const { copy } = useClipboard()
 const {
   message,
   dialog,
@@ -25,7 +28,7 @@ const {
   handleDownloadLoading,
 } = downloadStore
 const {
-  downloading,
+  torrentList,
   downloadingColumns,
   downloaderList,
   defaultDownloader,
@@ -61,16 +64,26 @@ const railStyle = ({
 }
 
 const showDropdown = ref(false)
+const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 
-const currentRow = ref<Torrent>()
-
+const currentRow = ref<Torrent>({})
+const pagination = ref({
+  pageSize: isMobile ? 20 : 25,
+  size: 'small',
+  itemCount: torrentList.value.length,
+  showSizePicker: true,
+  pageSizes: [10, 20, 25, 30, 40],
+  pageSlot: 9,
+})
 const x = ref(0)
 const y = ref(0)
 
 const onClickOutside = () => {
   showDropdown.value = false
 }
-
+const handlePageSize = (pageSize: number) => {
+  pagination.value.pageSize = pageSize
+}
 const openTorrentInfo = async (torrent_hash: string) => {
   const torrentInfo = await getTorrentProp(defaultDownloader.value, torrent_hash)
   dialog?.info({
@@ -105,6 +118,13 @@ const rowProps = (row: Torrent) => {
     onDblclick: async (e: MouseEvent) => {
       await openTorrentInfo(row.hash)
     },
+    // onClick: async (e: MouseEvent) => {
+    //   if (checkedRowKeys.value.includes(row.hash)) {
+    //     const index = checkedRowKeys.value.findIndex((key: string) => key === row.hash)
+    //     handleCheckRows(checkedRowKeys.value.splice(index, 1))
+    //   }
+    //   else { checkedRowKeys.value.push(row.hash) }
+    // },
   }
 }
 
@@ -126,9 +146,19 @@ const rowClassName = (row: Torrent) => {
   if (row.super_seeding)
     cls = 'super-seeding'
 
-  return cls
+  return `${cls}`
 }
-
+const copyTorrentsProp = async (torrent_hashes: string[], key: 'name' | 'magnet_uri' | 'hash') => {
+  let props = ''
+  if (key === 'hash') {
+    props = torrent_hashes.join('\n')
+  }
+  else {
+    const items = torrentList.value.filter((item: Torrent) => torrent_hashes.includes(item.hash))
+    props = items.map((item: Torrent) => item[key]).join('\n')
+  }
+  await copy(props)
+}
 const handleSelect = async (key: string, option: DropdownOption) => {
   if (checkedRowKeys.value.length <= 0)
     checkedRowKeys.value.push(currentRow.value.hash)
@@ -139,11 +169,13 @@ const handleSelect = async (key: string, option: DropdownOption) => {
       break
     case 'copy':
     case 'name':
+      await copyTorrentsProp(checkedRowKeys.value, 'name')
+      break
     case 'hash':
-      await copy(checkedRowKeys.value)
+      await copyTorrentsProp(checkedRowKeys.value, 'hash')
       break
     case 'magnet_uri':
-      message?.warning('正在开发哦！')
+      await copyTorrentsProp(checkedRowKeys.value, 'magnet_uri')
       break
     case 'resume':
     case 'set_force_start':
@@ -164,13 +196,13 @@ const handleSelect = async (key: string, option: DropdownOption) => {
       handleDeleteModal(true)
       break
     case 'clearSort':
-      message?.warning('正在开发哦！')
+      downloadingTableRef.value?.clearSorter()
       break
     case 'clearFilter':
-      message?.warning('正在开发哦！')
+      downloadingTableRef.value?.clearFilters()
       break
-    case 'clearCheckboxRow':
-      message?.warning('正在开发哦！')
+    case 'clearChecked':
+      checkedRowKeys.value.length = 0
       break
     case 'clearCategory':
       await handleSelected('set_category', '')
@@ -194,9 +226,6 @@ const handleSelect = async (key: string, option: DropdownOption) => {
   }
   showDropdown.value = false
 }
-const getVisibleRows = () => {
-  const visibleRows = downloadingTableRef.value.virtualBody.visibleItems
-}
 onBeforeMount(async () => {
   handleDownloadLoading(true)
   await getDownloaderList()
@@ -209,6 +238,9 @@ onBeforeMount(async () => {
     message?.error('请先添加下载器，然后重试！')
   }
   handleDownloadLoading(false)
+})
+onBeforeUnmount(async () => {
+  await clearTimer()
 })
 </script>
 
@@ -230,15 +262,16 @@ onBeforeMount(async () => {
 
     <div style="height: 100%;">
       <n-space>
-        <n-button v-if="isNaN(timer)" size="tiny" type="success" @click="startFresh">
-          刷新
-        </n-button>
-        <n-button v-else size="tiny" type="error" @click="clearTimer">
+        <n-button v-if="timer" size="tiny" type="error" @click="clearTimer">
           停止
         </n-button>
-        <n-button size="tiny" type="error" @click="getVisibleRows">
+        <n-button v-else size="tiny" type="success" @click="startFresh">
+          刷新
+        </n-button>
+        <n-button size="tiny" type="error">
           rows
         </n-button>
+        <n-input size="tiny" />
         <n-select
           v-model:value="currentCategory"
           filterable
@@ -248,14 +281,15 @@ onBeforeMount(async () => {
         />
       </n-space>
       <n-data-table
-        :ref="downloadingTableRef"
+        ref="downloadingTableRef"
         :columns="downloadingColumns"
-        :data="downloading.torrents"
+        :data="torrentList"
         :loading="downloadLoading"
         :max-height="720"
         :row-class-name="rowClassName"
         :row-key="(row: Torrent) => row.hash"
         :row-props="rowProps"
+        :pagination="pagination"
         bordered
         show-on-focus
         class="text-10px!"
@@ -263,6 +297,7 @@ onBeforeMount(async () => {
         sticky-expanded-rows
         striped
         virtual-scroll
+        @update:page-size="handlePageSize"
         @update:checked-row-keys="handleCheckRows"
       />
     </div>
