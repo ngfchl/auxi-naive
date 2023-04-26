@@ -5,6 +5,7 @@ specifiers:
   '@types/lodash-es': ^4.17.7
   '@types/node': ^18.16.0
   '@unocss/reset': ^0.50.8
+  '@v-c/utils': ^0.0.23
   '@vicons/ionicons5': ^0.12.0
   '@vitejs/plugin-vue': ^4.1.0
   '@vue/runtime-core': ^3.2.47
@@ -31,6 +32,7 @@ specifiers:
   vue-tsc: ^1.4.4
 
 dependencies:
+  '@v-c/utils': registry.npmmirror.com/@v-c/utils/0.0.23
   '@vueuse/core': registry.npmmirror.com/@vueuse/core/9.13.0_vue@3.2.47
   axios: registry.npmmirror.com/axios/1.3.6
   echarts: registry.npmmirror.com/echarts/5.4.2
@@ -1175,6 +1177,17 @@ packages:
     transitivePeerDependencies:
       - rollup
     dev: true
+
+  registry.npmmirror.com/@v-c/utils/0.0.23:
+    resolution: {integrity: sha512-MJt21ZmcKyMA8Zdb+6J2IO/1cvwWLYzdvrMaqxno8gDtoDTYrv+ORh7NiY5QdxGEd8BLtnd3sXK7FuZlmV6wUQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@v-c/utils/-/utils-0.0.23.tgz}
+    name: '@v-c/utils'
+    version: 0.0.23
+    dependencies:
+      lodash.clonedeep: registry.npmmirror.com/lodash.clonedeep/4.5.0
+      lodash.isequal: registry.npmmirror.com/lodash.isequal/4.5.0
+      lodash.merge: registry.npmmirror.com/lodash.merge/4.6.2
+      vue: registry.npmmirror.com/vue/3.2.47
+    dev: false
 
   registry.npmmirror.com/@vicons/ionicons5/0.12.0:
     resolution: {integrity: sha512-Iy1EUVRpX0WWxeu1VIReR1zsZLMc4fqpt223czR+Rpnrwu7pt46nbnC2ycO7ItI/uqDLJxnbcMC7FujKs9IfFA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@vicons/ionicons5/-/ionicons5-0.12.0.tgz}
@@ -3576,11 +3589,22 @@ packages:
     version: 4.17.21
     dev: true
 
+  registry.npmmirror.com/lodash.clonedeep/4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz}
+    name: lodash.clonedeep
+    version: 4.5.0
+    dev: false
+
+  registry.npmmirror.com/lodash.isequal/4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz}
+    name: lodash.isequal
+    version: 4.5.0
+    dev: false
+
   registry.npmmirror.com/lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lodash.merge/-/lodash.merge-4.6.2.tgz}
     name: lodash.merge
     version: 4.6.2
-    dev: true
 
   registry.npmmirror.com/lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lodash/-/lodash-4.17.21.tgz}
