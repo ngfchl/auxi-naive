@@ -258,8 +258,12 @@ export const $getDownloader: (params: object) => Promise<any> = async (params: o
   return await getList<object, Downloader>('download/downloader', params)
 }
 
-export const $getDownloading: (params: object) => Promise<any> = async (params: object) => {
+export const $getTorrentList: (params: object) => Promise<any> = async (params: object) => {
   return await getList<object, Downloading>('download/downloaders/downloading', params)
+}
+
+export const $getCategoryList: (downloader_id: number) => Promise<any> = async (downloader_id: number) => {
+  return await getList<object, Category[]>('download/downloaders/categories', { downloader_id })
 }
 export const $controlTorrent: (params: object) => Promise<any> = async (params) => {
   const { msg, code } = await usePost('download/control', params)
