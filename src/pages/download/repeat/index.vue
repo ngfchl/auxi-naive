@@ -4,9 +4,8 @@ import type { DataTableRowKey, DropdownOption, SelectOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import type { Category, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
-import { $controlTorrent } from '~/api/download'
 import torrent from '~/pages/download/repeat/components/torrent.vue'
-
+const { text, copy, copied, isSupported } = useClipboard()
 const {
   message,
   dialog,
@@ -141,6 +140,8 @@ const handleSelect = async (key: string, option: DropdownOption) => {
     case 'copy':
     case 'name':
     case 'hash':
+      await copy(checkedRowKeys.value)
+      break
     case 'magnet_uri':
       message?.warning('正在开发哦！')
       break
