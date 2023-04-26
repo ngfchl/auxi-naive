@@ -21,7 +21,7 @@ import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import renderSize from '~/hooks/renderSize'
 
 export const useDownloadStore = defineStore('download', () => {
-  const { dialog } = useGlobalConfig()
+  const { dialog, message } = useGlobalConfig()
   const speedList = ref<DownloadSpeedType[]>([])
   const downloaderList = ref<Downloader[]>([])
   const timer = ref()
@@ -34,6 +34,9 @@ export const useDownloadStore = defineStore('download', () => {
     categories: [],
     torrents: [],
   })
+  const downloadingTableRef = ref()
+  const downloadLoading = ref(false)
+
   const download_state = {
     uploading: '正在上传',
     downloading: '正在下载',
@@ -360,7 +363,7 @@ export const useDownloadStore = defineStore('download', () => {
   const startFresh = async () => {
     timer.value = setInterval(async () => {
       await getDownloading(defaultDownloader.value, true)
-    }, 3000)
+    }, 5000)
     setTimeout(async () => {
       await clearTimer()
     }, timeout.value)
@@ -461,6 +464,13 @@ export const useDownloadStore = defineStore('download', () => {
         label: item.name,
         value: item.name,
       })),
+      // renderFilter: (options: { active: boolean; show: boolean }) => {
+      //   console.log(options)
+      // },
+      renderFilterMenu: (actions) => {
+        // todo
+        console.log(actions)
+      },
       render: (row) => {
         if (row.category) {
           return h(
@@ -876,11 +886,13 @@ export const useDownloadStore = defineStore('download', () => {
   const handleCheckRows = (rowKeys: DataTableRowKey[]) => {
     checkedRowKeys.value = rowKeys
   }
-  const handleDeleteModal = async (value: boolean) => {
+  const handleDeleteModal = (value: boolean) => {
     deleteModal.value = value
   }
-
-  const handleDefaultDownloader = async (value: number) => {
+  const handleDownloadLoading = (value: boolean) => {
+    downloadLoading.value = value
+  }
+  const handleDefaultDownloader = (value: number) => {
     defaultDownloader.value = value
   }
   return {
@@ -901,6 +913,7 @@ export const useDownloadStore = defineStore('download', () => {
     downloaderForm,
     downloaderList,
     downloading,
+    downloadLoading,
     downloadingColumns,
     downloadingFlag,
     editDownloader,
@@ -912,6 +925,7 @@ export const useDownloadStore = defineStore('download', () => {
     getTorrentProp,
     handleDelete,
     handleSelected,
+    handleDownloadLoading,
     handleUpdateDownloading,
     interval,
     refDownloaderForm,
@@ -927,5 +941,6 @@ export const useDownloadStore = defineStore('download', () => {
     timeout,
     timer,
     trackerStatus,
+    downloadingTableRef,
   }
 })

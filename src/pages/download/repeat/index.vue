@@ -23,6 +23,7 @@ const {
   handleDeleteModal,
   clearTimer,
   handleCheckRows,
+  handleDownloadLoading,
 } = downloadStore
 const {
   downloading,
@@ -30,13 +31,14 @@ const {
   downloaderList,
   defaultDownloader,
   rightOptions,
+  downloadLoading,
   categories,
   deleteFiles,
   currentCategory,
   checkedRowKeys,
   timer, deleteModal,
+  downloadingTableRef,
 } = storeToRefs(downloadStore)
-const loading = ref(false)
 const timeout = ref<number>(1000 * 60)
 const railStyle = ({
   focused,
@@ -59,7 +61,6 @@ const railStyle = ({
   return style
 }
 
-const expandRowKeys = ref<string[] | number[]>([])
 const showDropdown = ref(false)
 
 const currentRow = ref<Torrent>()
@@ -69,6 +70,25 @@ const y = ref(0)
 
 const onClickOutside = () => {
   showDropdown.value = false
+}
+
+const openTorrentInfo = async (torrent_hash: string) => {
+  const torrentInfo = await getTorrentProp(defaultDownloader.value, torrent_hash)
+  dialog?.info({
+    title: '种子详情',
+    content: () => h(
+      torrent,
+      {
+        torrent: torrentInfo,
+        downloader_id: defaultDownloader.value,
+      },
+    ),
+    style: {
+      width: '100%',
+      height: '80%',
+    },
+    closable: true,
+  })
 }
 const rowProps = (row: Torrent) => {
   return {
@@ -83,26 +103,29 @@ const rowProps = (row: Torrent) => {
         y.value = e.clientY
       })
     },
+    onDblclick: async (e: MouseEvent) => {
+      await openTorrentInfo(row.hash)
+    },
   }
 }
 
 const rowClassName = (row: Torrent) => {
   const trackers = row.trackers
-  let cls = 'double-click'
+  let cls = ''
   if (trackers && trackers.length > 0) {
     switch (trackers[0].status) {
       case 0:
       case 4:
-        cls += 'tracker-error'
+        cls = 'tracker-error'
         break
       case 1:
       case 3:
-        cls += 'tracker-warning'
+        cls = 'tracker-warning'
         break
     }
   }
   if (row.super_seeding)
-    cls += 'super-seeding'
+    cls = 'super-seeding'
 
   return cls
 }
@@ -113,20 +136,7 @@ const handleSelect = async (key: string, option: DropdownOption) => {
 
   switch (key) {
     case 'prop':
-      dialog?.info({
-        title: '种子详情',
-        content: () => h(
-          torrent,
-          {
-            torrent: getTorrentProp(defaultDownloader.value, currentRow.value.hash),
-            downloader_id: defaultDownloader.value,
-          },
-        ),
-        style: {
-          width: '100%',
-        },
-        closable: true,
-      })
+      await openTorrentInfo(currentRow.value.hash)
       break
     case 'copy':
     case 'name':
@@ -150,7 +160,7 @@ const handleSelect = async (key: string, option: DropdownOption) => {
       )
       break
     case 'deleteForm':
-      await handleDeleteModal(true)
+      handleDeleteModal(true)
       break
     case 'clearSort':
       message?.warning('正在开发哦！')
@@ -183,19 +193,21 @@ const handleSelect = async (key: string, option: DropdownOption) => {
   }
   showDropdown.value = false
 }
-
+const getVisibleRows = () => {
+  const visibleRows = downloadingTableRef.value.virtualBody.visibleItems
+}
 onBeforeMount(async () => {
-  loading.value = true
+  handleDownloadLoading(true)
   await getDownloaderList()
   if (downloaderList.value.length > 0) {
-    await handleDefaultDownloader(downloaderList.value[0].id)
+    handleDefaultDownloader(downloaderList.value[0].id)
     await handleUpdateDownloading(defaultDownloader.value)
     await startFresh()
   }
   else {
     message?.error('请先添加下载器，然后重试！')
   }
-  loading.value = false
+  handleDownloadLoading(false)
 })
 </script>
 
@@ -223,7 +235,9 @@ onBeforeMount(async () => {
         <n-button v-else size="tiny" type="error" @click="clearTimer">
           停止
         </n-button>
-
+        <n-button size="tiny" type="error" @click="getVisibleRows">
+          rows
+        </n-button>
         <n-select
           v-model:value="currentCategory"
           filterable
@@ -233,10 +247,10 @@ onBeforeMount(async () => {
         />
       </n-space>
       <n-data-table
-        ref="downloadingRef"
+        :ref="downloadingTableRef"
         :columns="downloadingColumns"
         :data="downloading.torrents"
-        :loading="loading"
+        :loading="downloadLoading"
         :max-height="720"
         :row-class-name="rowClassName"
         :row-key="(row: Torrent) => row.hash"

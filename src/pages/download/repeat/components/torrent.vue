@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import numberFormat from '../../../../hooks/numberFormat'
 import renderSize from '../../../../hooks/renderSize'
 import timeFormat from '../../../../hooks/timeFormat'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
@@ -7,6 +8,7 @@ import type { Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 const props = defineProps<{
   torrent: Torrent
+  // eslint-disable-next-line vue/prop-name-casing
   downloader_id: number
 }>()
 const downloadStore = useDownloadStore()
@@ -150,318 +152,388 @@ watchEffect(() => {
       </template>
       <div>
         <n-card>
-          <n-descriptions
-            label-placement="left"
+          <n-tabs
+            type="line"
             size="small"
-            :columns="columns"
-            class="text-8px!"
-            :title="torrent.name"
-            bordered
+            justify-content="center"
           >
-            <n-descriptions-item>
-              <template #label>
-                总大小
-              </template>
-              {{ renderSize(torrent.total_size) }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                区块
-              </template>
-              {{ `${torrent.peers_total}x${renderSize(torrent.piece_size)}(已下载：${torrent.pieces_have})` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                创建
-              </template>
-              {{ torrent.created_by }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                添加于
-              </template>
-              {{ timestampToBeijingTime(torrent.addition_date) }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                完成于
-              </template>
-              {{ timestampToBeijingTime(torrent.completion_date) }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                创建于
-              </template>
-              {{ timestampToBeijingTime(torrent.creation_date) }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="torrent.category">
-              <template #label>
-                分类
-              </template>
-              {{ torrent.category }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="torrent.tags">
-              <template #label>
-                标签
-              </template>
-              {{ torrent.tags }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                保存路径
-              </template>
-              {{ torrent.save_path }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                HASH
-              </template>
-              {{ torrent.hash }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="torrent.comment">
-              <template #label>
-                注释
-              </template>
-              {{ torrent.comment }}
-            </n-descriptions-item>
-          </n-descriptions>
-          <n-descriptions
-            label-placement="left"
-            size="small"
-            :columns="columns"
-            class="text-8px!"
-            title="传输"
-            bordered
-          >
-            <n-descriptions-item>
-              <template #label>
-                活动时间
-              </template>
-              {{ torrent.time_active ? timeFormat(torrent.time_active) : 0 }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                剩余时间
-              </template>
-              {{ timeFormat(torrent.amount_left / torrent.dl_speed) }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                连接
-              </template>
-              {{ `${torrent.nb_connections}(链接限制：${torrent.nb_connections_limit})` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                已下载
-              </template>
-              {{ `${renderSize(torrent.total_downloaded)}(会话：${renderSize(torrent.total_downloaded_session)})` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                已上传
-              </template>
-              {{ `${renderSize(torrent.total_uploaded)}(会话：${renderSize(torrent.total_uploaded_session)})` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                种子：
-              </template>
-              {{ `${torrent.seeds}(${torrent.seeds_total})` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                下载速度
-              </template>
-              {{ `${renderSize(torrent.dl_speed)}/s(平均：${renderSize(torrent.dl_speed_avg)}/s)` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                上传速度
-              </template>
-              {{ `${renderSize(torrent.up_speed)}/s(平均：${renderSize(torrent.up_speed_avg)}/s)` }}
-            </n-descriptions-item>
+            <n-tab-pane name="信息">
+              <n-descriptions
+                label-placement="left"
+                size="small"
+                :columns="columns"
+                class="text-8px!"
+                :title="torrent.name"
+                bordered
+              >
+                <n-descriptions-item>
+                  <template #label>
+                    总大小
+                  </template>
+                  {{ renderSize(torrent.total_size) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    区块
+                  </template>
+                  {{ `${torrent.peers_total}x${renderSize(torrent.piece_size)}(已下载：${torrent.pieces_have})` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    创建
+                  </template>
+                  {{ torrent.created_by }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    添加于
+                  </template>
+                  {{ timestampToBeijingTime(torrent.addition_date) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    完成于
+                  </template>
+                  {{ timestampToBeijingTime(torrent.completion_date) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    创建于
+                  </template>
+                  {{ timestampToBeijingTime(torrent.creation_date) }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="torrent.category">
+                  <template #label>
+                    分类
+                  </template>
+                  {{ torrent.category }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="torrent.tags">
+                  <template #label>
+                    标签
+                  </template>
+                  {{ torrent.tags }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    保存路径
+                  </template>
+                  {{ torrent.save_path }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    HASH
+                  </template>
+                  {{ torrent.hash }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="torrent.comment">
+                  <template #label>
+                    注释
+                  </template>
+                  {{ torrent.comment }}
+                </n-descriptions-item>
+              </n-descriptions>
+              <n-descriptions
+                label-placement="left"
+                size="small"
+                :columns="columns"
+                class="text-8px!"
+                title="传输"
+                bordered
+              >
+                <n-descriptions-item>
+                  <template #label>
+                    活动时间
+                  </template>
+                  {{ torrent.time_active ? timeFormat(torrent.time_active) : 0 }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    剩余时间
+                  </template>
+                  {{ timeFormat(torrent.amount_left / torrent.dl_speed) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    连接
+                  </template>
+                  {{ `${torrent.nb_connections}(链接限制：${torrent.nb_connections_limit})` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    已下载
+                  </template>
+                  {{ `${renderSize(torrent.total_downloaded)}(会话：${renderSize(torrent.total_downloaded_session)})` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    已上传
+                  </template>
+                  {{ `${renderSize(torrent.total_uploaded)}(会话：${renderSize(torrent.total_uploaded_session)})` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    种子：
+                  </template>
+                  {{ `${torrent.seeds}(${torrent.seeds_total})` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    下载速度
+                  </template>
+                  {{ `${renderSize(torrent.dl_speed)}/s(平均：${renderSize(torrent.dl_speed_avg)}/s)` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    上传速度
+                  </template>
+                  {{ `${renderSize(torrent.up_speed)}/s(平均：${renderSize(torrent.up_speed_avg)}/s)` }}
+                </n-descriptions-item>
 
-            <n-descriptions-item>
-              <template #label>
-                用户
-              </template>
-              {{ `${torrent.num_leechs}(总计：${torrent.num_incomplete})` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                下载限制
-              </template>
-              {{ (torrent.dl_limit && torrent.dl_limit < 0) ? '' : `${renderSize(torrent.dl_limit)}/s` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                上传限制
-              </template>
-              {{ (torrent.up_limit && torrent.up_limit < 0) ? '' : `${renderSize(torrent.up_limit)}/s` }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                已丢弃
-              </template>
-              {{ torrent.total_wasted ? renderSize(torrent.total_wasted) : 0 }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                分享率
-              </template>
-              {{ torrent.ratio ? torrent.ratio.toFixed(2) : 0 }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                下次汇报
-              </template>
-              {{ torrent.reannounce ? timeFormat(torrent.reannounce) : 0 }}
-            </n-descriptions-item>
-            <n-descriptions-item>
-              <template #label>
-                最后完整可见
-              </template>
-              {{ torrent.last_seen ? timestampToBeijingTime(torrent.last_seen) : 0 }}
-            </n-descriptions-item>
-          </n-descriptions>
-          <n-descriptions
-            v-for="(tracker, index) in torrent.trackers"
-            :key="tracker.url"
-            :title="`Tracker${index + 1}`"
-            label-placement="left"
-            size="small"
-            :columns="columns"
-            class="text-8px!"
-            bordered
-          >
-            <n-descriptions-item v-if="tracker.tier">
-              <template #label>
-                层级
-              </template>
-              {{ tracker.tier }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.url">
-              <template #label>
-                url
-              </template>
-              <n-ellipsis style="max-width: 200px">
-                {{ tracker.url }}
-              </n-ellipsis>
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.status">
-              <template #label>
-                状态
-              </template>
-              {{ trackerStatus[tracker.status] }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.num_peers">
-              <template #label>
-                用户
-              </template>
-              {{ tracker.num_peers }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.num_seeds">
-              <template #label>
-                种子
-              </template>
-              {{ tracker.num_seeds }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.num_leeches">
-              <template #label>
-                下载
-              </template>
-              {{ tracker.num_leeches }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.num_downloaded">
-              <template #label>
-                吸血
-              </template>
-              {{ tracker.num_downloaded }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="tracker.msg">
-              <template #label>
-                消息
-              </template>
-              <n-ellipsis style="max-width: 200px">
-                {{ tracker.msg }}
-              </n-ellipsis>
-            </n-descriptions-item>
-          </n-descriptions>
-
-          <!--              <n-descriptions -->
-          <!--                v-for="(peer, index) in torrent.peerList" -->
-          <!--                :key="peer.ip" -->
-          <!--                :title="`Peer${index + 1}`" -->
-          <!--                label-placement="left" -->
-          <!--                size="small" -->
-          <!--                :columns="columns" -->
-          <!--                class="text-8px!" -->
-          <!--                bordered -->
-          <!--              > -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    国家/地区 -->
-          <!--                  </template> -->
-          <!--                  {{ peer.country }} -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    IP -->
-          <!--                  </template> -->
-          <!--                  {{ peer.ip }}:{{ peer.port }} -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    客户端 -->
-          <!--                  </template> -->
-          <!--                  {{ peer.client }} -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    进度 -->
-          <!--                  </template> -->
-          <!--                  {{ (numberFormat(peer.progress) * 100).toFixed(2) }}% -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    下载速度 -->
-          <!--                  </template> -->
-          <!--                  {{ renderSize(peer.dl_speed) }}/s -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    上传速度 -->
-          <!--                  </template> -->
-          <!--                  {{ renderSize(peer.up_speed) }}/s -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    已下载 -->
-          <!--                  </template> -->
-          <!--                  {{ renderSize(peer.downloaded) }} -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    已上传 -->
-          <!--                  </template> -->
-          <!--                  {{ renderSize(peer.uploaded) }} -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item> -->
-          <!--                  <template #label> -->
-          <!--                    文件关联 -->
-          <!--                  </template> -->
-          <!--                  {{ numberFormat(peer.relevance) * 100 }}% -->
-          <!--                </n-descriptions-item> -->
-          <!--                <n-descriptions-item v-if="peer.files"> -->
-          <!--                  <template #label> -->
-          <!--                    文件 -->
-          <!--                  </template> -->
-          <!--                  <n-ellipsis style="max-width: 120px"> -->
-          <!--                    {{ peer.files }} -->
-          <!--                  </n-ellipsis> -->
-          <!--                </n-descriptions-item> -->
-          <!--              </n-descriptions> -->
+                <n-descriptions-item>
+                  <template #label>
+                    用户
+                  </template>
+                  {{ `${torrent.num_leechs}(总计：${torrent.num_incomplete})` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    下载限制
+                  </template>
+                  {{ (torrent.dl_limit && torrent.dl_limit < 0) ? '' : `${renderSize(torrent.dl_limit)}/s` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    上传限制
+                  </template>
+                  {{ (torrent.up_limit && torrent.up_limit < 0) ? '' : `${renderSize(torrent.up_limit)}/s` }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    已丢弃
+                  </template>
+                  {{ torrent.total_wasted ? renderSize(torrent.total_wasted) : 0 }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    分享率
+                  </template>
+                  {{ torrent.ratio ? torrent.ratio.toFixed(2) : 0 }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    下次汇报
+                  </template>
+                  {{ torrent.reannounce ? timeFormat(torrent.reannounce) : 0 }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    最后完整可见
+                  </template>
+                  {{ torrent.last_seen ? timestampToBeijingTime(torrent.last_seen) : 0 }}
+                </n-descriptions-item>
+              </n-descriptions>
+            </n-tab-pane>
+            <n-tab-pane name="连接">
+              <n-descriptions
+                v-for="(tracker, index) in torrent.trackers"
+                :key="tracker.url"
+                :title="`Tracker${index + 1}`"
+                label-placement="left"
+                size="small"
+                :columns="columns"
+                class="text-8px!"
+                bordered
+              >
+                <n-descriptions-item v-if="tracker.tier">
+                  <template #label>
+                    层级
+                  </template>
+                  {{ tracker.tier }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.url">
+                  <template #label>
+                    url
+                  </template>
+                  <n-ellipsis style="max-width: 200px">
+                    {{ tracker.url }}
+                  </n-ellipsis>
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.status">
+                  <template #label>
+                    状态
+                  </template>
+                  {{ trackerStatus[tracker.status] }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_peers">
+                  <template #label>
+                    用户
+                  </template>
+                  {{ tracker.num_peers }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_seeds">
+                  <template #label>
+                    种子
+                  </template>
+                  {{ tracker.num_seeds }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_leeches">
+                  <template #label>
+                    下载
+                  </template>
+                  {{ tracker.num_leeches }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.num_downloaded">
+                  <template #label>
+                    吸血
+                  </template>
+                  {{ tracker.num_downloaded }}
+                </n-descriptions-item>
+                <n-descriptions-item v-if="tracker.msg">
+                  <template #label>
+                    消息
+                  </template>
+                  <n-ellipsis style="max-width: 200px">
+                    {{ tracker.msg }}
+                  </n-ellipsis>
+                </n-descriptions-item>
+              </n-descriptions>
+              <n-descriptions
+                v-for="(peer, index) in torrent.peerList"
+                :key="peer.ip"
+                :title="`Peer${index + 1}`"
+                label-placement="left"
+                size="small"
+                :columns="columns"
+                class="text-8px!"
+                bordered
+              >
+                <n-descriptions-item>
+                  <template #label>
+                    国家/地区
+                  </template>
+                  {{ peer.country }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    IP
+                  </template>
+                  {{ peer.ip }}:{{ peer.port }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    客户端
+                  </template>
+                  {{ peer.client }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    进度
+                  </template>
+                  {{ (numberFormat(peer.progress) * 100).toFixed(2) }}%
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    下载速度
+                  </template>
+                  {{ renderSize(peer.dl_speed) }}/s
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    上传速度
+                  </template>
+                  {{ renderSize(peer.up_speed) }}/s
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    已下载
+                  </template>
+                  {{ renderSize(peer.downloaded) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    已上传
+                  </template>
+                  {{ renderSize(peer.uploaded) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    文件关联
+                  </template>
+                  {{ numberFormat(peer.relevance) * 100 }}%
+                </n-descriptions-item>
+                <n-descriptions-item v-if="peer.files">
+                  <template #label>
+                    文件
+                  </template>
+                  <n-ellipsis style="max-width: 120px">
+                    {{ peer.files }}
+                  </n-ellipsis>
+                </n-descriptions-item>
+              </n-descriptions>
+            </n-tab-pane>
+            <n-tab-pane name="文件" display-directive="show:lazy">
+              <n-descriptions
+                v-for="(file, index) in torrent.files"
+                :key="file.ip"
+                :title="`Peer${index + 1}`"
+                label-placement="left"
+                size="small"
+                :columns="columns"
+                class="text-8px!"
+                bordered
+              >
+                <n-descriptions-item>
+                  <template #label>
+                    index
+                  </template>
+                  {{ file.index }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    文件名
+                  </template>
+                  {{ file.name }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    可用性
+                  </template>
+                  {{ file.availability }}
+                </n-descriptions-item>
+                <!--                <n-descriptions-item> -->
+                <!--                  <template #label> -->
+                <!--                    文件名 -->
+                <!--                  </template> -->
+                <!--                  {{ file.is_seed }} -->
+                <!--                </n-descriptions-item> -->
+                <n-descriptions-item>
+                  <template #label>
+                    优先级
+                  </template>
+                  {{ file.priority }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    大小
+                  </template>
+                  {{ renderSize(file.size) }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    进度
+                  </template>
+                  <n-progress
+                    type="line"
+                    :percentage="Number((file.progress * 100).toFixed(2))"
+                    :height="20"
+                    :border-radius="4"
+                    :fill-border-radius="0"
+                  />
+                </n-descriptions-item>
+              </n-descriptions>
+            </n-tab-pane>
+          </n-tabs>
         </n-card>
       </div>
       <template #footer />
