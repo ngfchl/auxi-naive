@@ -3,6 +3,7 @@ import { isNaN } from 'lodash-es'
 import type { DataTableRowKey, DropdownOption, SelectOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import { useClipboard } from '@v-c/utils'
+import renderSize from '../../../hooks/renderSize'
 import type { Category, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import torrent from '~/pages/download/repeat/components/torrent.vue'
@@ -26,20 +27,24 @@ const {
   clearTimer,
   handleCheckRows,
   handleDownloadLoading,
+  searchTorrent,
 } = downloadStore
 const {
   torrentList,
   downloadingColumns,
   downloaderList,
+  downloaderSpeed,
   defaultDownloader,
   rightOptions,
   downloadLoading,
   categories,
   deleteFiles,
   currentCategory,
+  showTorrentList,
   checkedRowKeys,
   timer, deleteModal,
   downloadingTableRef,
+  searchKey,
 } = storeToRefs(downloadStore)
 const timeout = ref<number>(1000 * 60)
 const railStyle = ({
@@ -65,16 +70,21 @@ const railStyle = ({
 
 const showDropdown = ref(false)
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
-
-const currentRow = ref<Torrent>({})
+const currentRow = ref<Torrent>()
 const pagination = ref({
   pageSize: isMobile ? 20 : 25,
+  showQuickJumper: true,
   size: 'small',
   itemCount: torrentList.value.length,
   showSizePicker: true,
   pageSizes: [10, 20, 25, 30, 40],
-  pageSlot: 9,
+  pageSlot: 5,
 })
+// watchEffect(() => {
+//   if (isPad.value || isDesktop.value) pagination.value.pageSize = 25
+//
+//   if (isMobile.value) pagination.value.pageSize = 20
+// })
 const x = ref(0)
 const y = ref(0)
 
@@ -161,11 +171,11 @@ const copyTorrentsProp = async (torrent_hashes: string[], key: 'name' | 'magnet_
 }
 const handleSelect = async (key: string, option: DropdownOption) => {
   if (checkedRowKeys.value.length <= 0)
-    checkedRowKeys.value.push(currentRow.value.hash)
+    checkedRowKeys.value.push(currentRow.value!.hash)
 
   switch (key) {
     case 'prop':
-      await openTorrentInfo(currentRow.value.hash)
+      await openTorrentInfo(currentRow.value!.hash)
       break
     case 'copy':
     case 'name':
@@ -226,18 +236,17 @@ const handleSelect = async (key: string, option: DropdownOption) => {
   }
   showDropdown.value = false
 }
+
 onBeforeMount(async () => {
-  handleDownloadLoading(true)
   await getDownloaderList()
   if (downloaderList.value.length > 0) {
     handleDefaultDownloader(downloaderList.value[0].id)
     await handleUpdateDownloading(defaultDownloader.value)
-    await startFresh()
+    await searchTorrent()
   }
   else {
     message?.error('请先添加下载器，然后重试！')
   }
-  handleDownloadLoading(false)
 })
 onBeforeUnmount(async () => {
   await clearTimer()
@@ -257,44 +266,70 @@ onBeforeUnmount(async () => {
         :key="downloader.id"
         :name="downloader.id"
         :tab="downloader.name"
-      />
+      >
+        <n-image
+          width="13"
+          class="mr-1"
+          :src="downloader.category === 'Qb' ? '/images/qb32.png' : '/images/tr.png'"
+          preview-disabled
+        />
+        {{ downloader.name }}
+      </n-tab>
     </n-tabs>
 
     <div style="height: 100%;">
-      <n-space>
+      <n-space justify="end">
         <n-button v-if="timer" size="tiny" type="error" @click="clearTimer">
           停止
         </n-button>
         <n-button v-else size="tiny" type="success" @click="startFresh">
           刷新
         </n-button>
-        <n-button size="tiny" type="error">
-          rows
-        </n-button>
-        <n-input size="tiny" />
+
         <n-select
+          v-if="isMobile"
           v-model:value="currentCategory"
           filterable
           size="tiny"
           placeholder="分类"
           :options="categories"
         />
+        <n-space v-if="downloaderSpeed">
+          <!--          <n-tag type="primary" size="small"> -->
+          <!--            {{ downloaderSpeed.connection_status }} -->
+          <!--          </n-tag> -->
+          <!--          <n-tag type="primary" size="small"> -->
+          <!--            {{ downloaderSpeed.category }} -->
+          <!--          </n-tag> -->
+          <n-tag type="success" size="small">
+            ↑{{ renderSize(downloaderSpeed.up_info_speed) }}/s（{{ renderSize(downloaderSpeed.up_info_data) }}）
+          </n-tag>
+          <n-tag type="warning" size="small">
+            ↓{{ renderSize(downloaderSpeed.dl_info_speed) }}/s({{ renderSize(downloaderSpeed.dl_info_data) }})
+          </n-tag>
+        </n-space>
+        <n-input v-model:value="searchKey" size="tiny" @change="searchTorrent" />
+        <n-button size="tiny" type="primary">
+          <template #icon>
+            <MenuIcon icon="Reload" />
+          </template>
+        </n-button>
       </n-space>
       <n-data-table
         ref="downloadingTableRef"
         :columns="downloadingColumns"
-        :data="torrentList"
+        :data="showTorrentList"
         :loading="downloadLoading"
-        :max-height="720"
+        :pagination="pagination"
         :row-class-name="rowClassName"
         :row-key="(row: Torrent) => row.hash"
         :row-props="rowProps"
-        :pagination="pagination"
         bordered
-        show-on-focus
-        class="text-10px!"
+        flex-height
+        max-height="720"
+        min-height="680"
+        remote
         size="small"
-        sticky-expanded-rows
         striped
         virtual-scroll
         @update:page-size="handlePageSize"

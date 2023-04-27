@@ -30,8 +30,10 @@ export const useDownloadStore = defineStore('download', () => {
   const deleteModal = ref(false)
   const deleteFiles = ref(false)
   const torrentList = ref<Torrent[]>([])
+  const showTorrentList = ref<Torrent[]>([])
   const downloadingTableRef = ref(null)
   const downloadLoading = ref(false)
+  const downloaderSpeed = ref<DownloadSpeedType>()
   const download_state = {
     uploading: '正在上传',
     downloading: '正在下载',
@@ -197,7 +199,7 @@ export const useDownloadStore = defineStore('download', () => {
     }
   }
   const getSpeedList = async () => {
-    speedList.value = await $getDownloadSpeedList()
+    speedList.value = await $getDownloadSpeedList(0)
     getSpeedTotal()
   }
   const clearSpeedListTimer = () => {
@@ -365,19 +367,36 @@ export const useDownloadStore = defineStore('download', () => {
     clearInterval(timer.value)
     timer.value = null
   }
+  const handleDownloaderSpeed = async (downloader_id: number) => {
+    downloaderSpeed.value = await $getDownloadSpeedList(downloader_id)
+  }
+  const searchKey = ref('')
 
+  const searchTorrent = async () => {
+    if (searchKey.value.length <= 0) { showTorrentList.value = torrentList.value }
+    else {
+      const key = searchKey.value.trim().toLowerCase()
+      showTorrentList.value = torrentList.value.filter(
+        (torrent: Torrent) => torrent.name.toLowerCase().includes(key)
+              || torrent.category.toLowerCase().includes(key)
+              || torrent.tracker.toLowerCase().includes(key),
+      )
+    }
+  }
   const startFresh = async () => {
     timer.value = setInterval(async () => {
+      await handleDownloaderSpeed(defaultDownloader.value)
       const showDataHashes = downloadingTableRef.value!.paginatedData.map((row: { key: string }) => row.key)
       const showData = await getTorrentList(defaultDownloader.value, true, showDataHashes.join('|'))
       showData.forEach((torrent: Torrent) => {
         const index = torrentList.value.findIndex(item => item.hash === torrent.hash)
         torrentList.value.splice(index, 1, torrent)
       })
-    }, 5000)
+      await searchTorrent()
+    }, 2500)
     setTimeout(async () => {
       await clearTimer()
-    }, timeout.value)
+    }, timeout.value * 1000 * 60)
   }
   /**
      * 获取下载器分类列表
@@ -386,13 +405,16 @@ export const useDownloadStore = defineStore('download', () => {
   const getDownloaderCategoryList = async (downloader_id: number) => {
     categoryList.value = await $getCategoryList(downloader_id)
   }
+
   const handleUpdateDownloading = async (value: number) => {
+    await clearTimer()
     downloadLoading.value = true
     categories.value.length = 1
     selectedCategories.value.length = 2
     if (!isNaN(value))
       defaultDownloader.value = value
     await getDownloaderCategoryList(defaultDownloader.value)
+    await handleDownloaderSpeed(defaultDownloader.value)
     torrentList.value = await getTorrentList(defaultDownloader.value)
 
     categoryList.value?.forEach((category: Category) => {
@@ -405,6 +427,7 @@ export const useDownloadStore = defineStore('download', () => {
         key: `setCategory?${category.name}`,
       })
     })
+    await searchTorrent()
     downloadLoading.value = false
     await startFresh()
   }
@@ -429,6 +452,7 @@ export const useDownloadStore = defineStore('download', () => {
 
     return flag
   }
+
   const handleDelete = async () => {
     deleteModal.value = false
     await handleSelected(
@@ -441,6 +465,15 @@ export const useDownloadStore = defineStore('download', () => {
     {
       type: 'selection',
       fixed: 'left',
+    },
+    {
+      title: '#',
+      key: 'index',
+      fixed: 'left',
+      width: 35,
+      render(row, index) {
+        return `${index + 1}`
+      },
     },
     // {
     //   type: 'expand',
@@ -898,6 +931,7 @@ export const useDownloadStore = defineStore('download', () => {
   const handleCheckRows = (rowKeys: string[]) => {
     checkedRowKeys.value = rowKeys
   }
+
   const handleDeleteModal = (value: boolean) => {
     deleteModal.value = value
   }
@@ -938,6 +972,8 @@ export const useDownloadStore = defineStore('download', () => {
     handleDelete,
     handleDeleteModal,
     handleDownloadLoading,
+    downloaderSpeed,
+    showTorrentList,
     handleSelected,
     handleUpdateDownloading,
     interval,
@@ -948,6 +984,8 @@ export const useDownloadStore = defineStore('download', () => {
     setDownloadSpeedList,
     setIntervalValue,
     setTimeoutValue,
+    searchTorrent,
+    searchKey,
     speedList,
     speedTotal,
     startFresh,
