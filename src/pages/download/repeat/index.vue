@@ -88,7 +88,7 @@ const pagination = ref({
 // })
 const x = ref(0)
 const y = ref(0)
-
+const showAddModal = ref(false)
 const onClickOutside = () => {
   showDropdown.value = false
 }
@@ -310,9 +310,20 @@ onBeforeUnmount(async () => {
           </n-tag>
         </n-space>
         <n-input v-model:value="searchKey" size="tiny" @change="searchTorrent" />
-        <n-button size="tiny" type="primary">
+        <n-button
+          size="tiny" type="info" secondary
+          @click="handleUpdateDownloading(defaultDownloader)"
+        >
           <template #icon>
             <MenuIcon icon="Reload" />
+          </template>
+        </n-button>
+        <n-button
+          size="tiny" type="primary"
+          @click="showAddModal = true"
+        >
+          <template #icon>
+            <MenuIcon icon="AddOutline" />
           </template>
         </n-button>
       </n-space>
@@ -349,6 +360,23 @@ onBeforeUnmount(async () => {
     :on-clickoutside="onClickOutside"
     @select="handleSelect"
   />
+  <n-modal
+    v-model:show="showAddModal"
+    class="custom-card"
+    preset="card"
+    title="添加种子"
+    size="small"
+    :bordered="false"
+    style="width: 300px"
+    :segmented="{
+      content: 'soft',
+      footer: 'soft',
+    } as const"
+  >
+    <template #header-extra>
+      <MenuIcon class="text-green" icon="AddOutline" />
+    </template>
+  </n-modal>
   <n-modal
     v-model:show="deleteModal"
     class="custom-card"
