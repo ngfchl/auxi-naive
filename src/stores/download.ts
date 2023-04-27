@@ -3,14 +3,14 @@ import { NButton, NProgress, NSwitch, NTag, NTooltip } from 'naive-ui'
 import type {
   Category,
   DownloadSpeedType, Downloader,
-  Torrent,
+  NewTorrent, Torrent,
 } from '~/api/download'
 import {
   $addDownloader,
-  $controlTorrent,
-  $editDownloader, $getCategoryList,
-  $getDownloadSpeedList,
-  $getDownloader, $getDownloaderList, $getTorrentList, $getTorrentProp, $removeDownloader,
+  $addTorrent,
+  $controlTorrent, $editDownloader,
+  $getCategoryList,
+  $getDownloadSpeedList, $getDownloader, $getDownloaderList, $getTorrentList, $getTorrentProp, $removeDownloader,
 } from '~/api/download'
 import numberFormat from '~/hooks/numberFormat'
 import timeFormat from '~/hooks/timeFormat'
@@ -219,6 +219,9 @@ export const useDownloadStore = defineStore('download', () => {
       torrent_hashes,
     })
   }
+  const addTorrent = async (downloader_id: number, new_torrent: NewTorrent) => {
+    return await $addTorrent({ downloader_id, new_torrent })
+  }
   const interval = ref<number>(5)
   const timeout = ref<number>(10)
   const setIntervalValue = (value: number) => {
@@ -239,7 +242,7 @@ export const useDownloadStore = defineStore('download', () => {
   }
   const categoryList = ref<Category[]>()
   const categories = ref<{ label: string; value: string | number }[]>([{
-    label: '请选择',
+    label: '分类',
     value: '',
   }])
   const currentCategory = ref<string>('')
@@ -949,6 +952,7 @@ export const useDownloadStore = defineStore('download', () => {
   }
   return {
     addDownloaderFormRules,
+    addTorrent,
     categories,
     categorySelectList,
     checkedRowKeys,
@@ -962,7 +966,7 @@ export const useDownloadStore = defineStore('download', () => {
     downloadLoading,
     downloaderForm,
     downloaderList,
-    torrentList,
+    downloaderSpeed,
     downloadingColumns,
     downloadingFlag,
     downloadingTableRef,
@@ -978,8 +982,6 @@ export const useDownloadStore = defineStore('download', () => {
     handleDelete,
     handleDeleteModal,
     handleDownloadLoading,
-    downloaderSpeed,
-    showTorrentList,
     handleSelected,
     handleUpdateDownloading,
     interval,
@@ -987,16 +989,18 @@ export const useDownloadStore = defineStore('download', () => {
     removeDownloader,
     rightOptions,
     saveDownloader,
+    searchKey,
+    searchTorrent,
     setDownloadSpeedList,
     setIntervalValue,
     setTimeoutValue,
-    searchTorrent,
-    searchKey,
+    showTorrentList,
     speedList,
     speedTotal,
     startFresh,
     timeout,
     timer,
+    torrentList,
     trackerStatus,
   }
 })

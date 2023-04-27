@@ -232,6 +232,17 @@ export interface ServerState {
   write_cache_overload: number
 }
 
+export interface NewTorrent {
+  urls?: string | string[]
+  cookie?: string
+  category?: string
+  is_paused?: boolean
+  upload_limit?: number
+  download_limit?: number
+  is_skip_checking?: boolean
+  use_auto_torrent_management?: boolean
+}
+
 export interface Downloading {
   categories: Category[]
   server_state?: ServerState
@@ -267,6 +278,18 @@ export const $getCategoryList: (downloader_id: number) => Promise<any> = async (
 }
 export const $controlTorrent: (params: object) => Promise<any> = async (params) => {
   const { msg, code } = await usePost('download/control', params)
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return true
+    default:
+      message?.error(msg)
+      return false
+  }
+}
+
+export const $addTorrent: (params: object) => Promise<any> = async (params) => {
+  const { msg, code } = await usePost('download/add_torrent', params)
   switch (code) {
     case 0:
       message?.success(msg)

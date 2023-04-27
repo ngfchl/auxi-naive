@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { isNaN } from 'lodash-es'
-import type { DataTableRowKey, DropdownOption, SelectOption } from 'naive-ui'
+import type { DropdownOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import { useClipboard } from '@v-c/utils'
 import renderSize from '../../../hooks/renderSize'
-import type { Category, Torrent } from '~/api/download'
+import type { Category, NewTorrent, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import torrent from '~/pages/download/repeat/components/torrent.vue'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
@@ -17,6 +17,7 @@ const {
 const downloadStore = useDownloadStore()
 const {
   handleSelected,
+  addTorrent,
   getDownloaderList,
   getTorrentProp,
   handleDefaultDownloader,
@@ -56,7 +57,7 @@ const railStyle = ({
 }) => {
   const style: CSSProperties = {}
   if (checked) {
-    style.background = '#d03050'
+    style.background = '#1fcc6b'
     if (focused)
       style.boxShadow = '0 0 0 2px #d0305040'
   }
@@ -237,6 +238,28 @@ const handleSelect = async (key: string, option: DropdownOption) => {
   }
   showDropdown.value = false
 }
+const newTorrent = reactive<NewTorrent>({
+  urls: '',
+  category: '',
+  cookie: '',
+  is_paused: false,
+  upload_limit: 0,
+  download_limit: 0,
+  is_skip_checking: false,
+  use_auto_torrent_management: true,
+})
+
+const cancelDownload = () => {
+  showAddModal.value = false
+  newTorrent.urls = ''
+}
+const handleDownload = async () => {
+  const flag = await addTorrent(
+    defaultDownloader.value,
+    newTorrent,
+  )
+  if (flag) cancelDownload()
+}
 
 onBeforeMount(async () => {
   await getDownloaderList()
@@ -252,6 +275,10 @@ onBeforeMount(async () => {
 onBeforeUnmount(async () => {
   await clearTimer()
 })
+const {
+  urls, is_skip_checking, is_paused, upload_limit,
+  download_limit, category, cookie, use_auto_torrent_management,
+} = toRefs(newTorrent)
 </script>
 
 <template>
@@ -360,23 +387,7 @@ onBeforeUnmount(async () => {
     :on-clickoutside="onClickOutside"
     @select="handleSelect"
   />
-  <n-modal
-    v-model:show="showAddModal"
-    class="custom-card"
-    preset="card"
-    title="添加种子"
-    size="small"
-    :bordered="false"
-    style="width: 300px"
-    :segmented="{
-      content: 'soft',
-      footer: 'soft',
-    } as const"
-  >
-    <template #header-extra>
-      <MenuIcon class="text-green" icon="AddOutline" />
-    </template>
-  </n-modal>
+
   <n-modal
     v-model:show="deleteModal"
     class="custom-card"
@@ -414,6 +425,104 @@ onBeforeUnmount(async () => {
         </n-button>
         <n-button type="error" @click="handleDelete">
           删除
+        </n-button>
+      </n-space>
+    </template>
+  </n-modal>
+  <n-modal
+    v-model:show="showAddModal"
+    class="custom-card"
+    preset="card"
+    title="添加种子"
+    size="small"
+    :bordered="false"
+    style="width: 300px"
+    :segmented="{
+      content: 'soft',
+      footer: 'soft',
+    } as const"
+    @beforeLeave="cancelDownload"
+  >
+    <template #header-extra>
+      <MenuIcon class="text-green" icon="AddOutline" />
+    </template>
+    <n-space vertical>
+      <n-input
+        v-model:value="urls"
+        type="textarea"
+        placeholder="种子链接"
+      />
+      <n-switch
+        v-model:value="use_auto_torrent_management"
+        :round="false" size="small"
+        :rail-style="railStyle"
+      >
+        <template #checked>
+          自动管理
+        </template>
+        <template #unchecked>
+          手动管理
+        </template>
+      </n-switch>
+      <n-switch
+        v-model:value="is_paused"
+        :round="false" size="small"
+        :rail-style="railStyle"
+      >
+        <template #unchecked>
+          开始
+        </template>
+        <template #checked>
+          暂停
+        </template>
+      </n-switch>
+      <n-switch
+        v-model:value="is_skip_checking"
+        :round="false" size="small"
+        :rail-style="railStyle"
+      >
+        <template #checked>
+          跳过校验
+        </template>
+        <template #unchecked>
+          正常校验
+        </template>
+      </n-switch>
+      <n-select
+        v-model:value="category"
+        filterablesize="small"
+        placeholder="分类"
+        :options="categories"
+      />
+      <n-input-number
+        v-model:value="download_limit" size="small"
+        placeholder="下载限速：KB/S"
+        step="100" min="0"
+        button-placement="both"
+      >
+        <template #prefix>
+          ↓
+        </template>
+      </n-input-number>
+      <n-input-number
+        v-model:value="upload_limit" size="small"
+        placeholder="上传限速：KB/S"
+        step="100"
+        min="0"
+        button-placement="both"
+      >
+        <template #prefix>
+          ↑
+        </template>
+      </n-input-number>
+    </n-space>
+    <template #footer>
+      <n-space justify="center">
+        <n-button type="info" @click="cancelDownload">
+          取消
+        </n-button>
+        <n-button type="primary" @click="handleDownload">
+          下载
         </n-button>
       </n-space>
     </template>
