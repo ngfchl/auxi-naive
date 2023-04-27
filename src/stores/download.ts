@@ -230,7 +230,7 @@ export const useDownloadStore = defineStore('download', () => {
   const getSpeedListTimer = async () => {
     clearSpeedListTimer()
     timer.value = setInterval(async () => {
-      speedList.value = await $getDownloadSpeedList()
+      speedList.value = await $getDownloadSpeedList(0)
       getSpeedTotal()
     }, interval.value * 1000)
     setTimeout(() => {
@@ -407,12 +407,17 @@ export const useDownloadStore = defineStore('download', () => {
   }
 
   const handleUpdateDownloading = async (value: number) => {
+    // 初始化表格
     await clearTimer()
     downloadLoading.value = true
+    downloadingTableRef.value?.clearSorter()
+    downloadingTableRef.value?.clearFilters()
+    checkedRowKeys.value.length = 0
     categories.value.length = 1
     selectedCategories.value.length = 2
     if (!isNaN(value))
       defaultDownloader.value = value
+    // 加载数据
     await getDownloaderCategoryList(defaultDownloader.value)
     await handleDownloaderSpeed(defaultDownloader.value)
     torrentList.value = await getTorrentList(defaultDownloader.value)
@@ -429,6 +434,7 @@ export const useDownloadStore = defineStore('download', () => {
     })
     await searchTorrent()
     downloadLoading.value = false
+    // 开启自动刷新
     await startFresh()
   }
   const handleSelected = async (
