@@ -243,8 +243,8 @@ export const downloadSpeedUrl = 'download/downloaders/speed'
 /**
  * 获取下载器实时数据
  */
-export const $getDownloadSpeedList: () => Promise<any> = async () => {
-  return await getList<null, DownloadSpeedType[]>(downloadSpeedUrl)
+export const $getDownloadSpeedList: (downloader_id: number) => Promise<any> = async (downloader_id = 0) => {
+  return await getList<object, DownloadSpeedType>(downloadSpeedUrl, { downloader_id })
 }
 
 /**
