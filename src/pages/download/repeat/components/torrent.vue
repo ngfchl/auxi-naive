@@ -44,10 +44,8 @@ watchEffect(() => {
       <!--        </n-avatar> -->
       <!--      </template> -->
       <template #header>
-        <n-ellipsis style="max-width: 280px">
-          <span class="text-10px!">
-            {{ torrent.name }}
-          </span>
+        <n-ellipsis class="w-100% text-10px">
+          {{ torrent.name }}
         </n-ellipsis>
       </template>
       <template #header-extra>
@@ -87,42 +85,43 @@ watchEffect(() => {
           <n-button
             size="tiny"
             type="success"
+            secondary
             @click="handleSelected('set_auto_management')"
           >
             <template #icon>
-              <MenuIcon icon="Play" />
+              <MenuIcon icon="Car" />
             </template>
             自动
           </n-button>
           <n-button
             size="tiny"
-            type="warning"
+            type="warning" secondary
             @click="handleSelected('set_force_start')"
           >
             <template #icon>
-              <MenuIcon icon="Pause" />
+              <MenuIcon icon="PlayForward" />
             </template>
-            强制继续
+            强制
           </n-button>
           <n-button
             size="tiny"
-            type="success"
+            type="info"
             @click="handleSelected('recheck')"
           >
             <template #icon>
-              <MenuIcon icon="Play" />
+              <MenuIcon icon="CheckmarkDone" />
             </template>
-            强制校验
+            校验
           </n-button>
           <n-button
             size="tiny"
-            type="warning"
+            type="info" secondary
             @click="handleSelected('reannounce')"
           >
             <template #icon>
-              <MenuIcon icon="Pause" />
+              <MenuIcon icon="Mic" />
             </template>
-            强制汇报
+            汇报
           </n-button>
 
           <n-button size="tiny" type="primary">
