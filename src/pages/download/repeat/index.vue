@@ -72,13 +72,14 @@ const showDropdown = ref(false)
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 const currentRow = ref<Torrent>()
 const pagination = ref({
-  pageSize: isMobile ? 20 : 25,
-  showQuickJumper: true,
+  pageSize: isMobile.value ? 20 : 25,
   size: 'small',
+  showQuickJumper: true,
   itemCount: torrentList.value.length,
   showSizePicker: true,
   pageSizes: [10, 20, 25, 30, 40],
   pageSlot: 5,
+  simple: isMobile.value,
 })
 // watchEffect(() => {
 //   if (isPad.value || isDesktop.value) pagination.value.pageSize = 25
@@ -302,10 +303,10 @@ onBeforeUnmount(async () => {
           <!--            {{ downloaderSpeed.category }} -->
           <!--          </n-tag> -->
           <n-tag type="success" size="small">
-            ↑{{ renderSize(downloaderSpeed.up_info_speed) }}/s（{{ renderSize(downloaderSpeed.up_info_data) }}）
+            ↑{{ renderSize(downloaderSpeed?.up_info_speed) }}/s（{{ renderSize(downloaderSpeed?.up_info_data) }}）
           </n-tag>
           <n-tag type="warning" size="small">
-            ↓{{ renderSize(downloaderSpeed.dl_info_speed) }}/s({{ renderSize(downloaderSpeed.dl_info_data) }})
+            ↓{{ renderSize(downloaderSpeed?.dl_info_speed) }}/s({{ renderSize(downloaderSpeed?.dl_info_data) }})
           </n-tag>
         </n-space>
         <n-input v-model:value="searchKey" size="tiny" @change="searchTorrent" />
@@ -322,13 +323,13 @@ onBeforeUnmount(async () => {
         :loading="downloadLoading"
         :pagination="pagination"
         :row-class-name="rowClassName"
+        :paginate-single-page="false"
         :row-key="(row: Torrent) => row.hash"
         :row-props="rowProps"
         bordered
         flex-height
         max-height="720"
-        min-height="680"
-        remote
+        :min-height="isMobile ? 520 : 680"
         size="small"
         striped
         virtual-scroll
