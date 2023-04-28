@@ -394,7 +394,7 @@ export const useDownloadStore = defineStore('download', () => {
       key: 'prop',
       icon: () => h(MenuIcon, { icon: 'Information' }),
     },
-    ...categoryFlag ? qbHandleOptions : trHandleOptions,
+    ...categoryFlag.value ? qbHandleOptions : trHandleOptions,
     {
       type: 'divider',
       key: 'd3',
