@@ -15,10 +15,10 @@ export interface Downloader {
   name: string
   username?: string
   password?: string
-  host: string
+  host?: string
   port?: number
   category: string
-  enable: boolean
+  enable?: boolean
   reserved_space?: number
 }
 export interface Peer {
@@ -40,114 +40,245 @@ export interface Peer {
 }
 export interface Tracker {
   'tier': number
-  'url': string
-  'msg': string
-  'status': number
-  'num_downloaded': number
-  'num_leeches': number
-  'num_peers': number
-  'num_seeds': number
+
+  /**
+   * QB
+   */
+  'url'?: string
+  'msg'?: string
+  'status'?: number
+  'num_downloaded'?: number
+  'num_leeches'?: number
+  'num_peers'?: number
+  'num_seeds'?: number
+  /**
+   * Tr
+   */
+  'id'?: number
+  'scrape'?: string
+  'announce'?: string
+  'announceState'?: number
+  'downloadCount'?: number
+  'hasAnnounced'?: boolean
+  'hasScraped'?: boolean
+  'host'?: string
+  'isBackup'?: boolean
+  'lastAnnouncePeerCount'?: number
+  'lastAnnounceResult'?: 'Success'
+  'lastAnnounceStartTime'?: number
+  'lastAnnounceSucceeded'?: boolean
+  'lastAnnounceTime'?: number
+  'lastAnnounceTimedOut'?: boolean
+  'lastScrapeResult'?: string
+  'lastScrapeStartTime'?: number
+  'lastScrapeSucceeded'?: boolean
+  'lastScrapeTime'?: number
+  'lastScrapeTimedOut'?: boolean
+  'leecherCount'?: number
+  'nextAnnounceTime'?: number
+  'nextScrapeTime'?: number
+  'scrapeState'?: number
+  'seederCount'?: number
+}
+export interface TransmissionFile {
+  'bytesCompleted': number
+  'length': number
+  'name': string
+}
+
+export interface TransmissionFileState {
+  'bytesCompleted': number
+  'length': number
+  'wanted': boolean
 }
 export interface Torrent {
-  // 添加事件
-  added_on: number
-  // 剩余要下载的大小
-  amount_left: number
-  // 种子自动管理
-  auto_tmm: boolean
-  // 可用片段百分比
-  availability: number
-  // 分类
-  category: string
-  // 已下载
-  completed: number
-  // 完成于
-  completion_on: number
-  // 文件路径
-  content_path: string
-  // 下载限速
-  dl_limit: number
-  // 下载速度
-  dlspeed: number
-  // 已下载
-  downloaded: number
-  // 会话下载
-  downloaded_session: number
-  eta: number
-  // 优先下载首尾区块
-  f_l_piece_prio: boolean
-  // 强制
-  force_start: boolean
-  // hash
-  hash: string
-  // 最近活动
-  last_activity: number
-  // 下载链接
-  magnet_uri: string
-  // 最大分享率
-  max_ratio: number
-  // 最大做种时间
-  max_seeding_time: number
+  /**
+   * 公共字段
+   */
   // 名称
   name: string
+  // hash ,Tr的是id
+  hash: string
+  // 备注
+  comment?: string
+  // 时间
+  eta?: number
+
+  /**
+   * Tr 字段
+    */
+  // 下载路径
+  id?: number
+  downloadDir?: string
+  activityDate?: number
+  addedDate?: number
+  bandwidthPriority?: number
+  corruptEver?: number
+  creator?: string
+  dateCreated?: number
+  desiredAvailable?: number
+  doneDate?: number
+  downloadLimit?: number
+  downloadLimited?: boolean
+  downloadedEver?: number
+  editDate?: number
+  error?: number
+  errorString?: string
+  etaIdle?: number
+  fileStats?: TransmissionFileState[]
+  files?: TransmissionFile[]
+  hashString?: string
+  haveUnchecked?: number
+  haveValid?: number
+  honorsSessionLimits?: boolean
+  isFinished?: boolean
+  isPrivate?: boolean
+  isStalled?: boolean
+  labels?: string[]
+  leftUntilDone?: number
+  magnetLink?: string
+  manualAnnounceTime?: number
+  maxConnectedPeers?: number
+  metadataPercentComplete?: number
+  'peer-limit'?: number
+  // peers?: []
+  peersConnected?: number
+  'peersFrom'?: {
+    'fromCache': number
+    'fromDht': number
+    'fromIncoming': number
+    'fromLpd': number
+    'fromLtep': number
+    'fromPex': number
+    'fromTracker': number
+  }
+  peersGettingFromUs?: number
+  peersSendingToUs?: number
+  percentDone?: number
+  pieceCount?: number
+  pieceSize?: number
+  pieces?: string
+  priorities?: number[]
+  queuePosition?: number
+  rateDownload?: number
+  rateUpload?: number
+  recheckProgress?: number
+  secondsDownloading?: number
+  secondsSeeding?: number
+  seedIdleLimit?: number
+  seedIdleMode?: number
+  seedRatioLimit?: number
+  seedRatioMode?: number
+  sizeWhenDone?: number
+  startDate?: number
+  status?: number
+  torrentFile?: string
+  totalSize?: number
+  trackerStats?: Tracker[]
+  uploadLimit?: number
+  uploadLimited?: boolean
+  uploadRatio?: number
+  uploadedEver?: number
+  wanted?: number[]
+  webseeds?: []
+  webseedsSendingToUs?: number
+  /**
+   * Qb字段
+   */
+  // 添加事件
+  added_on?: number
+  // 剩余要下载的大小
+  amount_left?: number
+  // 种子自动管理
+  auto_tmm?: boolean
+  // 可用片段百分比
+  availability?: number
+  // 分类
+  category?: string
+  // 已下载
+  completed?: number
+  // 完成于
+  completion_on?: number
+  // 文件路径
+  content_path?: string
+  // 下载限速
+  dl_limit?: number
+  // 下载速度
+  dlspeed?: number
+  // 已下载
+  downloaded?: number
+  // 会话下载
+  downloaded_session?: number
+  // 优先下载首尾区块
+  f_l_piece_prio?: boolean
+  // 强制
+  force_start?: boolean
+
+  // 最近活动
+  last_activity?: number
+  // 下载链接
+  magnet_uri?: string
+  // 最大分享率
+  max_ratio?: number
+  // 最大做种时间
+  max_seeding_time?: number
+
   // 完成用户数
-  num_complete: number
+  num_complete?: number
   // 未完成用户数
-  num_incomplete: number
+  num_incomplete?: number
   // 正在下载
-  num_leechs: number
+  num_leechs?: number
   // 做种数
-  num_seeds: number
+  num_seeds?: number
   // 优先
-  priority: number
+  priority?: number
   // 进度
-  progress: number
+  progress?: number
   // 分享率
-  ratio: number
+  ratio?: number
   // 分享率限制
-  ratio_limit: number
+  ratio_limit?: number
   // 保存路径
-  save_path: string
+  save_path?: string
   // 做种时间
-  seeding_time: number
+  seeding_time?: number
   // 做种时间限制
-  seeding_time_limit: number
+  seeding_time_limit?: number
   // 最后完整可见
-  seen_complete: number
+  seen_complete?: number
   // 启用队列
-  seq_dl: boolean
+  seq_dl?: boolean
   // 文件大小
-  size: number
+  size?: number
   // 任务状态
-  state: 'uploading' | 'downloading' | 'pausedUP' | 'pausedDL' | 'checkingUP' | 'forcedDL' | 'stalledUP' | 'stalledDL' |
+  state?: 'uploading' | 'downloading' | 'pausedUP' | 'pausedDL' | 'checkingUP' | 'forcedDL' | 'stalledUP' | 'stalledDL' |
   'missingFiles' | 'forcedUP' | 'moving' | 'queuedDL' | 'queuedUP' | 'error' | 'unknown' | 'checkingDL' | 'checkingResumeData'
   // 超级做种
-  super_seeding: boolean
+  super_seeding?: boolean
   // 标签
-  tags: string
+  tags?: string
   // 活动时间
-  time_active: number
+  time_active?: number
   // 总大小
-  total_size: number
+  total_size?: number
   // Tracker
-  tracker: string
-  trackers: Tracker[]
+  tracker?: string
+  trackers?: Tracker[]
   // Tracker计数
-  trackers_count: number
+  trackers_count?: number
   // 上传限制
-  up_limit: number
+  up_limit?: number
   // 已上传
-  uploaded: number
+  uploaded?: number
   // 会话上传
-  uploaded_session: number
+  uploaded_session?: number
   // 上传速度
-  upspeed: number
+  upspeed?: number
   // 连接信息
   peerList?: Peer[]
   // 添加此种子的时间
   addition_date?: number
-  // 备注
-  comment?: string
   // 种子完成日期
   completion_date?: number
   // 创建者
@@ -165,7 +296,7 @@ export interface Torrent {
   // 种子连接计数限制
   nb_connections_limit?: number
   // 连接到的节点
-  peers?: number
+  peers?: number | Peer[]
   // 节点总数
   peers_total?: number
   // 区块大小

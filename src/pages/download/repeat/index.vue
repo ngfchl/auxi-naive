@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isNaN } from 'lodash-es'
-import type { DropdownOption } from 'naive-ui'
+import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import { useClipboard } from '@v-c/utils'
 import renderSize from '../../../hooks/renderSize'
@@ -32,10 +32,12 @@ const {
 } = downloadStore
 const {
   torrentList,
-  downloadingColumns,
+  qBitTorrentColumns,
+  transmissionColumns,
   downloaderList,
   downloaderSpeed,
   defaultDownloader,
+  categoryFlag,
   rightOptions,
   downloadLoading,
   categories,
@@ -82,11 +84,14 @@ const pagination = ref({
   pageSlot: 5,
   simple: isMobile.value,
 })
-// watchEffect(() => {
-//   if (isPad.value || isDesktop.value) pagination.value.pageSize = 25
-//
-//   if (isMobile.value) pagination.value.pageSize = 20
-// })
+watchEffect(() => {
+  // if (isPad.value || isDesktop.value) pagination.value.pageSize = 25
+
+  // if (isMobile.value) pagination.value.pageSize = 20
+  // if (defaultDownloader.value.category === 'Qb')
+  //   categoryFlag.value = true
+  // if (defaultDownloader.value.category === 'Tr')categoryFlag.value = false
+})
 const x = ref(0)
 const y = ref(0)
 const showAddModal = ref(false)
@@ -97,14 +102,14 @@ const handlePageSize = (pageSize: number) => {
   pagination.value.pageSize = pageSize
 }
 const openTorrentInfo = async (torrent_hash: string) => {
-  const torrentInfo = await getTorrentProp(defaultDownloader.value, torrent_hash)
+  const torrentInfo = await getTorrentProp(defaultDownloader.value!.id, torrent_hash)
   dialog?.info({
     title: '种子详情',
     content: () => h(
       torrent,
       {
         torrent: torrentInfo,
-        downloader_id: defaultDownloader.value,
+        downloader_id: defaultDownloader.value!.id,
       },
     ),
     style: {
@@ -255,7 +260,7 @@ const cancelDownload = () => {
 }
 const handleDownload = async () => {
   const flag = await addTorrent(
-    defaultDownloader.value,
+    defaultDownloader.value!.id,
     newTorrent,
   )
   if (flag) cancelDownload()
@@ -264,8 +269,8 @@ const handleDownload = async () => {
 onBeforeMount(async () => {
   await getDownloaderList()
   if (downloaderList.value.length > 0) {
-    handleDefaultDownloader(downloaderList.value[0].id)
-    await handleUpdateDownloading(defaultDownloader.value)
+    await handleDefaultDownloader(downloaderList.value[0].id)
+    await handleUpdateDownloading(defaultDownloader.value!.id)
     await searchTorrent()
   }
   else {
@@ -284,7 +289,7 @@ const {
 <template>
   <n-card hoverable embedded>
     <n-tabs
-      v-model:value="defaultDownloader"
+      v-model:value="defaultDownloader.id"
       size="small"
       type="card"
       @update:value="handleUpdateDownloading"
@@ -335,11 +340,14 @@ const {
           <n-tag type="warning" size="small">
             ↓{{ renderSize(downloaderSpeed?.dl_info_speed) }}/s({{ renderSize(downloaderSpeed?.dl_info_data) }})
           </n-tag>
+          <n-tag type="primary" size="small">
+            {{ renderSize(downloaderSpeed?.free_space_on_disk) }}
+          </n-tag>
         </n-space>
         <n-input v-model:value="searchKey" size="tiny" @change="searchTorrent" />
         <n-button
           size="tiny" type="info" secondary
-          @click="handleUpdateDownloading(defaultDownloader)"
+          @click="handleUpdateDownloading(defaultDownloader.id)"
         >
           <template #icon>
             <MenuIcon icon="Reload" />
@@ -356,7 +364,7 @@ const {
       </n-space>
       <n-data-table
         ref="downloadingTableRef"
-        :columns="downloadingColumns"
+        :columns="categoryFlag ? qBitTorrentColumns : transmissionColumns"
         :data="showTorrentList"
         :loading="downloadLoading"
         :pagination="pagination"
@@ -374,6 +382,27 @@ const {
         @update:page-size="handlePageSize"
         @update:checked-row-keys="handleCheckRows"
       />
+      <!--      <n-data-table -->
+      <!--        v-else -->
+      <!--        ref="downloadingTableRef" -->
+      <!--        :columns="transmissionColumns" -->
+      <!--        :data="showTorrentList" -->
+      <!--        :loading="downloadLoading" -->
+      <!--        :pagination="pagination" -->
+      <!--        :row-class-name="rowClassName" -->
+      <!--        :paginate-single-page="false" -->
+      <!--        :row-key="row => row.hash" -->
+      <!--        :row-props="rowProps" -->
+      <!--        bordered -->
+      <!--        flex-height -->
+      <!--        max-height="720" -->
+      <!--        :min-height="isMobile ? 520 : 680" -->
+      <!--        size="small" -->
+      <!--        striped -->
+      <!--        virtual-scroll -->
+      <!--        @update:page-size="handlePageSize" -->
+      <!--        @update:checked-row-keys="handleCheckRows" -->
+      <!--      /> -->
     </div>
   </n-card>
   <n-dropdown
