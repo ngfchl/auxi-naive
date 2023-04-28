@@ -361,6 +361,16 @@ const {
             <MenuIcon icon="AddOutline" />
           </template>
         </n-button>
+        <n-button
+          tag="a"
+          :href="`${defaultDownloader.host && defaultDownloader.host.startsWith('http') ? '' : 'http://'}${defaultDownloader.host}:${defaultDownloader.port}`"
+          target="_blank"
+          secondary
+          type="warning"
+          size="tiny"
+        >
+          访问
+        </n-button>
       </n-space>
       <n-data-table
         ref="downloadingTableRef"
