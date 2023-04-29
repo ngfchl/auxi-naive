@@ -103,7 +103,8 @@ export interface Torrent {
   comment?: string
   // 时间
   eta?: number
-
+  // host
+  host: string
   /**
    * Tr 字段
     */

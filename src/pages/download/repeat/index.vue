@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { isNaN } from 'lodash-es'
-import type { DataTableColumns, DropdownOption } from 'naive-ui'
+import type { DataTableColumns, DataTableCreateSummary, DropdownOption } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import { useClipboard } from '@v-c/utils'
+import { NTag } from 'naive-ui'
 import renderSize from '../../../hooks/renderSize'
 import type { Category, NewTorrent, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
@@ -38,7 +39,8 @@ const {
   downloaderSpeed,
   defaultDownloader,
   categoryFlag,
-  rightOptions,
+  qbHandleOptions,
+  trHandleOptions,
   downloadLoading,
   categories,
   deleteFiles,
@@ -102,6 +104,7 @@ const handlePageSize = (pageSize: number) => {
   pagination.value.pageSize = pageSize
 }
 const openTorrentInfo = async (torrent_hash: string) => {
+  handleCheckRows([torrent_hash])
   const torrentInfo = await getTorrentProp(defaultDownloader.value!.id, torrent_hash)
   dialog?.info({
     title: '种子详情',
@@ -239,7 +242,7 @@ const handleSelect = async (key: string, option: DropdownOption) => {
         await handleSelected('set_category', key.replace('setCategory?', ''))
         break
       }
-      message?.warning('正在开发哦！')
+      await handleSelected(key)
   }
   showDropdown.value = false
 }
@@ -312,13 +315,50 @@ const {
 
     <div style="height: 100%;">
       <n-space justify="end">
+        <n-collapse accordion>
+          <n-collapse-item title="" name="1">
+            <template #header-extra>
+              <n-space v-if="downloaderSpeed">
+                <!--          <n-tag type="primary" size="small"> -->
+                <!--            {{ downloaderSpeed.connection_status }} -->
+                <!--          </n-tag> -->
+                <!--          <n-tag type="primary" size="small"> -->
+                <!--            {{ downloaderSpeed.category }} -->
+                <!--          </n-tag> -->
+                <NTag type="success" size="small">
+                  ↑{{
+                    renderSize(downloaderSpeed?.up_info_speed)
+                  }}/s（{{ renderSize(downloaderSpeed?.up_info_data) }}）
+                </NTag>
+                <NTag type="warning" size="small">
+                  ↓{{
+                    renderSize(downloaderSpeed?.dl_info_speed)
+                  }}/s({{ renderSize(downloaderSpeed?.dl_info_data) }})
+                </NTag>
+              </n-space>
+            </template>
+            <n-space>
+              <NTag type="primary" size="small">
+                剩余空间： {{ renderSize(downloaderSpeed?.free_space_on_disk) }}
+              </NTag>
+              <NTag type="primary" size="small">
+                种子数量： {{ torrentList.length }}
+              </NTag>
+              <NTag type="primary" size="small">
+                做种体积： {{
+                  renderSize(torrentList.reduce((prevValue, row) => prevValue + row.size,
+                                                0))
+                }}
+              </NTag>
+            </n-space>
+          </n-collapse-item>
+        </n-collapse>
         <n-button v-if="timer" size="tiny" type="error" @click="clearTimer">
           停止
         </n-button>
         <n-button v-else size="tiny" type="success" @click="startFresh">
           刷新
         </n-button>
-
         <n-select
           v-if="isMobile"
           v-model:value="currentCategory"
@@ -327,23 +367,6 @@ const {
           placeholder="分类"
           :options="categories"
         />
-        <n-space v-if="downloaderSpeed">
-          <!--          <n-tag type="primary" size="small"> -->
-          <!--            {{ downloaderSpeed.connection_status }} -->
-          <!--          </n-tag> -->
-          <!--          <n-tag type="primary" size="small"> -->
-          <!--            {{ downloaderSpeed.category }} -->
-          <!--          </n-tag> -->
-          <n-tag type="success" size="small">
-            ↑{{ renderSize(downloaderSpeed?.up_info_speed) }}/s（{{ renderSize(downloaderSpeed?.up_info_data) }}）
-          </n-tag>
-          <n-tag type="warning" size="small">
-            ↓{{ renderSize(downloaderSpeed?.dl_info_speed) }}/s({{ renderSize(downloaderSpeed?.dl_info_data) }})
-          </n-tag>
-          <n-tag type="primary" size="small">
-            {{ renderSize(downloaderSpeed?.free_space_on_disk) }}
-          </n-tag>
-        </n-space>
         <n-input v-model:value="searchKey" size="tiny" @change="searchTorrent" />
         <n-button
           size="tiny" type="info" secondary
@@ -377,15 +400,15 @@ const {
         :columns="categoryFlag ? qBitTorrentColumns : transmissionColumns"
         :data="showTorrentList"
         :loading="downloadLoading"
+        :min-height="isMobile ? 520 : 680"
+        :paginate-single-page="false"
         :pagination="pagination"
         :row-class-name="rowClassName"
-        :paginate-single-page="false"
         :row-key="(row: Torrent) => row.hash"
         :row-props="rowProps"
         bordered
         flex-height
         max-height="720"
-        :min-height="isMobile ? 520 : 680"
         size="small"
         striped
         virtual-scroll
@@ -421,7 +444,7 @@ const {
     size="small"
     :x="x"
     :y="y"
-    :options="rightOptions"
+    :options="categoryFlag ? qbHandleOptions : trHandleOptions"
     :show="showDropdown"
     :on-clickoutside="onClickOutside"
     @select="handleSelect"

@@ -18,6 +18,8 @@ import TimestampToBeijingTime from '~/hooks/timestampToBeijingTime'
 import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import renderSize from '~/hooks/renderSize'
+import type { WebSite } from '~/api/website'
+import { $siteList } from '~/api/website'
 
 export const useDownloadStore = defineStore('download', () => {
   const { dialog } = useGlobalConfig()
@@ -62,6 +64,15 @@ export const useDownloadStore = defineStore('download', () => {
     checkingResumeData: '校验恢复数据',
     forcedMetaDL: '强制下载元数据',
   }
+  const trState = [
+    '停止',
+    '等待校验',
+    '校验中',
+    '等待下载',
+    '下载中',
+    '等待做种',
+    '做种中',
+  ]
   const trackerStatus = ref([
     '已禁用',
     '未联系',
@@ -69,6 +80,33 @@ export const useDownloadStore = defineStore('download', () => {
     '更新中',
     '出错啦',
   ])
+  const siteList = ref<WebSite[]>([])
+  const categoryList = ref<Category[]>()
+  const categories = ref<{ label: string; value: string | number }[]>([{
+    label: '分类',
+    value: '',
+  }])
+  const hosts = ref<{ label: string; value: string | number }[]>([])
+  const currentCategory = ref<string>('')
+  const selectedCategories = ref<DropdownOption[]>([
+    {
+      label: '清除分类',
+      key: 'clearCategory',
+    },
+    {
+      label: '移除未使用',
+      key: 'removeCategories',
+    },
+  ])
+  const getSiteList = async () => {
+    siteList.value = await $siteList()
+    siteList.value.forEach((site) => {
+      hosts.value.push({
+        label: site.name,
+        value: site.tracker,
+      })
+    })
+  }
   const setDownloadSpeedList = (value: DownloadSpeedType[]) => {
     speedList.value = value
   }
@@ -94,7 +132,7 @@ export const useDownloadStore = defineStore('download', () => {
   const downloader = {
     id: 0,
     name: '',
-    usernames: '',
+    username: '',
     password: '',
     host: '',
     port: 8999,
@@ -246,23 +284,64 @@ export const useDownloadStore = defineStore('download', () => {
       clearSpeedListTimer()
     }, timeout.value * 1000 * 60)
   }
-  const categoryList = ref<Category[]>()
-  const categories = ref<{ label: string; value: string | number }[]>([{
-    label: '分类',
-    value: '',
-  }])
-  const currentCategory = ref<string>('')
-  const selectedCategories = ref<DropdownOption[]>([
+
+  const clearTimer = async () => {
+    clearInterval(timer.value)
+    timer.value = null
+  }
+  const handleDownloaderSpeed = async (downloader_id: number) => {
+    downloaderSpeed.value = await $getDownloadSpeedList(downloader_id)
+  }
+  const searchKey = ref('')
+
+  const searchTorrent = async () => {
+    if (searchKey.value.length <= 0) {
+      showTorrentList.value = torrentList.value
+    }
+    else {
+      const key = searchKey.value.trim().toLowerCase()
+      showTorrentList.value = torrentList.value.filter(
+        (torrent: Torrent) => torrent.name.toLowerCase().includes(key)
+                    || (torrent.category && torrent.category!.toLowerCase().includes(key))
+                    || (torrent.downloadDir && torrent.downloadDir!.toLowerCase().includes(key))
+                    || (torrent.host && torrent.host!.toLowerCase().includes(key)),
+      )
+    }
+  }
+  const startFresh = async () => {
+    timer.value = setInterval(async () => {
+      await handleDownloaderSpeed(defaultDownloader.value.id)
+      const showDataHashes = downloadingTableRef.value!.paginatedData.map((row: { key: string }) => row.key)
+      const showData = await getTorrentList(defaultDownloader.value.id, true, showDataHashes.join('|'))
+      showData.forEach((torrent: Torrent) => {
+        if (categoryFlag.value) {
+          const index = torrentList.value.findIndex(item => item.hash === torrent.hash)
+          torrentList.value.splice(index, 1, torrent)
+        }
+        else {
+          const index = torrentList.value.findIndex(item => item.id === torrent.id)
+          torrentList.value.splice(index, 1, torrent)
+        }
+      })
+      await searchTorrent()
+    }, 2500)
+    setTimeout(async () => {
+      await clearTimer()
+    }, timeout.value * 1000 * 60)
+  }
+  /**
+     * 获取下载器分类列表
+     * @param downloader_id
+     */
+  const getDownloaderCategoryList = async (downloader_id: number) => {
+    categoryList.value = await $getCategoryList(downloader_id)
+  }
+  const qbHandleOptions = ref<DropdownOption[]>([
     {
-      label: '清除分类',
-      key: 'clearCategory',
+      label: '详情',
+      key: 'prop',
+      icon: () => h(MenuIcon, { icon: 'Information' }),
     },
-    {
-      label: '移除未使用',
-      key: 'removeCategories',
-    },
-  ])
-  const qbHandleOptions = [
     {
       label: '继续',
       key: 'resume',
@@ -317,8 +396,61 @@ export const useDownloadStore = defineStore('download', () => {
       key: 'reannounce',
       icon: () => h(MenuIcon, { icon: 'Mic' }),
     },
-  ]
-  const trHandleOptions = [
+    {
+      type: 'divider',
+      key: 'd3',
+    },
+    {
+      label: '清除',
+      key: 'clear',
+      icon: () => h(MenuIcon, { icon: 'CalendarClear' }),
+      children: [
+        {
+          label: '清除排序',
+          key: 'clearSort',
+          icon: () => h(MenuIcon, { icon: 'SwapVertical' }),
+        },
+        {
+          label: '清除筛选',
+          key: 'clearFilter',
+          icon: () => h(MenuIcon, { icon: 'Filter' }),
+        },
+        {
+          label: '清除选中',
+          key: 'clearChecked',
+          icon: () => h(MenuIcon, { icon: 'Checkbox' }),
+        },
+      ],
+    },
+    {
+      label: '复制',
+      key: 'copy',
+      icon: () => h(MenuIcon, { icon: 'Copy' }),
+      children: [
+        {
+          label: '名称',
+          key: 'name',
+          icon: () => h(MenuIcon, { icon: 'Duplicate' }),
+        },
+        {
+          label: 'HASH',
+          key: 'hash',
+          icon: () => h(MenuIcon, { icon: 'DuplicateOutline' }),
+        },
+        {
+          label: '链接',
+          key: 'magnet_uri',
+          icon: () => h(MenuIcon, { icon: 'Magnet' }),
+        },
+      ],
+    },
+  ])
+  const trHandleOptions = ref<DropdownOption[]>([
+    {
+      label: '详情',
+      key: 'prop',
+      icon: () => h(MenuIcon, { icon: 'Information' }),
+    },
     {
       label: '开始',
       key: 'start_torrent',
@@ -344,7 +476,7 @@ export const useDownloadStore = defineStore('download', () => {
       icon: () => h(MenuIcon, { icon: 'Trash' }),
     },
     {
-      label: '分类',
+      label: '路径',
       key: 'categoryForm',
       icon: () => h(MenuIcon, { icon: 'Document' }),
       children: selectedCategories.value,
@@ -354,12 +486,12 @@ export const useDownloadStore = defineStore('download', () => {
       key: 'd2',
     },
     {
-      label: '重新校验',
+      label: '校验',
       key: 'verify_torrent',
       icon: () => h(MenuIcon, { icon: 'CheckmarkDoneCircle' }),
     },
     {
-      label: '重新汇报',
+      label: '汇报',
       key: 'reannounce_torrent',
       icon: () => h(MenuIcon, { icon: 'Mic' }),
     },
@@ -384,17 +516,9 @@ export const useDownloadStore = defineStore('download', () => {
     },
     {
       label: '队列向下',
-      key: 'queue_up',
+      key: 'queue_down',
       icon: () => h(MenuIcon, { icon: 'Mic' }),
     },
-  ]
-  const rightOptions = ref<DropdownOption[]>([
-    {
-      label: '详情',
-      key: 'prop',
-      icon: () => h(MenuIcon, { icon: 'Information' }),
-    },
-    ...categoryFlag.value ? qbHandleOptions : trHandleOptions,
     {
       type: 'divider',
       key: 'd3',
@@ -445,72 +569,24 @@ export const useDownloadStore = defineStore('download', () => {
     },
   ])
 
-  const clearTimer = async () => {
-    clearInterval(timer.value)
-    timer.value = null
-  }
-  const handleDownloaderSpeed = async (downloader_id: number) => {
-    downloaderSpeed.value = await $getDownloadSpeedList(downloader_id)
-  }
-  const searchKey = ref('')
-
-  const searchTorrent = async () => {
-    if (searchKey.value.length <= 0) {
-      showTorrentList.value = torrentList.value
-    }
-    else {
-      const key = searchKey.value.trim().toLowerCase()
-      showTorrentList.value = torrentList.value.filter(
-        (torrent: Torrent) => torrent.name.toLowerCase().includes(key)
-                    || torrent.category.toLowerCase().includes(key)
-                    || torrent.tracker.toLowerCase().includes(key),
-      )
-    }
-  }
-  const startFresh = async () => {
-    timer.value = setInterval(async () => {
-      await handleDownloaderSpeed(defaultDownloader.value.id)
-      const showDataHashes = downloadingTableRef.value!.paginatedData.map((row: { key: string }) => row.key)
-      const showData = await getTorrentList(defaultDownloader.value.id, true, showDataHashes.join('|'))
-      showData.forEach((torrent: Torrent) => {
-        if (categoryFlag.value) {
-          const index = torrentList.value.findIndex(item => item.hash === torrent.hash)
-          torrentList.value.splice(index, 1, torrent)
-        }
-        else {
-          const index = torrentList.value.findIndex(item => item.id === torrent.id)
-          torrentList.value.splice(index, 1, torrent)
-        }
-      })
-      await searchTorrent()
-    }, 2500)
-    setTimeout(async () => {
-      await clearTimer()
-    }, timeout.value * 1000 * 60)
-  }
-  /**
-     * 获取下载器分类列表
-     * @param downloader_id
-     */
-  const getDownloaderCategoryList = async (downloader_id: number) => {
-    categoryList.value = await $getCategoryList(downloader_id)
-  }
   const handleDefaultDownloader = async (value: number) => {
     defaultDownloader.value = await $getDownloader({ downloader_id: value })
     categoryFlag.value = defaultDownloader.value.category === 'Qb'
   }
   const handleUpdateDownloading = async (value: number) => {
     // 初始化表格
+    if (!isNaN(value))
+      await handleDefaultDownloader(value)
     await clearTimer()
     downloadLoading.value = true
     downloadingTableRef.value?.clearSorter()
     downloadingTableRef.value?.clearFilters()
     checkedRowKeys.value.length = 0
     categories.value.length = 1
-    selectedCategories.value.length = 2
-    if (!isNaN(value))
-      await handleDefaultDownloader(value)
+    selectedCategories.value.length = categoryFlag.value ? 2 : 0
+
     // 加载数据
+    await getSiteList()
     await getDownloaderCategoryList(defaultDownloader.value.id)
     await handleDownloaderSpeed(defaultDownloader.value.id)
     torrentList.value = await getTorrentList(defaultDownloader.value.id)
@@ -518,7 +594,7 @@ export const useDownloadStore = defineStore('download', () => {
     categoryList.value?.forEach((category: Category) => {
       categories.value.push({
         label: category.name,
-        value: category.name,
+        value: category.savePath,
       })
       selectedCategories.value.push({
         label: category.name,
@@ -536,6 +612,10 @@ export const useDownloadStore = defineStore('download', () => {
     delete_files = false,
     enable = true,
   ) => {
+    if (!categoryFlag.value && category.length > 0) {
+      const item = categoryList.value?.find(item => item.name === category)
+      category = item!.savePath
+    }
     const data = {
       ids: checkedRowKeys.value,
       command,
@@ -608,7 +688,7 @@ export const useDownloadStore = defineStore('download', () => {
       sorter: 'default',
       resizable: true,
       filter(value, row) {
-        return !!~row.category.indexOf(value.toString())
+        return !!~row.category!.indexOf(value.toString())
       },
       filterOptions: categories.value,
       render: (row) => {
@@ -648,7 +728,29 @@ export const useDownloadStore = defineStore('download', () => {
         )
       },
     },
-    // { title: '保存路径', key: 'save_path', width: 200 },
+    {
+      title: 'host',
+      key: 'host',
+      width: 100,
+      sorter: 'default',
+      filter(value, row) {
+        return !!~value.toString().indexOf(row.host!)
+      },
+      filterOptions: hosts.value,
+      render(row: Torrent) {
+        const site = siteList.value.find(item => item.tracker.includes(row.host))
+        return h(
+          NTag,
+          {
+            type: 'info',
+            size: 'small',
+          },
+          {
+            default: () => site ? site.name : row.host,
+          },
+        )
+      },
+    },
     {
       title: 'tracker',
       key: 'status',
@@ -755,14 +857,14 @@ export const useDownloadStore = defineStore('download', () => {
       width: 88,
       maxWidth: 120,
       resizable: true,
-      sorter: (row1, row2) => row1.progress - row2.progress,
+      sorter: (row1, row2) => row1.progress! - row2.progress!,
       render(row: Torrent) {
         return h(
           NProgress,
           {
             'type': 'line',
             'indicator-placement': 'inside',
-            'percentage': Number((row.progress * 100).toFixed(2)),
+            'percentage': Number((row.progress! * 100).toFixed(2)),
             'height': 20,
             'borderRadius': 4,
             'fill-border-radius': 0,
@@ -946,6 +1048,7 @@ export const useDownloadStore = defineStore('download', () => {
       fixed: 'left',
       width: 35,
     },
+
     {
       title: '名称',
       key: 'name',
@@ -992,6 +1095,12 @@ export const useDownloadStore = defineStore('download', () => {
       },
     },
     {
+      title: '队列',
+      key: 'queuePosition',
+      fixed: 'left',
+      width: 35,
+    },
+    {
       title: '状态',
       key: 'status',
       sorter: 'default',
@@ -999,6 +1108,51 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 100,
       maxWidth: 150,
       resizable: true,
+      filter(value, row) {
+        const status = row.trackers && row.trackers[0] ? row.trackers[0].status : 3
+        return status === value
+      },
+      filterOptions: trState.map((status, index) => ({
+        label: status,
+        value: index,
+      })),
+      render(row) {
+        return h(
+          NTag,
+          {
+            type: 'info',
+            size: 'small',
+          },
+          {
+            default: () => trState[row.status],
+          },
+        )
+      },
+    },
+    {
+      title: 'host',
+      key: 'host',
+      width: 100,
+      sorter: 'default',
+      filter(value, row) {
+        return !!~value.toString().indexOf(row.host!)
+      },
+      filterOptions: hosts.value,
+      render(row: Torrent) {
+        const site = siteList.value.find(item => item.tracker.includes(row.host))
+        return site
+          ? h(
+            NTag,
+            {
+              type: 'info',
+              size: 'small',
+            },
+            {
+              default: () => site.name,
+            },
+          )
+          : ''
+      },
     },
     {
       title: '大小',
@@ -1022,7 +1176,30 @@ export const useDownloadStore = defineStore('download', () => {
       },
     },
     {
-      title: '已上传',
+      title: '进度',
+      key: 'percentDone',
+      minWidth: 80,
+      width: 88,
+      maxWidth: 120,
+      resizable: true,
+      sorter: (row1, row2) => row1.recheckProgress ? (row1.recheckProgress! - row2.recheckProgress!) : (row1.percentDone! - row2.percentDone!),
+      render(row: Torrent) {
+        return h(
+          NProgress,
+          {
+            'type': 'line',
+            'indicator-placement': 'inside',
+            'percentage': row.recheckProgress ? Number((row.recheckProgress! * 100).toFixed(2)) : Number((row.percentDone! * 100).toFixed(2)),
+            'height': 20,
+            'borderRadius': 4,
+            'fill-border-radius': 0,
+          },
+        )
+      },
+    },
+
+    {
+      title: '分享率',
       key: 'uploadRatio',
       sorter: 'default',
       width: 100,
@@ -1037,7 +1214,7 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => renderSize(row.uploadRatio),
+            default: () => row.uploadRatio!,
           },
         )
       },
@@ -1092,9 +1269,12 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 100,
       maxWidth: 150,
       resizable: true,
+      render(row: Torrent) {
+        return row.eta! > 0 ? timeFormat(row.eta!) : ''
+      },
     },
     {
-      title: '已上传数据量',
+      title: '已上传',
       key: 'uploadedEver',
       sorter: 'default',
       width: 100,
@@ -1109,13 +1289,13 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => renderSize(row.uploadedEver),
+            default: () => renderSize(row.uploadedEver!),
           },
         )
       },
     },
     {
-      title: '已下载数据量',
+      title: '已下载',
       key: 'downloadedEver',
       sorter: 'default',
       width: 100,
@@ -1130,7 +1310,7 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => renderSize(row.downloadedEver),
+            default: () => renderSize(row.downloadedEver!),
           },
         )
       },
@@ -1139,24 +1319,36 @@ export const useDownloadStore = defineStore('download', () => {
       title: '创建时间',
       key: 'addedDate',
       sorter: 'default',
-      width: 100,
+      width: 150,
       minWidth: 100,
-      maxWidth: 150,
+      maxWidth: 250,
       resizable: true,
       render(row: Torrent) {
-        return TimestampToBeijingTime(row.addedDate)
+        return TimestampToBeijingTime(<number>row.addedDate)
       },
     },
     {
       title: '完成时间',
       key: 'doneDate',
       sorter: 'default',
-      width: 100,
+      width: 150,
       minWidth: 100,
-      maxWidth: 150,
+      maxWidth: 250,
       resizable: true,
       render(row: Torrent) {
-        return TimestampToBeijingTime(row.doneDate)
+        return TimestampToBeijingTime(<number>row.doneDate)
+      },
+    },
+    {
+      title: '完成时间',
+      key: 'activityDate',
+      sorter: 'default',
+      width: 150,
+      minWidth: 100,
+      maxWidth: 250,
+      resizable: true,
+      render(row: Torrent) {
+        return TimestampToBeijingTime(<number>row.activityDate)
       },
     },
     {
@@ -1167,18 +1359,18 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 150,
       maxWidth: 200,
       resizable: true,
-      render(row: Torrent) {
-        return h(
-          NTag,
-          {
-            type: 'info',
-            size: 'small',
-          },
-          {
-            default: () => `${renderSize(<number>row.uploadLimit)}/s`,
-          },
-        )
-      },
+      // render(row: Torrent) {
+      //   return h(
+      //     NTag,
+      //     {
+      //       type: 'info',
+      //       size: 'small',
+      //     },
+      //     {
+      //       default: () => `${renderSize(<number>row.uploadLimit)}/s`,
+      //     },
+      //   )
+      // },
     },
     {
       title: '下载速率限制',
@@ -1188,18 +1380,18 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 150,
       maxWidth: 200,
       resizable: true,
-      render(row: Torrent) {
-        return h(
-          NTag,
-          {
-            type: 'info',
-            size: 'small',
-          },
-          {
-            default: () => `${renderSize(<number>row.downloadLimit)}/s`,
-          },
-        )
-      },
+      // render(row: Torrent) {
+      //   return h(
+      //     NTag,
+      //     {
+      //       type: 'info',
+      //       size: 'small',
+      //     },
+      //     {
+      //       default: () => `${renderSize(<number>row.downloadLimit)}/s`,
+      //     },
+      //   )
+      // },
     },
     // {
     //   title: 'hash',
@@ -1374,9 +1566,10 @@ export const useDownloadStore = defineStore('download', () => {
     handleSelected,
     handleUpdateDownloading,
     interval,
+    trHandleOptions,
+    qbHandleOptions,
     refDownloaderForm,
     removeDownloader,
-    rightOptions,
     saveDownloader,
     searchKey,
     searchTorrent,
