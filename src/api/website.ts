@@ -8,6 +8,7 @@ export interface WebSite {
   name: string
   nickname: string
   logo: string
+  tracker: string
   tags: '电影' | '电视剧' | 'MV' | 'MUSIC' | '纪录片'
   sp_full: number
   page_message: string
