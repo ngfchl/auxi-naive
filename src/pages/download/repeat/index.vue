@@ -28,6 +28,7 @@ const {
   handleDeleteModal,
   clearTimer,
   handleCheckRows,
+  removeBrush,
   handleDownloadLoading,
   searchTorrent,
 } = downloadStore
@@ -383,6 +384,16 @@ const {
           <template #icon>
             <MenuIcon icon="AddOutline" />
           </template>
+        </n-button>
+        <n-button
+          v-if="categoryFlag"
+          size="tiny" type="error"
+          @click="removeBrush"
+        >
+          <template #icon>
+            <MenuIcon icon="AddOutline" />
+          </template>
+          刷流删种
         </n-button>
         <n-button
           tag="a"

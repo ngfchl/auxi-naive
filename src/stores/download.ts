@@ -8,9 +8,16 @@ import type {
 import {
   $addDownloader,
   $addTorrent,
-  $controlTorrent, $editDownloader,
+  $controlTorrent,
+  $editDownloader,
   $getCategoryList,
-  $getDownloadSpeedList, $getDownloader, $getDownloaderList, $getTorrentList, $getTorrentProp, $removeDownloader,
+  $getDownloadSpeedList,
+  $getDownloader,
+  $getDownloaderList,
+  $getTorrentList,
+  $getTorrentProp,
+  $removeBrush,
+  $removeDownloader,
 } from '~/api/download'
 import numberFormat from '~/hooks/numberFormat'
 import timeFormat from '~/hooks/timeFormat'
@@ -1529,10 +1536,15 @@ export const useDownloadStore = defineStore('download', () => {
   const handleDownloadLoading = (value: boolean) => {
     downloadLoading.value = value
   }
-
+  const removeBrush = async () => {
+    const flag = await $removeBrush(defaultDownloader.value.id)
+    if (flag)
+      await handleUpdateDownloading(defaultDownloader.value.id)
+  }
   return {
     addDownloaderFormRules,
     addTorrent,
+    removeBrush,
     categories,
     categorySelectList,
     checkedRowKeys,
