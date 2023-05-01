@@ -6,5 +6,5 @@ const props = defineProps({
 </script>
 
 <template>
-  <n-menu v-bind="props" />
+  <n-menu v-bind="props" accordion />
 </template>
