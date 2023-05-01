@@ -590,6 +590,7 @@ export const useDownloadStore = defineStore('download', () => {
     downloadingTableRef.value?.clearFilters()
     checkedRowKeys.value.length = 0
     categories.value.length = 1
+    torrentList.value.length = 0
     selectedCategories.value.length = categoryFlag.value ? 2 : 0
 
     // 加载数据
