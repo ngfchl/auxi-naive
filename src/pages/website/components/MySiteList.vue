@@ -19,6 +19,7 @@ import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useWebsiteStore } from '~/stores/website'
 import SignInList from '~/pages/website/components/SignInList.vue'
 import numberFormat from '~/hooks/numberFormat'
+import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
 defineEmits(['update:eDrawer'])
 const websiteStore = useWebsiteStore()
@@ -54,6 +55,18 @@ const {
  */
 onMounted(async () => {
   await initData()
+})
+const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
+const slots = ref(3)
+watchEffect(() => {
+  if (isPad.value)
+    slots.value = 9
+
+  else if (isDesktop.value)
+    slots.value = 11
+
+  if (isMobile.value)
+    slots.value = 5
 })
 const list = computed(() => {
   const start = (page.value - 1) * pageSize.value
@@ -104,10 +117,11 @@ const handleUpdate = async (my_site: MySite) => {
     v-model:page="page"
     v-model:page-size="pageSize"
     class="absolute z-998 mt-8"
-    size="small" simple
+    size="small"
     :item-count="siteStatusList.length"
     show-size-picker
     :page-sizes="[6, 8, 10, 20, 30, 40]"
+    :page-slot="slots"
   />
   <n-grid
     cols="400:1 600:2 900:3 1200:4"
