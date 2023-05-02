@@ -164,7 +164,7 @@ const handleSaveMySite = async () => {
       <n-form-item label="Cookies" path="cookie">
         <n-input
           v-model:value="mySiteForm.cookie"
-          :autosize="{ minRows: 3, maxRows: 6 }"
+          :autosize="{ minRows: 2, maxRows: 6 }"
           autocomplete="off"
           placeholder="请输入站点Cookies，与UA搭配使用效果更佳"
           type="textarea"
@@ -172,9 +172,19 @@ const handleSaveMySite = async () => {
       </n-form-item>
       <n-form-item label="UserAgent" path="user_agent" required>
         <n-input
-          v-model:value="mySiteForm.user_agent" :autosize="{ minRows: 3, maxRows: 6 }"
+          v-model:value="mySiteForm.user_agent" :autosize="{ minRows: 2, maxRows: 6 }"
           autocomplete="off"
           type="textarea"
+        />
+      </n-form-item>
+      <n-form-item label="RSS" path="rss" required>
+        <n-input
+          v-model:value="mySiteForm.rss" autocomplete="off"
+        />
+      </n-form-item>
+      <n-form-item label="代理服务器" path="custom_server" required>
+        <n-input
+          v-model:value="mySiteForm.custom_server" autocomplete="off"
         />
       </n-form-item>
     </n-form>

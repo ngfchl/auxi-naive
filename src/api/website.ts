@@ -48,6 +48,7 @@ export interface MySite {
   site: number
   nickname: string
   passkey: string
+  rss: string
   get_info: boolean
   sign_in: boolean
   get_torrents: boolean
@@ -59,6 +60,7 @@ export interface MySite {
   joined: string
   user_agent: string
   cookie: string
+  custom_server: string
 }
 
 export interface SiteStatus {
