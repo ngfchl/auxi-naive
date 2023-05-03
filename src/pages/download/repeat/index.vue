@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isNaN } from 'lodash-es'
-import type { DataTableColumns, DataTableCreateSummary, DropdownOption } from 'naive-ui'
+import type { DataTableColumns, DataTableCreateSummary, DropdownOption, FormInst } from 'naive-ui'
 import type { CSSProperties } from 'vue'
 import { useClipboard } from '@v-c/utils'
 import { NTag } from 'naive-ui'
@@ -51,6 +51,7 @@ const {
   timer, deleteModal,
   downloadingTableRef,
   searchKey,
+  addTorrentRules,
 } = storeToRefs(downloadStore)
 const timeout = ref<number>(1000 * 60)
 const railStyle = ({
@@ -247,7 +248,7 @@ const handleSelect = async (key: string, option: DropdownOption) => {
   }
   showDropdown.value = false
 }
-const newTorrent = reactive<NewTorrent>({
+const newTorrent = ref<NewTorrent>({
   urls: '',
   category: '',
   cookie: '',
@@ -260,12 +261,15 @@ const newTorrent = reactive<NewTorrent>({
 
 const cancelDownload = () => {
   showAddModal.value = false
-  newTorrent.urls = ''
+  newTorrent.value.urls = ''
 }
+const addTorrentForm = ref<FormInst>()
+
 const handleDownload = async () => {
+  await addTorrentForm.value?.validate()
   const flag = await addTorrent(
     defaultDownloader.value!.id,
-    newTorrent,
+    newTorrent.value,
   )
   if (flag) cancelDownload()
 }
@@ -284,10 +288,6 @@ onBeforeMount(async () => {
 onBeforeUnmount(async () => {
   await clearTimer()
 })
-const {
-  urls, is_skip_checking, is_paused, upload_limit,
-  download_limit, category, cookie, use_auto_torrent_management,
-} = toRefs(newTorrent)
 </script>
 
 <template>
@@ -360,14 +360,14 @@ const {
         <n-button v-else size="tiny" type="success" @click="startFresh">
           刷新
         </n-button>
-        <n-select
-          v-if="isMobile"
-          v-model:value="currentCategory"
-          filterable
-          size="tiny"
-          placeholder="分类"
-          :options="categories"
-        />
+        <!--        <n-select -->
+        <!--          v-if="isMobile" -->
+        <!--          v-model:value="currentCategory" -->
+        <!--          filterable -->
+        <!--          size="tiny" -->
+        <!--          placeholder="分类" -->
+        <!--          :options="categories" -->
+        <!--        /> -->
         <n-input v-model:value="searchKey" size="tiny" @change="searchTorrent" />
         <n-button
           size="tiny" type="info" secondary
@@ -520,74 +520,104 @@ const {
       <MenuIcon class="text-green" icon="AddOutline" />
     </template>
     <n-space vertical>
-      <n-input
-        v-model:value="urls"
-        type="textarea"
-        placeholder="种子链接"
-      />
-      <n-switch
-        v-model:value="use_auto_torrent_management"
-        :round="false" size="small"
-        :rail-style="railStyle"
+      <n-form
+        ref="addTorrentForm"
+        class="site-form"
+        inline-message
+        label-position="top"
+        size="small"
+        :rules="addTorrentRules"
+        :model="newTorrent"
+        :show-label="false"
+        status-icon
       >
-        <template #checked>
-          自动管理
-        </template>
-        <template #unchecked>
-          手动管理
-        </template>
-      </n-switch>
-      <n-switch
-        v-model:value="is_paused"
-        :round="false" size="small"
-        :rail-style="railStyle"
-      >
-        <template #unchecked>
-          开始
-        </template>
-        <template #checked>
-          暂停
-        </template>
-      </n-switch>
-      <n-switch
-        v-model:value="is_skip_checking"
-        :round="false" size="small"
-        :rail-style="railStyle"
-      >
-        <template #checked>
-          跳过校验
-        </template>
-        <template #unchecked>
-          正常校验
-        </template>
-      </n-switch>
-      <n-select
-        v-model:value="category"
-        filterablesize="small"
-        placeholder="分类"
-        :options="categories"
-      />
-      <n-input-number
-        v-model:value="download_limit" size="small"
-        placeholder="下载限速：KB/S"
-        step="100" min="0"
-        button-placement="both"
-      >
-        <template #prefix>
-          ↓
-        </template>
-      </n-input-number>
-      <n-input-number
-        v-model:value="upload_limit" size="small"
-        placeholder="上传限速：KB/S"
-        step="100"
-        min="0"
-        button-placement="both"
-      >
-        <template #prefix>
-          ↑
-        </template>
-      </n-input-number>
+        <n-form-item required path="urls">
+          <n-input
+            v-model:value="newTorrent.urls"
+            required
+            type="textarea"
+            placeholder="种子链接"
+          />
+        </n-form-item>
+        <n-form-item label="属性" path="category">
+          <n-space>
+            <n-switch
+              v-model:value="newTorrent.use_auto_torrent_management"
+              :round="false" size="small"
+              :rail-style="railStyle"
+            >
+              <template #checked>
+                自动管理
+              </template>
+              <template #unchecked>
+                手动管理
+              </template>
+            </n-switch>
+
+            <n-switch
+              v-model:value="newTorrent.is_paused"
+              :round="false" size="small"
+              :rail-style="railStyle"
+            >
+              <template #unchecked>
+                开始
+              </template>
+              <template #checked>
+                暂停
+              </template>
+            </n-switch>
+
+            <n-switch
+              v-model:value="newTorrent.is_skip_checking"
+              :round="false" size="small"
+              :rail-style="railStyle"
+            >
+              <template #checked>
+                跳过校验
+              </template>
+              <template #unchecked>
+                正常校验
+              </template>
+            </n-switch>
+          </n-space>
+        </n-form-item>
+        <n-form-item label="分类" path="category">
+          <n-select
+            v-model:value="newTorrent.category"
+            :multiple="false"
+            :options="categories"
+            filterable
+            :tag="categoryFlag"
+            placeholder="分类/路径"
+            size="small"
+          />
+        </n-form-item>
+        <n-form-item label="下载限速" path="download_limit">
+          <n-input-number
+            v-model:value="newTorrent.download_limit" size="small"
+            placeholder="下载限速：KB/S"
+            step="100" min="0"
+            button-placement="both"
+          >
+            <template #prefix>
+              ↓
+            </template>
+          </n-input-number>
+        </n-form-item>
+        <n-form-item label="上传限速" path="upload_limit">
+          <n-input-number
+            v-model:value="newTorrent.upload_limit" size="small"
+            placeholder="上传限速：KB/S"
+            step="100"
+            min="0"
+            button-placement="both"
+          >
+            <template #prefix>
+              ↑
+            </template>
+          </n-input-number>
+        </n-form-item>
+      </n-form>
     </n-space>
     <template #footer>
       <n-space justify="center">

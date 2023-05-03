@@ -89,9 +89,9 @@ export const useDownloadStore = defineStore('download', () => {
   ])
   const siteList = ref<WebSite[]>([])
   const categoryList = ref<Category[]>()
-  const categories = ref<{ label: string; value: string | number }[]>([{
-    label: '分类',
-    value: '',
+  const categories = ref<SelectOption[]>([{
+    label: '分类/路径',
+    value: '无',
   }])
   const hosts = ref<{ label: string; value: string | number }[]>([])
   const currentCategory = ref<string>('')
@@ -159,6 +159,15 @@ export const useDownloadStore = defineStore('download', () => {
     },
   ])
   const refDownloaderForm = ref<FormInst>()
+  const addTorrentRules = reactive<FormRules>({
+    urls: [
+      {
+        required: true,
+        message: '链接必填',
+        trigger: 'blur',
+      },
+    ],
+  })
   const addDownloaderFormRules = reactive<FormRules>({
     category: [
       {
@@ -602,7 +611,7 @@ export const useDownloadStore = defineStore('download', () => {
     categoryList.value?.forEach((category: Category) => {
       categories.value.push({
         label: category.name,
-        value: category.savePath,
+        value: categoryFlag ? category.name : category.savePath,
       })
       selectedCategories.value.push({
         label: category.name,
@@ -1598,5 +1607,6 @@ export const useDownloadStore = defineStore('download', () => {
     torrentList,
     trackerStatus,
     categoryFlag,
+    addTorrentRules,
   }
 })
