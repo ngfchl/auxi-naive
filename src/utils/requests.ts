@@ -27,7 +27,9 @@ export interface ResponseBody<T = any> {
   data?: T
   msg: string
 }
-
+const err_status: number[] = [
+  401, 403,
+]
 const responseHandler = (response: AxiosResponse): any | ResponseBody<any> | AxiosResponse<any> | Promise<any> => {
   return response.data
 }
@@ -38,7 +40,7 @@ const errorHandler = (error: AxiosError): Promise<any> => {
   // 判断是否存在response
   if (error.response) {
     const { data, status, statusText } = error.response as AxiosResponse<any>
-    if (status === 401) {
+    if (err_status.includes(status)) {
       // 重新登录
       notification?.error({
         title: i18n.global.t('global.request.error.401'),
