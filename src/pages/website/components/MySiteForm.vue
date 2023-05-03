@@ -1,15 +1,23 @@
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia'
+import type { Downloader } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
 const websiteStore = useWebsiteStore()
 const { refMySiteForm, mySiteForm, siteInfoList, addMySiteFormRules } = storeToRefs(websiteStore)
 const { saveMySite, removeMySite } = websiteStore
+const downloaderStore = useDownloadStore()
+const { downloaderList } = storeToRefs(downloaderStore)
+const { getDownloaderList } = downloaderStore
 const loading = ref(false)
 const handleSaveMySite = async () => {
   loading.value = true
   await saveMySite()
   loading.value = false
 }
+onMounted(async () => {
+  await getDownloaderList()
+})
 </script>
 
 <template>
@@ -19,8 +27,10 @@ const handleSaveMySite = async () => {
       :model="mySiteForm"
       :rules="addMySiteFormRules"
       class="site-form"
+      :show-label="false"
       inline-message
       label-position="top"
+      size="small"
       status-icon
     >
       <n-form-item v-if="mySiteForm.id === 0" label="选择站点" path="site">
@@ -36,7 +46,7 @@ const handleSaveMySite = async () => {
         <n-input
           v-model:value="mySiteForm.nickname"
           clearable
-          placeholder="自定义站点名称"
+          placeholder="自定义站点名称，必填"
           show-word-limit
         />
       </n-form-item>
@@ -157,7 +167,7 @@ const handleSaveMySite = async () => {
       <n-form-item label="Passkey" path="passkey">
         <n-input
           v-model:value="mySiteForm.passkey" clearable
-          placeholder=""
+          placeholder="Passkey"
           show-word-limit
         />
       </n-form-item>
@@ -179,12 +189,25 @@ const handleSaveMySite = async () => {
       </n-form-item>
       <n-form-item label="RSS" path="rss" required>
         <n-input
-          v-model:value="mySiteForm.rss" autocomplete="off"
+          v-model:value="mySiteForm.rss"
+          placeholder="请输入站点RSS订阅地址" autocomplete="off"
+        />
+      </n-form-item>
+      <n-form-item label="下载器" path="downloader" required>
+        <n-select
+          v-model:value="mySiteForm.downloader"
+          placeholder="请选择刷流使用的下载器"
+          :options="downloaderList.map((downloader:Downloader) => ({
+            label: downloader.name,
+            value: downloader.id,
+          }))"
+          filterable
         />
       </n-form-item>
       <n-form-item label="代理服务器" path="custom_server" required>
         <n-input
-          v-model:value="mySiteForm.custom_server" autocomplete="off"
+          v-model:value="mySiteForm.custom_server"
+          placeholder="请输入代理服务器地址，部分站点需要" autocomplete="off"
         />
       </n-form-item>
     </n-form>
@@ -211,3 +234,10 @@ const handleSaveMySite = async () => {
     </n-space>
   </div>
 </template>
+
+<style scoped>
+.n-divider:not(.n-divider--vertical) {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+</style>

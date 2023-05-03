@@ -1,6 +1,7 @@
 import type { ECBasicOption } from 'echarts/types/src/util/types'
-import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
+import type { DataTableColumns, FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
+import MySiteForm from '@/pages/website/components/MySiteForm.vue'
 import type { BarData, MySite, NewestStatus, PerDayData, PieData, SiteStatus, TodayData, WebSite } from '~/api/website'
 import {
   $editMySite,
@@ -9,18 +10,22 @@ import {
   $getNewestStatus,
   $getSignList,
   $mySiteList,
-  $parseSiteHistory, $refreshAllSite,
+  $parseSiteHistory,
+  $refreshAllSite,
   $refreshSite,
   $removeMySite,
-  $saveMySite, $signAllSite,
+  $saveMySite,
+  $signAllSite,
   $signSite,
-  $siteInfoNewList, $siteList,
-  $siteStatusNewestList, $sortSite, $todayDataList,
+  $siteInfoNewList,
+  $siteList,
+  $siteStatusNewestList,
+  $sortSite,
+  $todayDataList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
-import MySiteForm from '@/pages/website/components/MySiteForm.vue'
 
 export const useWebsiteStore = defineStore('website',
   () => {
@@ -182,10 +187,10 @@ export const useWebsiteStore = defineStore('website',
       //   align: 'center',
       // },
     ])
-    const mySite = {
+    const mySite: MySite = {
       id: 0,
       sort_id: 1,
-      site: 0,
+      site: undefined,
       nickname: '',
       passkey: '',
       get_info: true,
@@ -200,35 +205,49 @@ export const useWebsiteStore = defineStore('website',
       user_agent: window.navigator.userAgent,
       cookie: '',
       rss: '',
+      downloader: undefined,
       custom_server: '',
     }
-    const addMySiteFormRules = reactive<FormRules>({
+    const addMySiteFormRules = ref<FormRules>({
       site: [
         {
           required: true,
           message: '请选择要添加的站点',
-          trigger: 'change',
+          trigger: 'blur',
+          validator: (rule: FormItemRule, value: number) => {
+            return value > 0
+          },
+        },
+      ],
+      nickname: [
+        {
+          required: true,
+          message: '自定义站点名称，必填',
+          trigger: ['blur', 'input'],
+          min: 1,
         },
       ],
       user_id: [
         {
           required: true,
           message: '请输入数字UID，指定站点请输入用户名',
-          trigger: 'blur',
+          trigger: ['blur', 'input'],
+          min: 1,
         },
       ],
       cookie: [
         {
           required: true,
           message: '请输入站点Cookies，与UA搭配使用效果更佳',
-          trigger: 'blur',
+          trigger: ['blur', 'input'],
+          min: 32,
         },
       ],
       user_agent: [
         {
           required: true,
           message: '请输入浏览器UA，使用效果更佳',
-          trigger: 'blur',
+          trigger: ['blur', 'input'],
         },
       ],
     })
@@ -242,7 +261,7 @@ export const useWebsiteStore = defineStore('website',
     const mySiteList = ref<MySite[]>([])
     const showList = ref<NewestStatus[]>([])
     const siteStatusList = ref<NewestStatus[]>([])
-    const mySiteForm = ref<MySite>(mySite)
+    const mySiteForm = ref<MySite>({ ...mySite })
     const siteInfoList = ref<SelectOption[]>([{
       label: '请选择站点',
       value: 0,

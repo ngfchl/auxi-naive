@@ -1,7 +1,7 @@
-import { getList } from '~/hooks/getList'
-import renderSize from '@/hooks/renderSize'
 import numberFormat from '@/hooks/numberFormat'
+import renderSize from '@/hooks/renderSize'
 import { useGlobalConfig } from '~/composables/gobal-config'
+import { getList } from '~/hooks/getList'
 
 export interface WebSite {
   id: number
@@ -45,10 +45,11 @@ export interface UserLevelRule {
 export interface MySite {
   id: number
   sort_id: number
-  site: number
+  site?: number
   nickname: string
   passkey: string
-  rss: string
+  rss?: string
+  downloader?: number
   get_info: boolean
   sign_in: boolean
   get_torrents: boolean
