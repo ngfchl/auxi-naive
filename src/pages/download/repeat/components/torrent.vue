@@ -15,6 +15,7 @@ const downloadStore = useDownloadStore()
 const {
   handleSelected,
   handleDeleteModal,
+  handleRepeat,
 } = downloadStore
 const {
   categories,
@@ -126,7 +127,10 @@ watchEffect(() => {
             汇报
           </n-button>
 
-          <n-button size="tiny" type="primary">
+          <n-button
+            size="tiny" type="primary"
+            @click="handleRepeat"
+          >
             <template #icon>
               <MenuIcon icon="Copy" />
             </template>

@@ -1,5 +1,6 @@
 import type { DataTableColumns, DropdownOption, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NProgress, NSwitch, NTag, NTooltip } from 'naive-ui'
+import { useClipboard as useClipboards } from '@v-c/utils'
 import type {
   Category,
   DownloadSpeedType, Downloader,
@@ -14,10 +15,10 @@ import {
   $getDownloadSpeedList,
   $getDownloader,
   $getDownloaderList,
+  $getRepeatTorrentList,
   $getTorrentList,
   $getTorrentProp,
-  $removeBrush,
-  $removeDownloader,
+  $removeBrush, $removeDownloader,
 } from '~/api/download'
 import numberFormat from '~/hooks/numberFormat'
 import timeFormat from '~/hooks/timeFormat'
@@ -27,9 +28,11 @@ import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import renderSize from '~/hooks/renderSize'
 import type { WebSite } from '~/api/website'
 import { $siteList } from '~/api/website'
+import { useQueryBreakPoints } from '~/composables/query-breakpoints'
+import torrent from '~/pages/download/repeat/components/torrent.vue'
 
 export const useDownloadStore = defineStore('download', () => {
-  const { dialog } = useGlobalConfig()
+  const { dialog, message } = useGlobalConfig()
   const speedList = ref<DownloadSpeedType[]>([])
   const downloaderList = ref<Downloader[]>([])
   const timer = ref()
@@ -39,6 +42,8 @@ export const useDownloadStore = defineStore('download', () => {
     name: '',
     category: 'Tr',
   })
+  const { copy } = useClipboards()
+
   const checkedRowKeys = ref<string[]>([])
   const deleteModal = ref(false)
   const deleteFiles = ref(false)
@@ -124,6 +129,18 @@ export const useDownloadStore = defineStore('download', () => {
       torrent_hash,
     })
   }
+  const { isMobile } = useQueryBreakPoints()
+
+  const torrentPagination = ref({
+    pageSize: isMobile.value ? 20 : 25,
+    size: 'small',
+    showQuickJumper: true,
+    itemCount: torrentList.value.length,
+    showSizePicker: true,
+    pageSizes: [10, 20, 25, 30, 40],
+    pageSlot: 5,
+    simple: isMobile.value,
+  })
   const getDownloaderList = async () => {
     downloaderList.value = await $getDownloaderList()
   }
@@ -279,6 +296,12 @@ export const useDownloadStore = defineStore('download', () => {
       torrent_hashes,
     })
   }
+
+  const repeatTorrentList = ref([])
+  const getRepeatTorrentList = async (torrent_hashes = '') => {
+    repeatTorrentList.value = await $getRepeatTorrentList({ torrent_hashes })
+  }
+
   const addTorrent = async (downloader_id: number, new_torrent: NewTorrent) => {
     return await $addTorrent({ downloader_id, new_torrent })
   }
@@ -352,6 +375,152 @@ export const useDownloadStore = defineStore('download', () => {
   const getDownloaderCategoryList = async (downloader_id: number) => {
     categoryList.value = await $getCategoryList(downloader_id)
   }
+  const handleRepeat = async () => {
+    await getRepeatTorrentList(checkedRowKeys.value.join('|'))
+  }
+  const handleCheckRows = (rowKeys: string[]) => {
+    checkedRowKeys.value = rowKeys
+  }
+  const openTorrentInfo = async (torrent_hash: string) => {
+    handleCheckRows([torrent_hash])
+    const torrentInfo = await getTorrentProp(defaultDownloader.value!.id, torrent_hash)
+    dialog?.info({
+      title: '种子详情',
+      content: () => h(
+        torrent,
+        {
+          torrent: torrentInfo,
+          downloader_id: defaultDownloader.value!.id,
+        },
+      ),
+      style: {
+        width: '100%',
+        height: '80%',
+      },
+      closable: true,
+    })
+  }
+  const currentRow = ref<Torrent>()
+  const copyTorrentsProp = async (torrent_hashes: string[], key: 'name' | 'magnet_uri' | 'hash') => {
+    let props = ''
+    if (key === 'hash') {
+      props = torrent_hashes.join('\n')
+    }
+    else {
+      const items = torrentList.value.filter((item: Torrent) => torrent_hashes.includes(item.hash))
+      props = items.map((item: Torrent) => item[key]).join('\n')
+    }
+    await copy(props)
+  }
+  const handleSelected = async (
+    command: string,
+    category = '',
+    delete_files = false,
+    enable = true,
+  ) => {
+    if (!categoryFlag.value && category.length > 0) {
+      const item = categoryList.value?.find(item => item.name === category)
+      category = item!.savePath
+    }
+    const data = {
+      ids: checkedRowKeys.value,
+      command,
+      enable,
+      category,
+      delete_files,
+      downloader_id: defaultDownloader.value.id,
+    }
+    deleteModal.value = false
+    const flag = await $controlTorrent(data)
+    if (flag)
+      await getTorrentList(defaultDownloader.value.id)
+
+    return flag
+  }
+  const showDropdown = ref(false)
+  const onClickOutside = () => {
+    showDropdown.value = false
+  }
+  const handleCurrentRow = (row: Torrent) => {
+    currentRow.value = row
+  }
+  const handleDeleteModal = (value: boolean) => {
+    deleteModal.value = value
+  }
+  const handleShowDropdown = (value: boolean) => {
+    showDropdown.value = value
+  }
+  const handleSelect = async (key: string) => {
+    if (checkedRowKeys.value.length <= 0)
+      checkedRowKeys.value.push(currentRow.value!.hash)
+
+    switch (key) {
+      case 'prop':
+        await openTorrentInfo(currentRow.value!.hash)
+        break
+      case 'copy':
+      case 'name':
+        await copyTorrentsProp(checkedRowKeys.value, 'name')
+        break
+      case 'hash':
+        await copyTorrentsProp(checkedRowKeys.value, 'hash')
+        break
+      case 'magnet_uri':
+        await copyTorrentsProp(checkedRowKeys.value, 'magnet_uri')
+        break
+      case 'resume':
+      case 'set_force_start':
+      case 'pause':
+      case 'set_auto_management':
+      case 'recheck':
+      case 'reannounce':
+        await handleSelected(key)
+        break
+      case 'repeat':
+        await handleRepeat()
+        break
+      case 'set_super_seeding':
+        await handleSelected(
+          key, '',
+          false,
+          !currentRow.value?.super_seeding || false,
+        )
+        break
+      case 'deleteForm':
+        handleDeleteModal(true)
+        break
+      case 'clearSort':
+        downloadingTableRef.value?.clearSorter()
+        break
+      case 'clearFilter':
+        downloadingTableRef.value?.clearFilters()
+        break
+      case 'clearChecked':
+        checkedRowKeys.value.length = 0
+        break
+      case 'clearCategory':
+        await handleSelected('set_category', '')
+        break
+      case 'removeCategories':
+        // await handleSelected('removeCategories', '')
+        message?.warning('正在开发哦！')
+        break
+      case 'setAllCheckboxRow':
+        message?.warning('正在开发哦！')
+        break
+      case 'filterSelect':
+        message?.warning('正在开发哦！')
+        break
+      default:
+        if (key.startsWith('setCategory')) {
+          await handleSelected('set_category', key.replace('setCategory?', ''))
+          break
+        }
+        await handleSelected(key)
+    }
+    showDropdown.value = false
+  }
+
   const qbHandleOptions = ref<DropdownOption[]>([
     {
       label: '详情',
@@ -372,6 +541,11 @@ export const useDownloadStore = defineStore('download', () => {
       label: '暂停',
       key: 'pause',
       icon: () => h(MenuIcon, { icon: 'Pause' }),
+    },
+    {
+      label: '辅种',
+      key: 'repeat',
+      icon: () => h(MenuIcon, { icon: 'Copy' }),
     },
     {
       type: 'divider',
@@ -595,8 +769,8 @@ export const useDownloadStore = defineStore('download', () => {
       await handleDefaultDownloader(value)
     await clearTimer()
     downloadLoading.value = true
-    downloadingTableRef.value?.clearSorter()
-    downloadingTableRef.value?.clearFilters()
+    downloadingTableRef.value!.clearSorter()
+    downloadingTableRef.value!.clearFilters()
     checkedRowKeys.value.length = 0
     categories.value.length = 1
     torrentList.value.length = 0
@@ -622,31 +796,6 @@ export const useDownloadStore = defineStore('download', () => {
     downloadLoading.value = false
     // 开启自动刷新
     await startFresh()
-  }
-  const handleSelected = async (
-    command: string,
-    category = '',
-    delete_files = false,
-    enable = true,
-  ) => {
-    if (!categoryFlag.value && category.length > 0) {
-      const item = categoryList.value?.find(item => item.name === category)
-      category = item!.savePath
-    }
-    const data = {
-      ids: checkedRowKeys.value,
-      command,
-      enable,
-      category,
-      delete_files,
-      downloader_id: defaultDownloader.value.id,
-    }
-    deleteModal.value = false
-    const flag = await $controlTorrent(data)
-    if (flag)
-      await getTorrentList(defaultDownloader.value.id)
-
-    return flag
   }
 
   const handleDelete = async () => {
@@ -707,7 +856,7 @@ export const useDownloadStore = defineStore('download', () => {
       filter(value, row) {
         return !!~row.category!.indexOf(value.toString())
       },
-      filterOptions: categories.value,
+      filterOptions: <{ label: string; value: string | number }[]>categories.value,
       render: (row) => {
         if (row.category) {
           return h(
@@ -774,7 +923,7 @@ export const useDownloadStore = defineStore('download', () => {
       width: 80,
       sorter: (row1, row2) => {
         if (row1.trackers && row2.trackers)
-          return row1.trackers[0].status - row2.trackers[0].status
+          return row1.trackers[0].status! - row2.trackers[0].status!
         else
           return -1
       },
@@ -803,10 +952,10 @@ export const useDownloadStore = defineStore('download', () => {
                   size: 'small',
                 },
                 {
-                  default: () => trackerStatus.value[trackers[0].status],
+                  default: () => trackerStatus.value[trackers![0].status!],
                 },
               ),
-              default: () => trackers[0].msg,
+              default: () => trackers![0].msg,
             },
           )
         }
@@ -822,14 +971,14 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => trackerStatus.value[state],
+            default: () => trackerStatus.value[state!],
           },
         )
       },
     },
     {
       filter(value, row) {
-        return !!~row.state.indexOf(value.toString())
+        return !!~row.state!.indexOf(value.toString())
       },
       filterOptions: Object.entries(download_state).map(([value, label]) => ({
         value,
@@ -846,11 +995,11 @@ export const useDownloadStore = defineStore('download', () => {
               const state = row.state
               if ([
                 'error', 'missingFiles', 'unknown', 'metaDL', 'forcedMetaDL', '',
-              ].includes(state))
+              ].includes(state!))
                 return 'error'
               else if ([
                 'queuedUP', 'queuedDL', 'forcedDL', 'stalledUP', 'uploading', 'downloading', 'checkingUP',
-              ].includes(state))
+              ].includes(state!))
                 return 'success'
               else
                 return 'warning'
@@ -858,7 +1007,7 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => download_state[row.state],
+            default: () => download_state[row.state!],
           },
         )
       },
@@ -897,9 +1046,9 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 150,
       width: 100,
       resizable: true,
-      sorter: (row1, row2) => row1.dlspeed - row2.dlspeed,
+      sorter: (row1, row2) => row1.dlspeed! - row2.dlspeed!,
       render(row: Torrent) {
-        return `${renderSize(row.dlspeed)}/s`
+        return `${renderSize(row.dlspeed!)}/s`
       },
     },
     {
@@ -909,9 +1058,9 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 150,
       width: 80,
       resizable: true,
-      sorter: (row1, row2) => row1.completed - row2.completed,
+      sorter: (row1, row2) => row1.completed! - row2.completed!,
       render(row: Torrent) {
-        return renderSize(row.completed)
+        return renderSize(row.completed!)
       },
     },
     {
@@ -921,9 +1070,9 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 150,
       width: 100,
       resizable: true,
-      sorter: (row1, row2) => row1.upspeed - row2.upspeed,
+      sorter: (row1, row2) => row1.upspeed! - row2.upspeed!,
       render(row: Torrent) {
-        return `${renderSize(row.upspeed)}/s`
+        return `${renderSize(row.upspeed!)}/s`
       },
     },
     {
@@ -933,9 +1082,9 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 150,
       width: 80,
       resizable: true,
-      sorter: (row1, row2) => row1.uploaded - row2.uploaded,
+      sorter: (row1, row2) => row1.uploaded! - row2.uploaded!,
       render(row: Torrent) {
-        return renderSize(row.uploaded)
+        return renderSize(row.uploaded!)
       },
     },
     {
@@ -945,21 +1094,21 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 75,
       maxWidth: 100,
       resizable: true,
-      sorter: (row1, row2) => row1.ratio - row2.ratio,
+      sorter: (row1, row2) => row1.ratio! - row2.ratio!,
       render(row: Torrent) {
-        return numberFormat(row.ratio)
+        return numberFormat(row.ratio!)
       },
     },
     {
       title: '总大小',
       key: 'total_size',
-      sorter: (row1, row2) => row1.total_size - row2.total_size,
+      sorter: (row1, row2) => row1.total_size! - row2.total_size!,
       minWidth: 80,
       maxWidth: 150,
       width: 80,
       resizable: true,
       render(row: Torrent) {
-        return renderSize(row.uploaded)
+        return renderSize(<number>row.uploaded)
       },
     },
 
@@ -967,7 +1116,7 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '种子',
       key: 'num_complete',
-      sorter: (row1, row2) => row1.num_complete - row2.num_complete,
+      sorter: (row1, row2) => row1.num_complete! - row2.num_complete!,
       width: 85,
       minWidth: 85,
       maxWidth: 150,
@@ -979,7 +1128,7 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '未完成',
       key: 'num_incomplete',
-      sorter: (row1, row2) => row1.num_incomplete - row2.num_incomplete,
+      sorter: (row1, row2) => row1.num_incomplete! - row2.num_incomplete!,
       width: 65,
       minWidth: 65,
       maxWidth: 100,
@@ -988,7 +1137,7 @@ export const useDownloadStore = defineStore('download', () => {
     {
       title: '下载中',
       key: 'num_leechs',
-      sorter: (row1, row2) => row1.num_leechs - row2.num_leechs,
+      sorter: (row1, row2) => row1.num_leechs! - row2.num_leechs!,
       width: 65,
       minWidth: 65,
       maxWidth: 100,
@@ -1024,7 +1173,7 @@ export const useDownloadStore = defineStore('download', () => {
       maxWidth: 250,
       resizable: true,
       render(row: Torrent) {
-        return timeFormat(new Date().getTime() / 1000 - row.last_activity)
+        return timeFormat(new Date().getTime() / 1000 - row.last_activity!)
       },
     },
     {
@@ -1036,7 +1185,7 @@ export const useDownloadStore = defineStore('download', () => {
       resizable: true,
       sorter: 'default',
       render(row: Torrent) {
-        return TimestampToBeijingTime(row.completion_on)
+        return TimestampToBeijingTime(<number>row.completion_on)
       },
     },
     {
@@ -1048,7 +1197,7 @@ export const useDownloadStore = defineStore('download', () => {
       resizable: true,
       sorter: 'default',
       render(row: Torrent) {
-        return TimestampToBeijingTime(row.added_on)
+        return TimestampToBeijingTime(<number>row.added_on)
       },
     },
     // { title: 'Tracker', key: 'tracker', minWidth: 100 },
@@ -1090,7 +1239,7 @@ export const useDownloadStore = defineStore('download', () => {
       filter(value, row) {
         return !!~row.downloadDir!.indexOf(value.toString())
       },
-      filterOptions: categories.value,
+      filterOptions: <{ label: string; value: string | number }[]>categories.value,
       render: (row) => {
         if (row.downloadDir) {
           return h(
@@ -1141,7 +1290,7 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => trState[row.status],
+            default: () => trState[<number>row.status],
           },
         )
       },
@@ -1187,7 +1336,7 @@ export const useDownloadStore = defineStore('download', () => {
             size: 'small',
           },
           {
-            default: () => renderSize(row.totalSize),
+            default: () => renderSize(<number>row.totalSize),
           },
         )
       },
@@ -1536,13 +1685,7 @@ export const useDownloadStore = defineStore('download', () => {
       },
     },
   ])
-  const handleCheckRows = (rowKeys: string[]) => {
-    checkedRowKeys.value = rowKeys
-  }
 
-  const handleDeleteModal = (value: boolean) => {
-    deleteModal.value = value
-  }
   const handleDownloadLoading = (value: boolean) => {
     downloadLoading.value = value
   }
@@ -1554,14 +1697,16 @@ export const useDownloadStore = defineStore('download', () => {
   return {
     addDownloaderFormRules,
     addTorrent,
-    removeBrush,
+    addTorrentRules,
     categories,
+    categoryFlag,
     categorySelectList,
     checkedRowKeys,
     clearSpeedListTimer,
     clearTimer,
     columns,
     currentCategory,
+    currentRow,
     defaultDownloader,
     deleteFiles,
     deleteModal,
@@ -1569,13 +1714,12 @@ export const useDownloadStore = defineStore('download', () => {
     downloaderForm,
     downloaderList,
     downloaderSpeed,
-    qBitTorrentColumns,
-    transmissionColumns,
     downloadingFlag,
     downloadingTableRef,
     editDownloader,
     getDownloaderList,
     getDownloading: getTorrentList,
+    getRepeatTorrentList,
     getSpeedList,
     getSpeedListTimer,
     getSpeedTotal,
@@ -1585,19 +1729,28 @@ export const useDownloadStore = defineStore('download', () => {
     handleDelete,
     handleDeleteModal,
     handleDownloadLoading,
+    handleRepeat,
+    handleSelect,
     handleSelected,
+    handleCurrentRow,
+    handleShowDropdown,
     handleUpdateDownloading,
     interval,
-    trHandleOptions,
+    onClickOutside,
+    openTorrentInfo,
+    qBitTorrentColumns,
     qbHandleOptions,
     refDownloaderForm,
+    removeBrush,
     removeDownloader,
+    repeatTorrentList,
     saveDownloader,
     searchKey,
     searchTorrent,
     setDownloadSpeedList,
     setIntervalValue,
     setTimeoutValue,
+    showDropdown,
     showTorrentList,
     speedList,
     speedTotal,
@@ -1605,8 +1758,9 @@ export const useDownloadStore = defineStore('download', () => {
     timeout,
     timer,
     torrentList,
+    torrentPagination,
+    trHandleOptions,
     trackerStatus,
-    categoryFlag,
-    addTorrentRules,
+    transmissionColumns,
   }
 })

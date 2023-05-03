@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { isNaN } from 'lodash-es'
-import type { DataTableColumns, DataTableCreateSummary, DropdownOption, FormInst } from 'naive-ui'
+import type { FormInst } from 'naive-ui'
 import type { CSSProperties } from 'vue'
-import { useClipboard } from '@v-c/utils'
 import { NTag } from 'naive-ui'
 import renderSize from '../../../hooks/renderSize'
-import type { Category, NewTorrent, Torrent } from '~/api/download'
+import type { NewTorrent, Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
-import torrent from '~/pages/download/repeat/components/torrent.vue'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 
-const { copy } = useClipboard()
 const {
   message,
   dialog,
+  notification,
 } = useGlobalConfig()
 const downloadStore = useDownloadStore()
 const {
   handleSelected,
+  getRepeatTorrentList,
   addTorrent,
   getDownloaderList,
   getTorrentProp,
@@ -29,8 +27,13 @@ const {
   clearTimer,
   handleCheckRows,
   removeBrush,
+  handleSelect,
   handleDownloadLoading,
+  onClickOutside,
+  handleCurrentRow,
+  handleShowDropdown,
   searchTorrent,
+  openTorrentInfo,
 } = downloadStore
 const {
   torrentList,
@@ -45,13 +48,16 @@ const {
   downloadLoading,
   categories,
   deleteFiles,
-  currentCategory,
   showTorrentList,
   checkedRowKeys,
   timer, deleteModal,
   downloadingTableRef,
   searchKey,
   addTorrentRules,
+  torrentPagination,
+  repeatTorrentList,
+  showDropdown,
+  currentRow,
 } = storeToRefs(downloadStore)
 const timeout = ref<number>(1000 * 60)
 const railStyle = ({
@@ -75,64 +81,25 @@ const railStyle = ({
   return style
 }
 
-const showDropdown = ref(false)
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
-const currentRow = ref<Torrent>()
-const pagination = ref({
-  pageSize: isMobile.value ? 20 : 25,
-  size: 'small',
-  showQuickJumper: true,
-  itemCount: torrentList.value.length,
-  showSizePicker: true,
-  pageSizes: [10, 20, 25, 30, 40],
-  pageSlot: 5,
-  simple: isMobile.value,
-})
-watchEffect(() => {
-  // if (isPad.value || isDesktop.value) pagination.value.pageSize = 25
 
-  // if (isMobile.value) pagination.value.pageSize = 20
-  // if (defaultDownloader.value.category === 'Qb')
-  //   categoryFlag.value = true
-  // if (defaultDownloader.value.category === 'Tr')categoryFlag.value = false
-})
 const x = ref(0)
 const y = ref(0)
 const showAddModal = ref(false)
-const onClickOutside = () => {
-  showDropdown.value = false
-}
+
 const handlePageSize = (pageSize: number) => {
-  pagination.value.pageSize = pageSize
+  torrentPagination.value.pageSize = pageSize
 }
-const openTorrentInfo = async (torrent_hash: string) => {
-  handleCheckRows([torrent_hash])
-  const torrentInfo = await getTorrentProp(defaultDownloader.value!.id, torrent_hash)
-  dialog?.info({
-    title: '种子详情',
-    content: () => h(
-      torrent,
-      {
-        torrent: torrentInfo,
-        downloader_id: defaultDownloader.value!.id,
-      },
-    ),
-    style: {
-      width: '100%',
-      height: '80%',
-    },
-    closable: true,
-  })
-}
+
 const rowProps = (row: Torrent) => {
   return {
     onContextmenu: (e: MouseEvent) => {
       // message?.info(JSON.stringify(row.hash, null, 2))
       e.preventDefault()
-      currentRow.value = row
-      showDropdown.value = false
+      handleCurrentRow(row)
+      handleShowDropdown(false)
       nextTick().then(() => {
-        showDropdown.value = true
+        handleShowDropdown(true)
         x.value = e.clientX
         y.value = e.clientY
       })
@@ -170,84 +137,7 @@ const rowClassName = (row: Torrent) => {
 
   return `${cls}`
 }
-const copyTorrentsProp = async (torrent_hashes: string[], key: 'name' | 'magnet_uri' | 'hash') => {
-  let props = ''
-  if (key === 'hash') {
-    props = torrent_hashes.join('\n')
-  }
-  else {
-    const items = torrentList.value.filter((item: Torrent) => torrent_hashes.includes(item.hash))
-    props = items.map((item: Torrent) => item[key]).join('\n')
-  }
-  await copy(props)
-}
-const handleSelect = async (key: string, option: DropdownOption) => {
-  if (checkedRowKeys.value.length <= 0)
-    checkedRowKeys.value.push(currentRow.value!.hash)
 
-  switch (key) {
-    case 'prop':
-      await openTorrentInfo(currentRow.value!.hash)
-      break
-    case 'copy':
-    case 'name':
-      await copyTorrentsProp(checkedRowKeys.value, 'name')
-      break
-    case 'hash':
-      await copyTorrentsProp(checkedRowKeys.value, 'hash')
-      break
-    case 'magnet_uri':
-      await copyTorrentsProp(checkedRowKeys.value, 'magnet_uri')
-      break
-    case 'resume':
-    case 'set_force_start':
-    case 'pause':
-    case 'set_auto_management':
-    case 'recheck':
-    case 'reannounce':
-      await handleSelected(key)
-      break
-    case 'set_super_seeding':
-      await handleSelected(
-        key, '',
-        false,
-        !currentRow.value?.super_seeding || false,
-      )
-      break
-    case 'deleteForm':
-      handleDeleteModal(true)
-      break
-    case 'clearSort':
-      downloadingTableRef.value?.clearSorter()
-      break
-    case 'clearFilter':
-      downloadingTableRef.value?.clearFilters()
-      break
-    case 'clearChecked':
-      checkedRowKeys.value.length = 0
-      break
-    case 'clearCategory':
-      await handleSelected('set_category', '')
-      break
-    case 'removeCategories':
-      // await handleSelected('removeCategories', '')
-      message?.warning('正在开发哦！')
-      break
-    case 'setAllCheckboxRow':
-      message?.warning('正在开发哦！')
-      break
-    case 'filterSelect':
-      message?.warning('正在开发哦！')
-      break
-    default:
-      if (key.startsWith('setCategory')) {
-        await handleSelected('set_category', key.replace('setCategory?', ''))
-        break
-      }
-      await handleSelected(key)
-  }
-  showDropdown.value = false
-}
 const newTorrent = ref<NewTorrent>({
   urls: '',
   category: '',
@@ -413,7 +303,7 @@ onBeforeUnmount(async () => {
         :loading="downloadLoading"
         :min-height="isMobile ? 520 : 680"
         :paginate-single-page="false"
-        :pagination="pagination"
+        :pagination="torrentPagination"
         :row-class-name="rowClassName"
         :row-key="(row: Torrent) => row.hash"
         :row-props="rowProps"
@@ -514,7 +404,7 @@ onBeforeUnmount(async () => {
       content: 'soft',
       footer: 'soft',
     } as const"
-    @beforeLeave="cancelDownload"
+    @before-leave="cancelDownload"
   >
     <template #header-extra>
       <MenuIcon class="text-green" icon="AddOutline" />

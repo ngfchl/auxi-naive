@@ -405,9 +405,14 @@ export const $getTorrentList: (params: object) => Promise<any> = async (params: 
   return await getList<object, Downloading>('download/downloaders/downloading', params)
 }
 
+export const $getRepeatTorrentList: (params: object) => Promise<any> = async (params: object) => {
+  return await getList<object, Downloading>('download/repeat_torrent', params)
+}
+
 export const $getCategoryList: (downloader_id: number) => Promise<any> = async (downloader_id: number) => {
   return await getList<object, Category[]>('download/downloaders/categories', { downloader_id })
 }
+
 export const $removeBrush: (downloader_id: number) => Promise<any> = async (downloader_id: number) => {
   const { msg, code } = await useGet<object>('download/brush_remove', { downloader_id })
   switch (code) {
