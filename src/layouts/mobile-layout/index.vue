@@ -28,6 +28,10 @@ const { active } = useMenuState()
 const onShowMenu = () => {
   emit('update:visible', true)
 }
+const handleChangeMenu = (value: string) => {
+  emit('update:active', value)
+  emit('update:visible', false)
+}
 </script>
 
 <template>
@@ -68,7 +72,7 @@ const onShowMenu = () => {
           :value="active"
           :options="menuOptions"
           :expanded-keys="expandedKeys"
-          @update:value="$emit('update:active', $event)"
+          @update:value="handleChangeMenu"
           @update:expanded-keys="$emit('update:expandedKeys', $event)"
         />
       </n-layout-header>
