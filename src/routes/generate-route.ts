@@ -88,13 +88,24 @@ export const generateRoute = async () => {
     }, {
       id: 4,
       pid: 3,
+      path: '/website/mydata',
+      name: 'mydata',
+      component: 'MyData',
+      title: 'pages.site.mydata.title',
+      icon: 'PlanetSharp',
+      keepAlive: true,
+    },
+    {
+      id: 19,
+      pid: 3,
       path: '/website/mysite',
       name: 'mysite',
       component: 'MySite',
       title: 'pages.site.mysite.title',
-      icon: 'PlanetSharp',
+      icon: 'AtCircleSharp',
       keepAlive: true,
-    }, {
+    },
+    {
       id: 18,
       pid: 3,
       path: '/website/website',
