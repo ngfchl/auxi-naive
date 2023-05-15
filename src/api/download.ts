@@ -15,10 +15,17 @@ export interface Downloader {
   name: string
   username?: string
   password?: string
+  http: 'http' | 'https'
   host?: string
   port?: number
   category: string
   enable?: boolean
+  brush?: boolean
+  package_files?: boolean
+  delete_one_file?: boolean
+  count_torrents?: number
+  package_size?: number
+  package_percent?: number
   reserved_space?: number
 }
 export interface Peer {

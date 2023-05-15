@@ -1,11 +1,7 @@
+import { useClipboard as useClipboards } from '@v-c/utils'
 import type { DataTableColumns, DropdownOption, FormInst, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NProgress, NSwitch, NTag, NTooltip } from 'naive-ui'
-import { useClipboard as useClipboards } from '@v-c/utils'
-import type {
-  Category,
-  DownloadSpeedType, Downloader,
-  NewTorrent, Torrent,
-} from '~/api/download'
+import type { Category, DownloadSpeedType, Downloader, NewTorrent, Torrent } from '~/api/download'
 import {
   $addDownloader,
   $addTorrent,
@@ -18,17 +14,18 @@ import {
   $getRepeatTorrentList,
   $getTorrentList,
   $getTorrentProp,
-  $removeBrush, $removeDownloader,
+  $removeBrush,
+  $removeDownloader,
 } from '~/api/download'
-import numberFormat from '~/hooks/numberFormat'
-import timeFormat from '~/hooks/timeFormat'
-import TimestampToBeijingTime from '~/hooks/timestampToBeijingTime'
-import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
-import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
-import renderSize from '~/hooks/renderSize'
 import type { WebSite } from '~/api/website'
 import { $siteList } from '~/api/website'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
+import numberFormat from '~/hooks/numberFormat'
+import renderSize from '~/hooks/renderSize'
+import timeFormat from '~/hooks/timeFormat'
+import TimestampToBeijingTime from '~/hooks/timestampToBeijingTime'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
 import torrent from '~/pages/download/repeat/components/torrent.vue'
 
 export const useDownloadStore = defineStore('download', () => {
@@ -153,18 +150,25 @@ export const useDownloadStore = defineStore('download', () => {
     up_info_speed: 0,
     category: 'none',
   })
-  const downloader = {
+  const downloader: Downloader = {
     id: 0,
     name: '',
     username: '',
     password: '',
+    http: 'http',
     host: '',
     port: 8999,
     category: 'Qb',
     enable: true,
+    brush: false,
+    package_files: false,
+    delete_one_file: false,
+    count_torrents: 30,
+    package_size: 30,
+    package_percent: 0.3,
     reserved_space: 30,
   }
-  const downloaderForm = ref<Downloader>(downloader)
+  const downloaderForm = ref<Downloader>({ ...downloader })
   const categorySelectList = ref<SelectOption[]>([
     {
       label: 'qBittorrent',
@@ -253,7 +257,7 @@ export const useDownloadStore = defineStore('download', () => {
       downloaderForm.value = await $getDownloader({ downloader_id })
 
     dialog?.info({
-      title: downloader_id === 0 ? '添加任务' : `编辑任务：${downloaderForm.value?.name}`,
+      title: downloader_id === 0 ? '添加下载器' : `编辑下载器：${downloaderForm.value?.name}`,
       content: () => h(DownloaderForm),
       closable: true,
     })
@@ -265,6 +269,7 @@ export const useDownloadStore = defineStore('download', () => {
       : await $editDownloader(downloaderForm.value!)
     if (flag) {
       dialog?.destroyAll()
+      downloaderForm.value = { ...downloader }
       await getDownloaderList()
     }
   }
@@ -1608,7 +1613,7 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 50,
       align: 'center',
       render(row: Downloader) {
-        const url = `${row.host}:${row.port}`
+        const url = `${row.http}://${row.host}:${row.port}`
         return h(
           NButton,
           {
@@ -1632,7 +1637,7 @@ export const useDownloadStore = defineStore('download', () => {
       minWidth: 60,
     },
     {
-      title: '开启',
+      title: '展示',
       key: 'enable',
       minWidth: 80,
       align: 'center',
@@ -1648,6 +1653,117 @@ export const useDownloadStore = defineStore('download', () => {
             'onUpdate:value': async (value) => {
               const downloader = await $getDownloader({ downloader_id: row.id })
               downloader.enable = value
+              const flag = await $editDownloader(downloader)
+              if (flag) await getDownloaderList()
+            },
+          },
+          {
+            'checked': () => '展示',
+            'unchecked': () => '关闭',
+            'checked-icon': () => '✅',
+            'unchecked-icon': () => h(
+              MenuIcon,
+              {
+                icon: 'CloseSharp',
+                color: 'red',
+                size: 16,
+              },
+            ),
+          },
+        )
+      },
+    },
+    {
+      title: '刷流专用',
+      key: 'brush',
+      minWidth: 80,
+      align: 'center',
+      render(row: Downloader) {
+        return h(
+          NSwitch,
+          {
+            'size': 'small',
+            'round': false,
+            'checked-value': true,
+            'unchecked-value': false,
+            'value': row.brush,
+            'onUpdate:value': async (value) => {
+              const downloader = await $getDownloader({ downloader_id: row.id })
+              downloader.brush = value
+              const flag = await $editDownloader(downloader)
+              if (flag) await getDownloaderList()
+            },
+          },
+          {
+            'checked': () => '开启',
+            'unchecked': () => '关闭',
+            'checked-icon': () => '✅',
+            'unchecked-icon': () => h(
+              MenuIcon,
+              {
+                icon: 'CloseSharp',
+                color: 'red',
+                size: 16,
+              },
+            ),
+          },
+        )
+      },
+    },
+    {
+      title: '拆包下载',
+      key: 'package_files',
+      minWidth: 80,
+      align: 'center',
+      render(row: Downloader) {
+        return h(
+          NSwitch,
+          {
+            'size': 'small',
+            'round': false,
+            'checked-value': true,
+            'unchecked-value': false,
+            'value': row.package_files,
+            'onUpdate:value': async (value) => {
+              const downloader = await $getDownloader({ downloader_id: row.id })
+              downloader.package_files = value
+              const flag = await $editDownloader(downloader)
+              if (flag) await getDownloaderList()
+            },
+          },
+          {
+            'checked': () => '开启',
+            'unchecked': () => '关闭',
+            'checked-icon': () => '✅',
+            'unchecked-icon': () => h(
+              MenuIcon,
+              {
+                icon: 'CloseSharp',
+                color: 'red',
+                size: 16,
+              },
+            ),
+          },
+        )
+      },
+    },
+    {
+      title: '删除单种',
+      key: 'delete_one_file',
+      minWidth: 80,
+      align: 'center',
+      render(row: Downloader) {
+        return h(
+          NSwitch,
+          {
+            'size': 'small',
+            'round': false,
+            'checked-value': true,
+            'unchecked-value': false,
+            'value': row.delete_one_file,
+            'onUpdate:value': async (value) => {
+              const downloader = await $getDownloader({ downloader_id: row.id })
+              downloader.delete_one_file = value
               const flag = await $editDownloader(downloader)
               if (flag) await getDownloaderList()
             },
