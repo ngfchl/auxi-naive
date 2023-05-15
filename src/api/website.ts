@@ -65,6 +65,7 @@ export interface MySite {
   cookie: string
   custom_server: string
   remove_torrent_rules?: string
+  time_join?: string
 }
 
 export interface SiteStatus {

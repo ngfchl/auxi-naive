@@ -26,10 +26,11 @@ import {
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+import { railStyle } from '~/utils/baseStyle'
 
 export const useWebsiteStore = defineStore('website',
   () => {
-    const { dialog } = useGlobalConfig()
+    const { dialog, message } = useGlobalConfig()
     /**
          * 搜索字符串
          */
@@ -611,9 +612,6 @@ export const useWebsiteStore = defineStore('website',
       }
     }
 
-    const getMySiteList = async () => {
-      mySiteList.value = await $mySiteList()
-    }
     const getSiteList = async () => {
       siteList.value = await $siteList()
     }
@@ -940,6 +938,199 @@ export const useWebsiteStore = defineStore('website',
       await initData()
       showAddMySite.value = false
     }
+
+    const getMySiteList = async () => {
+      mySiteList.value = await $mySiteList()
+      mySiteList.value.sort((a, b) => b.sort_id - a.sort_id)
+    }
+    const mySiteColumns = ref<DataTableColumns<MySite>>([
+      {
+        title: 'id',
+        key: 'id',
+        minWidth: 35,
+        fixed: 'left',
+        sorter: 'default',
+      },
+      {
+        title: '排序',
+        key: 'sort_id',
+        minWidth: 35,
+        fixed: 'left',
+        sorter: 'default',
+      },
+      {
+        title: '名称',
+        key: 'nickname',
+        minWidth: 65,
+        fixed: 'left',
+        sorter: 'default',
+        render(row: MySite) {
+          const website = siteList.value.find(item => item.id === row.site)
+          return h(
+            NButton,
+            {
+              tag: 'a',
+              href: website?.url,
+              target: '_blank',
+              secondary: true,
+              type: 'primary',
+              size: 'small',
+            },
+            {
+              default: () => `${row.nickname}`,
+            },
+          )
+        },
+      },
+      // {
+      //   title: '标签',
+      //   key: 'tags',
+      //   minWidth: 85,
+      //   render(row: MySite) {
+      //     const tagList = row.tags.split(',')
+      //     return tagList.map((tagKey) => {
+      //       return h(
+      //         NTag,
+      //         {
+      //           style: {
+      //             marginRight: '6px',
+      //           },
+      //           type: 'info',
+      //           bordered: false,
+      //         },
+      //         {
+      //           default: () => tagKey,
+      //         },
+      //       )
+      //     })
+      //   },
+      // },
+      {
+        title: '支持功能',
+        key: 'ability',
+        minWidth: 355,
+        align: 'center',
+        render(row: MySite) {
+          const abilityList = [
+            {
+              name: '签到',
+              key: 'sign_in',
+              support: row.sign_in,
+            },
+            {
+              name: '数据',
+              key: 'get_info',
+              support: row.get_info,
+            },
+
+            {
+              name: 'Free刷流',
+              key: 'brush_free',
+              support: row.brush_free,
+            },
+            {
+              name: 'RSS刷流',
+              key: 'brush_rss',
+              support: row.brush_rss,
+            },
+            {
+              name: '拆包刷流',
+              key: 'package_file',
+              support: row.package_file,
+            },
+            {
+              name: '辅种',
+              key: 'repeat_torrents',
+              support: row.repeat_torrents,
+            },
+            {
+              name: '搜索',
+              key: 'search',
+              support: row.search,
+            },
+            {
+              name: 'H&R',
+              key: 'hr',
+              support: row.hr,
+            },
+          ]
+          const website = siteList.value.find(item => item.id === row.site)
+          return h(NSpace, () => {
+            return abilityList.map((ability) => {
+              // if (!ability.support) return null
+              return h(
+                NSwitch,
+                {
+                  'size': 'small',
+                  'round': false,
+                  'value': ability.support,
+                  'rail-style': railStyle,
+                  // 'disabled': true,
+                  'onUpdate:value': async (value) => {
+                    if (website[ability.key] && value) {
+                      const mySite = await $getMySite({ mysite_id: row.id })
+                      mySite[ability.key] = true
+                      const flag = await $editMySite(mySite)
+                      if (flag) await getMySiteList()
+                    }
+                    else if (!value && !website[ability.key]) {
+                      const mySite = await $getMySite({ mysite_id: row.id })
+                      mySite[ability.key] = false
+                      const flag = await $editMySite(mySite)
+                      if (flag) await getMySiteList()
+                    }
+                    else {
+                      message?.warning(`${website.name} 尚不支持此功能！`)
+                    }
+                  },
+                },
+                {
+                  'checked': () => ability.name,
+                  'unchecked': () => ability.name,
+                  'checked-icon': () => '✅',
+                  'unchecked-icon': () => h(
+                    MenuIcon,
+                    {
+                      icon: 'CloseSharp',
+                      color: 'red',
+                      size: 16,
+                    },
+                  ),
+                },
+              )
+            })
+          })
+        },
+      },
+      // {
+      //   title: '注册时间',
+      //   key: 'time_join',
+      //   minWidth: 215,
+      // },
+      // {
+      //   title: '更新',
+      //   key: 'updated_at',
+      //   minWidth: 215,
+      // },
+      {
+        key: 'actions',
+        title: '操作',
+        minWidth: 85,
+        render(row: MySite) {
+          return h(
+            NButton,
+            {
+              size: 'small',
+              type: 'warning',
+              onClick: async () => await editMysite(row.id),
+            },
+            { default: () => '编辑' },
+          )
+        },
+        align: 'center',
+      },
+    ])
+
     return {
       addMySiteFormRules,
       barOption,
@@ -960,13 +1151,14 @@ export const useWebsiteStore = defineStore('website',
       initData,
       initSomeData,
       mySite,
+      mySiteColumns,
       mySiteForm,
       mySiteList,
+      page,
+      pageSize,
       perDayData,
       pieOption,
       pieTotalOption,
-      page,
-      pageSize,
       refMySiteForm,
       refreshAllSite,
       refreshSite,
