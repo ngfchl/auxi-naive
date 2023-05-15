@@ -15,7 +15,7 @@ export interface Downloader {
   name: string
   username?: string
   password?: string
-  http: 'http' | 'https'
+  http?: 'http' | 'https'
   host?: string
   port?: number
   category: string

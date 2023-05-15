@@ -25,8 +25,8 @@ import renderSize from '~/hooks/renderSize'
 import timeFormat from '~/hooks/timeFormat'
 import TimestampToBeijingTime from '~/hooks/timestampToBeijingTime'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+import torrent from '~/pages/download/brush/components/torrent.vue'
 import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
-import torrent from '~/pages/download/repeat/components/torrent.vue'
 
 export const useDownloadStore = defineStore('download', () => {
   const { dialog, message } = useGlobalConfig()
