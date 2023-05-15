@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { FormInst } from 'naive-ui'
-import type { CSSProperties } from 'vue'
 import { NTag } from 'naive-ui'
 import renderSize from '../../../hooks/renderSize'
 import type { NewTorrent, Torrent } from '~/api/download'
-import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+import { railStyle } from '~/utils/baseStyle'
 
 const {
   message,
@@ -60,26 +60,6 @@ const {
   currentRow,
 } = storeToRefs(downloadStore)
 const timeout = ref<number>(1000 * 60)
-const railStyle = ({
-  focused,
-  checked,
-}: {
-  focused: boolean
-  checked: boolean
-}) => {
-  const style: CSSProperties = {}
-  if (checked) {
-    style.background = '#1fcc6b'
-    if (focused)
-      style.boxShadow = '0 0 0 2px #d0305040'
-  }
-  else {
-    style.background = '#2080f0'
-    if (focused)
-      style.boxShadow = '0 0 0 2px #2080f040'
-  }
-  return style
-}
 
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 
