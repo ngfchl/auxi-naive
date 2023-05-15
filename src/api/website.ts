@@ -49,11 +49,13 @@ export interface MySite {
   nickname: string
   passkey: string
   rss?: string
+  torrents?: string
   downloader?: number
   get_info: boolean
   sign_in: boolean
-  get_torrents: boolean
-  brush_flow: boolean
+  brush_free: boolean
+  brush_rss: boolean
+  package_file: boolean
   repeat_torrents: boolean
   hr: boolean
   search: boolean
@@ -62,6 +64,7 @@ export interface MySite {
   user_agent: string
   cookie: string
   custom_server: string
+  remove_torrent_rules?: string
 }
 
 export interface SiteStatus {

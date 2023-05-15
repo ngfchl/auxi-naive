@@ -195,8 +195,9 @@ export const useWebsiteStore = defineStore('website',
       passkey: '',
       get_info: true,
       sign_in: true,
-      get_torrents: false,
-      brush_flow: false,
+      brush_rss: false,
+      brush_free: false,
+      package_file: false,
       repeat_torrents: false,
       hr: false,
       search: false,
@@ -205,8 +206,40 @@ export const useWebsiteStore = defineStore('website',
       user_agent: window.navigator.userAgent,
       cookie: '',
       rss: '',
+      torrents: '',
       downloader: undefined,
       custom_server: '',
+      remove_torrent_rules: '{\n'
+          + '  "push": {\n'
+          + '    "size": {\n'
+          + '      "min": 1,\n'
+          + '      "max": 30\n'
+          + '    },\n'
+          + '    "published": 1800,\n'
+          + '    "seeders": 3,\n'
+          + '    "sale_expire": 3600,\n'
+          + '  },\n'
+          + '  "remove": {\n'
+          + '    "upload_speed_avg": {\n'
+          + '      "time": 300,\n'
+          + '      "upload_speed": 100\n'
+          + '    },\n'
+          + '    "progress_check": {\n'
+          + '      "0.05": 100,\n'
+          + '      "0.5": 100,\n'
+          + '      "0.8": 100,\n'
+          + '      "0.9": 100\n'
+          + '    },\n'
+          + '    "ratio": {\n'
+          + '      "600": 0.1,\n'
+          + '      "1800": 0.5\n'
+          + '    },\n'
+          + '    "timeout": 3600,\n'
+          + '    "completers": 5,\n'
+          + '    "max_ratio": 3,\n'
+          + '    "num_delete": 5\n'
+          + '  }\n'
+          + '}',
     }
     const addMySiteFormRules = ref<FormRules>({
       site: [

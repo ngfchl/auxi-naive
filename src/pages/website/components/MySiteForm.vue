@@ -98,12 +98,26 @@ onMounted(async () => {
               <MenuIcon icon="CloseSharp" size="18" color="darkred" />
             </template>
           </n-switch>
-          <n-switch v-model:value="mySiteForm.get_torrents" :round="false" border label="">
+          <n-switch v-model:value="mySiteForm.brush_free" :round="false" border label="">
             <template #checked>
-              抓种
+              Free刷流
             </template>
             <template #unchecked>
-              抓种
+              Free刷流
+            </template>
+            <template #checked-icon>
+              <MenuIcon icon="Checkbox" size="24" color="green" />
+            </template>
+            <template #unchecked-icon>
+              <MenuIcon icon="CloseSharp" size="18" color="darkred" />
+            </template>
+          </n-switch>
+          <n-switch v-model:value="mySiteForm.brush_rss" :round="false" border label="">
+            <template #checked>
+              RSS刷流
+            </template>
+            <template #unchecked>
+              RSS刷流
             </template>
             <template #checked-icon>
               <MenuIcon icon="Checkbox" size="24" color="green" />
@@ -118,20 +132,6 @@ onMounted(async () => {
             </template>
             <template #unchecked>
               辅种
-            </template>
-            <template #checked-icon>
-              <MenuIcon icon="Checkbox" size="24" color="green" />
-            </template>
-            <template #unchecked-icon>
-              <MenuIcon icon="CloseSharp" size="18" color="darkred" />
-            </template>
-          </n-switch>
-          <n-switch v-model="mySiteForm.brush_flow" :round="false" border label="">
-            <template #checked>
-              刷流
-            </template>
-            <template #unchecked>
-              刷流
             </template>
             <template #checked-icon>
               <MenuIcon icon="Checkbox" size="24" color="green" />
@@ -187,10 +187,25 @@ onMounted(async () => {
           type="textarea"
         />
       </n-form-item>
+      <n-form-item label="删种规则" path="remove_torrent_rules" required>
+        <n-input
+          v-model:value="mySiteForm.remove_torrent_rules"
+          :autosize="{ minRows: 2, maxRows: 6 }"
+          autocomplete="off"
+          placeholder="JSON格式，请参照教程填写"
+          type="textarea"
+        />
+      </n-form-item>
       <n-form-item label="RSS" path="rss" required>
         <n-input
           v-model:value="mySiteForm.rss"
           placeholder="请输入站点RSS订阅地址" autocomplete="off"
+        />
+      </n-form-item>
+      <n-form-item label="Free种" path="torrents" required>
+        <n-input
+          v-model:value="mySiteForm.torrents"
+          placeholder="请输入站点免费种刷流地址" autocomplete="off"
         />
       </n-form-item>
       <n-form-item label="下载器" path="downloader" required>
