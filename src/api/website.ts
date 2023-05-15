@@ -305,7 +305,16 @@ export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_i
  * @param site_id
  */
 export const $refreshSite = async (site_id: number) => {
-  const { msg, code } = await usePost('mysite/status', { site_id })
+  let response = await usePost('mysite/status', { site_id })
+  if (typeof response === 'string') {
+    // 正则表达式查找替换所有无穷大字符
+    const reg = /Infinity/g
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const res_info = response.replace(reg, '"∞"')
+    response = JSON.parse(res_info)
+  }
+  const { code, msg } = response
   switch (code) {
     case 0:
       message?.success(msg)
