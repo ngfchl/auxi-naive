@@ -1,5 +1,6 @@
-import { NButton, NSwitch, NTag } from 'naive-ui'
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
+import { NButton, NSwitch, NTag } from 'naive-ui'
+import type { Crontab, Schedule, ScheduleForm, Task } from '~/api/tasks'
 import {
   $addSchedule,
   $crontabList,
@@ -9,7 +10,6 @@ import {
   $scheduleList,
   $taskList,
 } from '~/api/tasks'
-import type { Crontab, Schedule, ScheduleForm, Task } from '~/api/tasks'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import ScheduleFormPage from '~/pages/tasks/components/schedule-form.vue'
@@ -36,8 +36,10 @@ export const useTaskStore = defineStore('task', () => {
       day_of_month: '*',
       month_of_year: '*',
     },
+    args: [],
+    kwargs: {},
   }
-  const scheduleForm = ref<ScheduleForm>(baseSchedule)
+  const scheduleForm = ref<ScheduleForm>({ ...baseSchedule })
   const addScheduleFormRules = reactive<FormRules>({
     'task': [
       {
@@ -89,10 +91,12 @@ export const useTaskStore = defineStore('task', () => {
   }
   const editSchedule = async (schedule_id: number) => {
     if (schedule_id === 0) {
-      scheduleForm.value = baseSchedule
+      scheduleForm.value = { ...baseSchedule }
     }
     else {
       const schedule = await $schedule({ schedule_id })
+      if (typeof schedule.args === 'string')
+        schedule.args = JSON.parse(schedule.args)
       const crontab = crontabList.value?.find(item => item.id === schedule.crontab)
       scheduleForm.value = schedule
       scheduleForm.value.crontab = crontab

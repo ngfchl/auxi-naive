@@ -1,4 +1,5 @@
 import { getList } from '~/hooks/getList'
+
 const { message } = useGlobalConfig()
 export interface Task {
   task: string
@@ -27,10 +28,12 @@ export interface Crontab {
 }
 export interface ScheduleForm {
   id: number
-  name: String
-  task: String
+  name: string
+  task: string
   enabled?: boolean
   crontab?: Crontab | number
+  args?: string | number[]
+  kwargs?: string | object
 }
 
 export const $taskList: () => Promise<any> = async () => {
