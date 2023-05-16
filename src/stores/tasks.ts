@@ -126,12 +126,14 @@ export const useTaskStore = defineStore('task', () => {
     {
       title: '任务名称',
       key: 'name',
-      minWidth: 165,
+      width: 200,
+      minWidth: 180,
     },
     {
       title: '任务',
       key: 'task',
       minWidth: 65,
+      width: 85,
       render(row: Schedule) {
         const item = taskList.value?.find(item => row.task === item.task)
         if (!item) return null
@@ -153,7 +155,8 @@ export const useTaskStore = defineStore('task', () => {
     }, {
       title: '执行时间',
       key: 'crontab',
-      minWidth: 135,
+      minWidth: 120,
+      width: 135,
       render(row: Schedule): any {
         const item = crontabList.value?.find(item => row.crontab === item.id)
         return h(
@@ -202,7 +205,8 @@ export const useTaskStore = defineStore('task', () => {
     {
       title: '开启',
       key: 'enabled',
-      minWidth: 35,
+      minWidth: 75,
+      width: 85,
       render(row: Schedule) {
         return h(
           NSwitch,
@@ -241,7 +245,8 @@ export const useTaskStore = defineStore('task', () => {
     {
       title: '上次运行',
       key: 'last_run_at',
-      minWidth: 165,
+      minWidth: 150,
+      width: 165,
     },
     // {
     //   title: '备注',
@@ -255,6 +260,7 @@ export const useTaskStore = defineStore('task', () => {
     {
       key: 'actions',
       title: '操作',
+      width: 95,
       render(row: Schedule) {
         return h(
           NButton,
