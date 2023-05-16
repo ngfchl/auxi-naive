@@ -30,7 +30,7 @@ import { railStyle } from '~/utils/baseStyle'
 
 export const useWebsiteStore = defineStore('website',
   () => {
-    const { dialog, message } = useGlobalConfig()
+    const { dialog } = useGlobalConfig()
     /**
          * 搜索字符串
          */
@@ -98,40 +98,40 @@ export const useWebsiteStore = defineStore('website',
           const abilityList = [
             {
               name: '签到',
-              key: 'func_sign_in',
-              support: row.func_sign_in,
+              key: 'sign_in',
+              support: row.sign_in,
             },
             {
               name: '数据',
-              key: 'func_get_userinfo',
-              support: row.func_get_userinfo,
+              key: 'get_info',
+              support: row.get_info,
             },
 
             {
-              name: '抓种',
-              key: 'func_get_torrents',
-              support: row.func_get_torrents,
+              name: 'Free刷流',
+              key: 'brush_free',
+              support: row.brush_free,
             },
-            // {
-            //   name: '刷流',
-            //   key: 'func_brush_flow',
-            //   support: row.func_brush_flow,
-            // },
-            // {
-            //   name: '辅种',
-            //   key: 'func_repeat_torrents',
-            //   support: row.func_repeat_torrents,
-            // },
-            // {
-            //   name: '搜索',
-            //   key: 'func_search',
-            //   support: row.func_search,
-            // },
-            // {
-            //   name: 'H&R',
-            //   key: 'func_hr',
-            //   support: row.func_hr,
-            // },
+            {
+              name: 'RSS刷流',
+              key: 'brush_rss',
+              support: row.brush_rss,
+            },
+            {
+              name: '辅种',
+              key: 'repeat_torrents',
+              support: row.repeat_torrents,
+            },
+            {
+              name: '搜索',
+              key: 'search_torrents',
+              support: row.search_torrents,
+            },
+            {
+              name: 'H&R',
+              key: 'hr_discern',
+              support: row.hr_discern,
+            },
           ]
           return h(NSpace, () => {
             return abilityList.map((ability) => {
@@ -200,8 +200,8 @@ export const useWebsiteStore = defineStore('website',
       brush_free: false,
       package_file: false,
       repeat_torrents: false,
-      hr: false,
-      search: false,
+      hr_discern: false,
+      search_torrents: false,
       user_id: '',
       joined: '2023-01-01 12:00:00',
       user_agent: window.navigator.userAgent,
@@ -1029,13 +1029,13 @@ export const useWebsiteStore = defineStore('website',
             },
             {
               name: '搜索',
-              key: 'search',
-              support: row.search,
+              key: 'search_torrents',
+              support: row.search_torrents,
             },
             {
               name: 'H&R',
-              key: 'hr',
-              support: row.hr,
+              key: 'hr_discern',
+              support: row.hr_discern,
             },
             {
               name: 'Free刷流',
@@ -1056,7 +1056,7 @@ export const useWebsiteStore = defineStore('website',
           const website = siteList.value.find(item => item.id === row.site)
           return h(NSpace, () => {
             return abilityList.map((ability) => {
-              // if (!ability.support) return null
+              if (!website[ability.key]) return null
               return h(
                 NSwitch,
                 {
@@ -1066,21 +1066,10 @@ export const useWebsiteStore = defineStore('website',
                   'rail-style': railStyle,
                   // 'disabled': true,
                   'onUpdate:value': async (value) => {
-                    if (website[ability.key] && value) {
-                      const mySite = await $getMySite({ mysite_id: row.id })
-                      mySite[ability.key] = true
-                      const flag = await $editMySite(mySite)
-                      if (flag) await getMySiteList()
-                    }
-                    else if (!value && !website[ability.key]) {
-                      const mySite = await $getMySite({ mysite_id: row.id })
-                      mySite[ability.key] = false
-                      const flag = await $editMySite(mySite)
-                      if (flag) await getMySiteList()
-                    }
-                    else {
-                      message?.warning(`${website?.name} 尚不支持此功能！`)
-                    }
+                    const mySite = await $getMySite({ mysite_id: row.id })
+                    mySite[ability.key] = value
+                    const flag = await $editMySite(mySite)
+                    if (flag) await getMySiteList()
                   },
                 },
                 {
