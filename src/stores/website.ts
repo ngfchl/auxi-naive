@@ -947,14 +947,14 @@ export const useWebsiteStore = defineStore('website',
       {
         title: 'id',
         key: 'id',
-        minWidth: 35,
+        minWidth: 55,
         fixed: 'left',
         sorter: 'default',
       },
       {
         title: '排序',
         key: 'sort_id',
-        minWidth: 35,
+        minWidth: 65,
         fixed: 'left',
         sorter: 'default',
       },
@@ -1022,22 +1022,6 @@ export const useWebsiteStore = defineStore('website',
               key: 'get_info',
               support: row.get_info,
             },
-
-            {
-              name: 'Free刷流',
-              key: 'brush_free',
-              support: row.brush_free,
-            },
-            {
-              name: 'RSS刷流',
-              key: 'brush_rss',
-              support: row.brush_rss,
-            },
-            {
-              name: '拆包刷流',
-              key: 'package_file',
-              support: row.package_file,
-            },
             {
               name: '辅种',
               key: 'repeat_torrents',
@@ -1052,6 +1036,21 @@ export const useWebsiteStore = defineStore('website',
               name: 'H&R',
               key: 'hr',
               support: row.hr,
+            },
+            {
+              name: 'Free刷流',
+              key: 'brush_free',
+              support: row.brush_free,
+            },
+            {
+              name: 'RSS刷流',
+              key: 'brush_rss',
+              support: row.brush_rss,
+            },
+            {
+              name: '拆包刷流',
+              key: 'package_file',
+              support: row.package_file,
             },
           ]
           const website = siteList.value.find(item => item.id === row.site)
@@ -1080,7 +1079,7 @@ export const useWebsiteStore = defineStore('website',
                       if (flag) await getMySiteList()
                     }
                     else {
-                      message?.warning(`${website.name} 尚不支持此功能！`)
+                      message?.warning(`${website?.name} 尚不支持此功能！`)
                     }
                   },
                 },
