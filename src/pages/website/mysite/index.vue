@@ -8,10 +8,14 @@ const {
 } = storeToRefs(websiteStore)
 
 const {
-  getMySiteList, getSiteList,
+  getMySiteList, getSiteList, editMysite,
 } = websiteStore
 const loading = ref<Boolean>(false)
-
+const reloadData = async () => {
+  loading.value = true
+  await getMySiteList()
+  loading.value = false
+}
 onMounted(async () => {
   loading.value = true
   await getSiteList()
@@ -21,13 +25,29 @@ onMounted(async () => {
 </script>
 
 <template>
+  <n-space class="pt-2 mb-1" justify="start">
+    <n-button
+      size="small"
+      type="success"
+      @click="editMysite(0)"
+    >
+      添加
+    </n-button>
+    <n-button
+      size="small"
+      type="warning"
+      @click="reloadData"
+    >
+      刷新
+    </n-button>
+  </n-space>
   <n-data-table
     :columns="mySiteColumns"
     :data="mySiteList"
-    :row-key="(row: RowData) => row.id"
-    size="small"
     :loading="loading"
+    :row-key="(row: RowData) => row.id"
     bordered
+    size="small"
     striped
   />
 </template>
