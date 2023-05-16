@@ -13,13 +13,13 @@ export interface WebSite {
   sp_full: number
   page_message: string
   url: string
-  func_sign_in: boolean
-  func_get_userinfo: boolean
-  func_get_torrents: boolean
-  func_hr_discern: boolean
-  func_brush_flow: boolean
-  func_search_torrents: boolean
-  func_repeat_torrents: boolean
+  sign_in: boolean
+  get_info: boolean
+  brush_free: boolean
+  hr_discern: boolean
+  brush_rss: boolean
+  search_torrents: boolean
+  repeat_torrents: boolean
 }
 
 // eslint-disable-next-line import/export
@@ -51,14 +51,14 @@ export interface MySite {
   rss?: string
   torrents?: string
   downloader?: number
-  get_info: boolean
   sign_in: boolean
+  get_info: boolean
   brush_free: boolean
+  hr_discern: boolean
   brush_rss: boolean
-  package_file: boolean
+  search_torrents: boolean
   repeat_torrents: boolean
-  hr: boolean
-  search: boolean
+  package_file: boolean
   user_id: string
   joined: string
   user_agent: string
