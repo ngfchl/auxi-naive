@@ -28,6 +28,7 @@ const taskBySite = [
   'schedule.tasks.auto_sign_in',
   'schedule.tasks.auto_get_status',
   'schedule.tasks.auto_remove_brush_task',
+  'schedule.tasks.auto_push_to_downloader',
 ]
 const taskByDownloader = [
 
@@ -44,9 +45,10 @@ const handleChange = async (value: string) => {
   const functionMap = {
     'schedule.tasks.auto_get_rss': 'brush_rss',
     'schedule.tasks.auto_get_torrents': 'brush_free',
+    'schedule.tasks.auto_push_to_downloader': 'brush_free',
     'schedule.tasks.auto_sign_in': 'sign_in',
     'schedule.tasks.auto_get_status': 'get_info',
-    // 'schedule.tasks.auto_remove_brush_task': '',
+    'schedule.tasks.auto_remove_brush_task': 'brush_free',
   }
   showSiteList.value = mySiteList.value.filter((mySite: MySite) => {
     return mySite[functionMap[value]] && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
