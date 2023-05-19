@@ -413,6 +413,7 @@ const handleUpdate = async (my_site: MySite) => {
                   class="w-100px text-#3b5769"
                   size="tiny"
                   min="1"
+                  max="200"
                   @update:value="handleUpdate(my_site)"
                 >
                   <template #prefix>

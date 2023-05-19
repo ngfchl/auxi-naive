@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
+const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 
 const websiteStore = useWebsiteStore()
 const {
@@ -8,7 +9,7 @@ const {
 } = storeToRefs(websiteStore)
 
 const {
-  getMySiteList, getSiteList, editMysite,
+  getMySiteList, getSiteList, editMysite, handleUpdateSorter,
 } = websiteStore
 const loading = ref<Boolean>(false)
 const reloadData = async () => {
@@ -45,10 +46,14 @@ onMounted(async () => {
     :columns="mySiteColumns"
     :data="mySiteList"
     :loading="loading"
+    :min-height="isMobile ? 520 : 680"
     :row-key="(row: RowData) => row.id"
     bordered
+    flex-height
+    max-height="720"
     size="small"
     striped
+    @update:sorter="handleUpdateSorter"
   />
 </template>
 

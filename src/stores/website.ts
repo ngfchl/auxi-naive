@@ -1,6 +1,6 @@
 import type { ECBasicOption } from 'echarts/types/src/util/types'
 import type { DataTableColumns, FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui'
-import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
+import { NButton, NInputNumber, NSpace, NSwitch, NTag } from 'naive-ui'
 import MySiteForm from '@/pages/website/components/MySiteForm.vue'
 import type { BarData, MySite, NewestStatus, PerDayData, PieData, SiteStatus, TodayData, WebSite } from '~/api/website'
 import {
@@ -814,12 +814,18 @@ export const useWebsiteStore = defineStore('website',
       siteStatusList.value.splice(index, 1, item)
       await siteSearch()
     }
-
+    const getMySiteList = async () => {
+      mySiteList.value = await $mySiteList()
+      mySiteList.value.sort((a, b) => b.sort_id - a.sort_id)
+    }
     const sortMySite = async (my_site: MySite) => {
       const flag = await $sortSite(my_site.id, my_site.sort_id)
       if (flag) await updateMySiteStatus(my_site.id)
     }
-
+    const sortMySiteTable = async (my_site: MySite, value: number) => {
+      const flag = await $sortSite(my_site.id, value)
+      if (flag) await getMySiteList()
+    }
     /**
          * 打开编辑窗口
          * @param id
@@ -939,26 +945,58 @@ export const useWebsiteStore = defineStore('website',
       showAddMySite.value = false
     }
 
-    const getMySiteList = async () => {
-      mySiteList.value = await $mySiteList()
-      mySiteList.value.sort((a, b) => b.sort_id - a.sort_id)
+    const sortStatesRef = ref([])
+    const sortKeyMapOrderRef = computed(() =>
+      sortStatesRef.value.reduce((result, { columnKey, order }) => {
+        result[columnKey] = order
+        return result
+      }, {}),
+    )
+    const handleUpdateSorter = (sorters: ConcatArray<never>) => {
+      sortStatesRef.value = [].concat(sorters)
     }
-    const mySiteColumns = ref<DataTableColumns<MySite>>([
+    const mySiteColumns = computed(() => [
       {
         title: 'id',
         key: 'id',
-        minWidth: 55,
-        width: 65,
+        minWidth: 35,
+        width: 35,
+        align: 'center',
         fixed: 'left',
         sorter: 'default',
+        sortOrder: sortKeyMapOrderRef.value.id || false,
       },
       {
         title: '排序',
         key: 'sort_id',
-        minWidth: 65,
-        width: 65,
+        minWidth: 95,
+        width: 110,
         fixed: 'left',
         sorter: 'default',
+        align: 'center',
+        sortOrder: sortKeyMapOrderRef.value.sort_id || 'descend',
+        render(row: MySite) {
+          return h(
+            NInputNumber,
+            {
+              'status': 'warning',
+              'bordered': false,
+              'button-placement': 'both',
+              'class': 'text-#3b5769',
+              'size': 'small',
+              'min': 1,
+              'max': 200,
+              'step': 5,
+              'value': row.sort_id,
+              'update-value-on-input': false,
+              'onUpdate:value': async (value: number) => await sortMySiteTable(row, value),
+            },
+            {
+              'minus-icon': () => h(MenuIcon, { icon: 'ArrowDownCircleOutline' }),
+              'add-icon': () => h(MenuIcon, { icon: 'ArrowUpCircleOutline' }),
+            },
+          )
+        },
       },
       {
         title: '名称',
@@ -1181,6 +1219,7 @@ export const useWebsiteStore = defineStore('website',
       initSomeData,
       mySite,
       mySiteColumns,
+      handleUpdateSorter,
       mySiteForm,
       mySiteList,
       page,

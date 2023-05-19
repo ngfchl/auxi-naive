@@ -3,7 +3,6 @@ import type { FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
 import renderSize from '../../../hooks/renderSize'
 import type { NewTorrent, Torrent } from '~/api/download'
-import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { railStyle } from '~/utils/baseStyle'
 

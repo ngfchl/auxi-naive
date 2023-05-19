@@ -128,6 +128,7 @@ export const useTaskStore = defineStore('task', () => {
       key: 'name',
       width: 200,
       minWidth: 185,
+      fixed: 'left',
     },
     {
       title: '任务',

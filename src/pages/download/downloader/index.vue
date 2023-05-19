@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NButton } from 'naive-ui'
-
+const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 const downloadStore = useDownloadStore()
 const { getDownloaderList, editDownloader } = downloadStore
 const { downloaderList, columns } = storeToRefs(downloadStore)
@@ -29,9 +29,12 @@ onMounted(async () => {
         :columns="columns"
         :data="downloaderList"
         :loading="loading"
+        :min-height="isMobile ? 520 : 680"
+        bordered
+        flex-height
+        max-height="720"
         size="small"
         striped
-        bordered
       />
     </div>
   </n-card>

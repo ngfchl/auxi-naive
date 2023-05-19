@@ -1606,11 +1606,14 @@ export const useDownloadStore = defineStore('download', () => {
       title: '名称',
       key: 'name',
       minWidth: 100,
+      width: 150,
+      fixed: 'left',
     },
     {
       title: '地址',
       key: 'host',
-      minWidth: 50,
+      minWidth: 100,
+      width: 100,
       align: 'center',
       render(row: Downloader) {
         const url = `${row.http}://${row.host}:${row.port}`
@@ -1635,11 +1638,13 @@ export const useDownloadStore = defineStore('download', () => {
       key: 'category',
       align: 'center',
       minWidth: 60,
+      width: 100,
     },
     {
       title: '展示',
       key: 'enable',
       minWidth: 80,
+      width: 100,
       align: 'center',
       render(row: Downloader) {
         return h(
@@ -1677,6 +1682,7 @@ export const useDownloadStore = defineStore('download', () => {
       title: '刷流专用',
       key: 'brush',
       minWidth: 80,
+      width: 100,
       align: 'center',
       render(row: Downloader) {
         return h(
@@ -1714,6 +1720,7 @@ export const useDownloadStore = defineStore('download', () => {
       title: '拆包下载',
       key: 'package_files',
       minWidth: 80,
+      width: 100,
       align: 'center',
       render(row: Downloader) {
         return h(
@@ -1751,6 +1758,7 @@ export const useDownloadStore = defineStore('download', () => {
       title: '删除单种',
       key: 'delete_one_file',
       minWidth: 80,
+      width: 100,
       align: 'center',
       render(row: Downloader) {
         return h(
@@ -1787,7 +1795,8 @@ export const useDownloadStore = defineStore('download', () => {
     {
       key: 'actions',
       title: '操作',
-      minWidth: 50,
+      minWidth: 80,
+      width: 100,
       align: 'center',
       render(row: Downloader) {
         return h(
