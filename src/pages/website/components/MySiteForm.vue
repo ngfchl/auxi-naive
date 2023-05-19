@@ -210,7 +210,7 @@ onMounted(async () => {
       </n-form-item>
       <n-form-item label="下载器" path="downloader" required>
         <n-select
-          v-model:value="mySiteForm.downloader"
+          v-model:value="mySiteForm.downloader_id"
           placeholder="请选择刷流使用的下载器"
           :options="downloaderList.map((downloader:Downloader) => ({
             label: downloader.name,

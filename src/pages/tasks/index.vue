@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
-
+const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 const taskStore = useTaskStore()
 const {
   columns,
@@ -43,10 +43,13 @@ onBeforeMount(async () => {
   <n-data-table
     :columns="columns"
     :data="scheduleList"
-    :row-key="rowKey"
     :loading="loading"
-    size="small"
+    :min-height="isMobile ? 520 : 680"
+    :row-key="rowKey"
     bordered
+    flex-height
+    max-height="720"
+    size="small"
     striped
   />
 </template>

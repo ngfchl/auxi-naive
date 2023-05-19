@@ -127,13 +127,14 @@ export const useTaskStore = defineStore('task', () => {
       title: '任务名称',
       key: 'name',
       width: 200,
-      minWidth: 180,
+      minWidth: 185,
+      fixed: 'left',
     },
     {
       title: '任务',
       key: 'task',
-      minWidth: 65,
-      width: 85,
+      width: 180,
+      minWidth: 165,
       render(row: Schedule) {
         const item = taskList.value?.find(item => row.task === item.task)
         if (!item) return null
@@ -155,8 +156,8 @@ export const useTaskStore = defineStore('task', () => {
     }, {
       title: '执行时间',
       key: 'crontab',
-      minWidth: 120,
-      width: 135,
+      minWidth: 155,
+      width: 180,
       render(row: Schedule): any {
         const item = crontabList.value?.find(item => row.crontab === item.id)
         return h(
@@ -205,8 +206,8 @@ export const useTaskStore = defineStore('task', () => {
     {
       title: '开启',
       key: 'enabled',
-      minWidth: 75,
-      width: 85,
+      minWidth: 88,
+      width: 100,
       render(row: Schedule) {
         return h(
           NSwitch,
@@ -240,13 +241,13 @@ export const useTaskStore = defineStore('task', () => {
     {
       title: '次数',
       key: 'total_run_count',
-      width: 55,
+      width: 85,
     },
     {
       title: '上次运行',
       key: 'last_run_at',
-      minWidth: 150,
-      width: 165,
+      width: 180,
+      minWidth: 165,
     },
     // {
     //   title: '备注',
@@ -260,7 +261,7 @@ export const useTaskStore = defineStore('task', () => {
     {
       key: 'actions',
       title: '操作',
-      width: 95,
+      width: 80,
       render(row: Schedule) {
         return h(
           NButton,
