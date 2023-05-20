@@ -49,9 +49,11 @@ const handleChange = async (value: string) => {
     'schedule.tasks.auto_sign_in': 'sign_in',
     'schedule.tasks.auto_get_status': 'get_info',
     'schedule.tasks.auto_remove_brush_task': 'brush_free',
+    'schedule.tasks.auto_get_hash_by_category': 'brush_free',
   }
   showSiteList.value = mySiteList.value.filter((mySite: MySite) => {
-    return mySite[functionMap[value]] && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
+    // return mySite[functionMap[value]] && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
+    return mySite.rss?.startsWith('https://') && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
   })
 }
 onMounted(async () => {
