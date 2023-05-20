@@ -1,5 +1,6 @@
 import numberFormat from '@/hooks/numberFormat'
 import renderSize from '@/hooks/renderSize'
+import type { Downloader } from '~/api/download'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import { getList } from '~/hooks/getList'
 
@@ -173,6 +174,36 @@ export interface BarData {
   data: number[]
 }
 
+export interface Torrent {
+  'id': number
+  'site': number
+  'tid': number
+  'title': string
+  'subtitle': string
+  'category': string
+  'area': string
+  'magnet_url': string
+  'size': number
+  'hr': true
+  'sale_status': string
+  'sale_expire': Date
+  'published': Date
+  'seeders': number
+  'leechers': number
+  'completers': number
+  'hash_string': string
+  'filelist': string
+  'douban_url': string
+  'year_publish': string
+  'files_count': number
+  'completed': number
+  'uploaded': number
+  'pieces_qb': string
+  'pieces_tr': string
+  'state': number
+  'downloader'?: Downloader | null
+}
+
 const { message } = useGlobalConfig()
 
 /**
@@ -185,8 +216,8 @@ export const $mySiteList: () => Promise<any> = async () => {
 /**
  * 获取全部种子列表
  */
-export const $torrentList = async () => {
-  return await getList('mysite/torrents')
+export const $torrentList: () => Promise<any> = async () => {
+  return await getList<null, Torrent>('mysite/torrents')
 }
 /**
  * 获取未添加站点列表

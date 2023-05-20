@@ -2,7 +2,19 @@ import type { ECBasicOption } from 'echarts/types/src/util/types'
 import type { DataTableColumns, FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui'
 import { NButton, NInputNumber, NSpace, NSwitch, NTag } from 'naive-ui'
 import MySiteForm from '@/pages/website/components/MySiteForm.vue'
-import type { BarData, MySite, NewestStatus, PerDayData, PieData, SiteStatus, TodayData, WebSite } from '~/api/website'
+import type { Downloader } from '~/api/download'
+import { $getDownloaderList } from '~/api/download'
+import type {
+  BarData,
+  MySite,
+  NewestStatus,
+  PerDayData,
+  PieData,
+  SiteStatus,
+  TodayData,
+  Torrent,
+  WebSite,
+} from '~/api/website'
 import {
   $editMySite,
   $getHistoryList,
@@ -22,6 +34,7 @@ import {
   $siteStatusNewestList,
   $sortSite,
   $todayDataList,
+  $torrentList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
@@ -1198,9 +1211,288 @@ export const useWebsiteStore = defineStore('website',
       },
     ])
 
+    const torrentList = ref<Torrent[]>([])
+    const downloaderList = ref<Downloader[]>([])
+    const getTorrentList = async () => {
+      torrentList.value = await $torrentList()
+    }
+    const getDownloaderList = async () => {
+      downloaderList.value = await $getDownloaderList()
+    }
+    const torrentStatus = [
+      '未推送',
+      '已推送',
+      '免费过期',
+      '已删种',
+      '站点删种',
+      '已存档',
+    ]
+
+    const torrentColumns = computed(() => [
+      // {
+      //   title: 'ID',
+      //   key: 'id',
+      //   minWidth: 55,
+      //   width: 55,
+      //   fixed: 'left',
+      //   sorter: 'default',
+      //   align: 'center',
+      // },
+
+      // {
+      //   title: '种子ID',
+      //   key: 'tid',
+      //   minWidth: 65,
+      //   width: 125,
+      //   fixed: 'left',
+      //   align: 'center',
+      //   sorter: 'default',
+      // },
+      {
+        title: '名称',
+        key: 'title',
+        minWidth: 200,
+        width: 225,
+        fixed: 'left',
+        sorter: 'default',
+        ellipsis: {
+          tooltip: true,
+        },
+      },
+      {
+        title: '副标题',
+        key: 'subtitle',
+        minWidth: 200,
+        width: 225,
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+          tooltip: true,
+        },
+      },
+      {
+        title: '分类',
+        key: 'category',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '站点',
+        key: 'site',
+        minWidth: 65,
+        width: 125,
+        fixed: 'left',
+        align: 'center',
+        sorter: 'default',
+        render(row: Torrent) {
+          const website = siteList.value.find(site => site.id === row.site)
+          return website!.name
+        },
+      },
+      {
+        title: '状态',
+        key: 'state',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+        filter(value: number, row: Torrent) {
+          return row.state === value
+        },
+        filterOptions: torrentStatus.map((status, index) => ({
+          label: status,
+          value: index,
+        })),
+        render(row: Torrent): any {
+          return torrentStatus[row.state]
+        },
+      },
+      {
+        title: '资源地区',
+        key: 'area',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      // {
+      //   title: '下载链接',
+      //   key: 'magnet_url',
+      //   minWidth: 65,
+      //   width: 125,
+      //   align: 'center',
+      //   sorter: 'default',
+      // },
+      {
+        title: '种子大小',
+        key: 'size',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+        render(row: Torrent) {
+          return renderSize(row.size)
+        },
+      },
+      {
+        title: 'H&R',
+        key: 'hr',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '促销状态',
+        key: 'sale_status',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '促销时间',
+        key: 'sale_expire',
+        minWidth: 200,
+        width: 225,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '发布时间',
+        key: 'published',
+        minWidth: 200,
+        width: 225,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '做种数',
+        key: 'seeders',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '下载数',
+        key: 'leechers',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '完成数',
+        key: 'completers',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '种子HASH',
+        key: 'hash_string',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+          tooltip: true,
+        },
+      },
+      {
+        title: '文件列表HASH',
+        key: 'filelist',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+          tooltip: true,
+        },
+      },
+      {
+        title: '豆瓣链接',
+        key: 'douban_url',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '发行年份',
+        key: 'year_publish',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '种子文件数',
+        key: 'files_count',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+      },
+      {
+        title: '已下载',
+        key: 'completed',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+        render(row: Torrent) {
+          if (row.completed > 0)
+            return renderSize(row.completed)
+        },
+      },
+      {
+        title: '已上传',
+        key: 'uploaded',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: 'default',
+        render(row: Torrent) {
+          if (row.uploaded > 0)
+            return renderSize(row.uploaded)
+        },
+      },
+
+      {
+        title: '下载器',
+        key: 'downloader',
+        minWidth: 65,
+        width: 125,
+        align: 'center',
+        sorter: (row1: { downloader: number }, row2: { downloader: number }) => {
+          if (row1.downloader && row2.downloader) { return row1.downloader - row2.downloader }
+          else if (row1.downloader || row2.downloader) {
+            if (row1.downloader) return 1
+            else return -1
+          }
+          else { return -1 }
+        },
+        render(row: Torrent) {
+          if (row.downloader) {
+            const downloader = downloaderList.value.find(d => d.id === row.downloader)
+            return downloader?.name
+          }
+        },
+      },
+    ])
+
     return {
       addMySiteFormRules,
       barOption,
+      getTorrentList,
+      getDownloaderList,
+      torrentColumns,
+      torrentList,
       closeEditForm,
       columns,
       currentSite,
