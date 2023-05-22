@@ -120,7 +120,7 @@ const handleUpdate = async (my_site: MySite) => {
     size="small"
     :item-count="siteStatusList.length"
     show-size-picker
-    :page-sizes="[6, 8, 10, 20, 30, 40]"
+    :page-sizes="[6, 8, 10, 20, 30, 40, 100]"
     :page-slot="slots"
   />
   <n-grid
