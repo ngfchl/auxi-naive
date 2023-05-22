@@ -550,29 +550,29 @@ const handleUpdate = async (my_site: MySite) => {
                 图表
               </n-button>
               <n-button
-                v-if="my_site.get_info && site.func_get_userinfo" type="error"
+                v-if="my_site.get_info && site.get_info" type="error"
                 secondary @click="refreshSite(my_site.id)"
               >
                 刷新
               </n-button>
-              <n-button v-if="my_site.hr && site.func_hr_discern" type="warning" secondary>
+              <n-button v-if="my_site.hr_discern && site.hr_discern" type="warning" secondary>
                 H&&R
               </n-button>
-              <n-button v-if="my_site.brush_flow && site.func_brush_flow" type="warning" secondary>
+              <n-button v-if="my_site.brush_free && site.brush_free" type="warning" secondary>
                 刷流
               </n-button>
-              <n-button v-if="my_site.search && site.func_search_torrents" type="warning" secondary>
+              <n-button v-if="my_site.search_torrents && site.search_torrents" type="warning" secondary>
                 聚合
               </n-button>
               <n-button
-                v-if="my_site.repeat_torrents && site.func_repeat_torrents" type="warning"
+                v-if="my_site.repeat_torrents && site.repeat_torrents" type="warning"
                 secondary
               >
                 辅种
               </n-button>
 
               <n-button
-                v-if="my_site.sign_in && site.func_sign_in && (!sign || !sign.sign_in_today)"
+                v-if="my_site.sign_in && site.sign_in && (!sign || !sign.sign_in_today)"
                 type="warning" secondary
                 @click="signSite(my_site.id)"
               >
@@ -587,7 +587,7 @@ const handleUpdate = async (my_site: MySite) => {
               </n-button>
 
               <!--              <n-button -->
-              <!--                v-if="my_site.get_torrents && site.func_get_torrents" type="primary" -->
+              <!--                v-if="my_site.get_torrents && site.get_torrents" type="primary" -->
               <!--                secondary @click="updateTorrents(my_site.id)" -->
               <!--              > -->
               <!--                种子 -->
