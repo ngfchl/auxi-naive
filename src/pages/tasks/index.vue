@@ -5,11 +5,9 @@ const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 const taskStore = useTaskStore()
 const {
   columns,
-  taskList,
   scheduleList,
 } = storeToRefs(taskStore)
 const {
-  getTaskList,
   getScheduleList,
   editSchedule,
 } = taskStore
@@ -23,7 +21,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <n-space class="mb-2 flex items-center">
+  <n-space class="mb-2 pt-2 flex items-center">
     <n-button
       type="warning"
       size="small"
@@ -44,7 +42,7 @@ onBeforeMount(async () => {
     :columns="columns"
     :data="scheduleList"
     :loading="loading"
-    :min-height="isMobile ? 520 : 680"
+    :min-height="isMobile ? 580 : 680"
     :row-key="rowKey"
     bordered
     flex-height

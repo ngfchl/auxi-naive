@@ -264,9 +264,10 @@ export const useTaskStore = defineStore('task', () => {
     {
       key: 'actions',
       title: '操作',
-      width: 80,
+      width: 150,
+      align: 'center',
       render(row: Schedule) {
-        return h(NSpace, {}, {
+        return h(NSpace, { justify: 'center' }, {
           default: () => {
             return [
               h(
@@ -291,7 +292,6 @@ export const useTaskStore = defineStore('task', () => {
           },
         })
       },
-      align: 'center',
     },
   ])
 
