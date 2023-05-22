@@ -53,7 +53,7 @@ const handleChange = async (value: string) => {
   }
   showSiteList.value = mySiteList.value.filter((mySite: MySite) => {
     // return mySite[functionMap[value]] && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
-    return mySite.rss?.startsWith('https://') && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
+    return mySite.torrents?.startsWith('https://') && siteList.value.find((website: WebSite) => website.id === mySite.site)[functionMap[value]]
   })
 }
 onMounted(async () => {
