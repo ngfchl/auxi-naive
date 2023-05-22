@@ -39,6 +39,10 @@ export interface ScheduleForm {
 export const $taskList: () => Promise<any> = async () => {
   return await getList<null, Task>('schedule/tasks')
 }
+
+export const $taskExecute: (task_id: number) => Promise<any> = async (task_id: number) => {
+  return await getList<object, Task>('schedule/exec', { task_id })
+}
 export const $scheduleList: () => Promise<any> = async () => {
   return await getList<null, Schedule[]>('schedule/schedules')
 }

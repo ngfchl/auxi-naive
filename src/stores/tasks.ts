@@ -1,5 +1,5 @@
 import type { DataTableColumns, FormInst, FormRules, SelectOption } from 'naive-ui'
-import { NButton, NSwitch, NTag } from 'naive-ui'
+import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
 import type { Crontab, Schedule, ScheduleForm, Task } from '~/api/tasks'
 import {
   $addSchedule,
@@ -7,7 +7,7 @@ import {
   $editSchedule,
   $removeSchedule,
   $schedule,
-  $scheduleList,
+  $scheduleList, $taskExecute,
   $taskList,
 } from '~/api/tasks'
 import { useGlobalConfig } from '~/composables/gobal-config'
@@ -121,6 +121,9 @@ export const useTaskStore = defineStore('task', () => {
       await getScheduleList()
       dialog?.destroyAll()
     }
+  }
+  const executeTask = async (task_id: number) => {
+    await $taskExecute(task_id)
   }
   const columns = ref<DataTableColumns<Schedule>>([
     {
@@ -238,11 +241,11 @@ export const useTaskStore = defineStore('task', () => {
       },
 
     },
-    {
-      title: '次数',
-      key: 'total_run_count',
-      width: 85,
-    },
+    // {
+    //   title: '次数',
+    //   key: 'total_run_count',
+    //   width: 85,
+    // },
     {
       title: '上次运行',
       key: 'last_run_at',
@@ -263,15 +266,30 @@ export const useTaskStore = defineStore('task', () => {
       title: '操作',
       width: 80,
       render(row: Schedule) {
-        return h(
-          NButton,
-          {
-            size: 'small',
-            type: 'info',
-            onClick: () => editSchedule(row.id),
+        return h(NSpace, {}, {
+          default: () => {
+            return [
+              h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'warning',
+                  onClick: () => executeTask(row.id),
+                },
+                { default: () => '运行' },
+              ),
+              h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => editSchedule(row.id),
+                },
+                { default: () => '编辑' },
+              ),
+            ]
           },
-          { default: () => '编辑' },
-        )
+        })
       },
       align: 'center',
     },
