@@ -972,44 +972,12 @@ export const useWebsiteStore = defineStore('website',
       {
         title: 'id',
         key: 'id',
-        minWidth: 35,
-        width: 35,
+        minWidth: 50,
+        width: 55,
         align: 'center',
         fixed: 'left',
         sorter: 'default',
         sortOrder: sortKeyMapOrderRef.value.id || false,
-      },
-      {
-        title: '排序',
-        key: 'sort_id',
-        minWidth: 95,
-        width: 110,
-        fixed: 'left',
-        sorter: 'default',
-        align: 'center',
-        sortOrder: sortKeyMapOrderRef.value.sort_id || 'descend',
-        render(row: MySite) {
-          return h(
-            NInputNumber,
-            {
-              'status': 'warning',
-              'bordered': false,
-              'button-placement': 'both',
-              'class': 'text-#3b5769',
-              'size': 'small',
-              'min': 1,
-              'max': 200,
-              'step': 5,
-              'value': row.sort_id,
-              'update-value-on-input': false,
-              'onUpdate:value': async (value: number) => await sortMySiteTable(row, value),
-            },
-            {
-              'minus-icon': () => h(MenuIcon, { icon: 'ArrowDownCircleOutline' }),
-              'add-icon': () => h(MenuIcon, { icon: 'ArrowUpCircleOutline' }),
-            },
-          )
-        },
       },
       {
         title: '名称',
@@ -1032,6 +1000,38 @@ export const useWebsiteStore = defineStore('website',
             },
             {
               default: () => `${row.nickname}`,
+            },
+          )
+        },
+      },
+      {
+        title: '排序',
+        key: 'sort_id',
+        minWidth: 95,
+        width: 110,
+        // fixed: 'left',
+        sorter: 'default',
+        align: 'center',
+        sortOrder: sortKeyMapOrderRef.value.sort_id || 'descend',
+        render(row: MySite) {
+          return h(
+            NInputNumber,
+            {
+              'status': 'warning',
+              'bordered': false,
+              'button-placement': 'both',
+              'class': 'text-#3b5769',
+              'size': 'small',
+              'min': 1,
+              'max': 200,
+              'step': 5,
+              'value': row.sort_id,
+              'update-value-on-input': false,
+              'onUpdate:value': async (value: number) => await sortMySiteTable(row, value),
+            },
+            {
+              'minus-icon': () => h(MenuIcon, { icon: 'ArrowDownCircleOutline' }),
+              'add-icon': () => h(MenuIcon, { icon: 'ArrowUpCircleOutline' }),
             },
           )
         },
@@ -1211,10 +1211,18 @@ export const useWebsiteStore = defineStore('website',
       },
     ])
 
-    const torrentList = ref<Torrent[]>([])
+    const torrentList = ref<{
+      total: number
+      items: Torrent[]
+      per_page: number
+    }>({
+      total: 0,
+      items: [],
+      per_page: 1,
+    })
     const downloaderList = ref<Downloader[]>([])
-    const getTorrentList = async () => {
-      torrentList.value = await $torrentList()
+    const getTorrentList = async (page: number, limit: number) => {
+      torrentList.value = await $torrentList({ page, limit })
     }
     const getDownloaderList = async () => {
       downloaderList.value = await $getDownloaderList()

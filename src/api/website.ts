@@ -100,8 +100,8 @@ export interface SignInfo {
   updated: string
 }
 
-export interface SignInParams {
-  site_id: number
+export interface PaginateParams {
+  site_id?: number
   page: number
   limit: number
 }
@@ -216,8 +216,8 @@ export const $mySiteList: () => Promise<any> = async () => {
 /**
  * 获取全部种子列表
  */
-export const $torrentList: () => Promise<any> = async () => {
-  return await getList<null, Torrent>('mysite/torrents')
+export const $torrentList: (params: object) => Promise<any> = async (params: object) => {
+  return await getList<object, Torrent>('mysite/torrents', params)
 }
 /**
  * 获取未添加站点列表
@@ -388,8 +388,16 @@ export const $sortSite = async (site_id: number, sort_id: number) => {
  * 获取站点签到信息列表
  * @param params
  */
-export const $getSignList: (params: SignInParams) => Promise<any> = async (params: SignInParams) => {
-  return await getList<SignInParams, SiteInfoPage>('mysite/signin', params)
+export const $getSignList: (params: PaginateParams) => Promise<any> = async (params: PaginateParams) => {
+  return await getList<PaginateParams, SiteInfoPage>('mysite/signin', params)
+}
+
+/**
+ * 获取站点种子信息列表
+ * @param params
+ */
+export const $getTorrentList: (params: PaginateParams) => Promise<any> = async (params: PaginateParams) => {
+  return await getList<PaginateParams, SiteInfoPage>('mysite/torrents', params)
 }
 
 /**

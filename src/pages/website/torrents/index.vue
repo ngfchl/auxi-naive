@@ -16,8 +16,23 @@ const {
 const loading = ref<Boolean>(false)
 const showList = ref<Torrent[]>([])
 const searchKey = ref<String>('')
+
+const torrentPagination = ref({
+  page: 1,
+  pageSize: isMobile.value ? 20 : 33,
+  size: 'small',
+  showQuickJumper: true,
+  itemCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 25, 30, 33, 40, 100],
+  pageSlot: 9,
+  simple: isMobile.value,
+  prefix({ itemCount }) {
+    return `共 ${itemCount}.`
+  },
+})
 const filterTorrents = async () => {
-  showList.value = torrentList.value.filter((torrent: Torrent) => {
+  showList.value = torrentList.value.items.filter((torrent: Torrent) => {
     return torrent.title.toLowerCase().includes(searchKey.value.toLowerCase())
     || torrent.subtitle.toLowerCase().includes(searchKey.value.toLowerCase())
     || torrent.category.toLowerCase().includes(searchKey.value.toLowerCase())
@@ -25,18 +40,29 @@ const filterTorrents = async () => {
     || torrent.sale_status.toLowerCase().includes(searchKey.value.toLowerCase())
   })
 }
-const reloadData = async () => {
+const updateShowData = async (page: number, pageSize: number) => {
   loading.value = true
-  await getTorrentList()
+  await getTorrentList(page, pageSize)
+  torrentPagination.value.page = torrentList.value.per_page
+  torrentPagination.value.itemCount = torrentList.value.total
   await filterTorrents()
   loading.value = false
+}
+const handlePageSize = async (pageSize: number) => {
+  torrentPagination.value.pageSize = pageSize
+  await updateShowData(torrentPagination.value.page, torrentPagination.value.pageSize)
+}
+const handlePageChange = async (currentPage: number) => {
+  await updateShowData(currentPage, torrentPagination.value.pageSize)
+}
+const reloadData = async () => {
+  await updateShowData(torrentPagination.value.page, torrentPagination.value.pageSize)
 }
 onMounted(async () => {
   loading.value = true
   await getSiteList()
   await getDownloaderList()
-  await getTorrentList()
-  await filterTorrents()
+  await updateShowData(torrentPagination.value.page, torrentPagination.value.pageSize)
   loading.value = false
 })
 </script>
@@ -60,18 +86,30 @@ onMounted(async () => {
     :columns="torrentColumns"
     :data="showList"
     :loading="loading"
-    :min-height="isMobile ? 520 : 680"
-    :row-key="(row: RowData) => row.id"
+    :min-height="isMobile ? 520 : 740"
+    :paginate-single-page="true"
+    :pagination="torrentPagination"
+    :row-key="(row: RowData) => row.hash_string"
     bordered
     flex-height
-    max-height="720"
+    max-height="900"
+    remote
     size="small"
     striped
-    virtual-scroll
+    @update:page-size="handlePageSize"
+    @update:page="handlePageChange"
     @update:sorter="handleUpdateSorter"
   />
 </template>
 
 <style scoped>
+:deep(td) {
+  padding: 1px !important;
+  font-size: 11px !important;
+}
 
+:deep(th) {
+  padding: 2px !important;
+  font-size: 12px !important;
+}
 </style>
