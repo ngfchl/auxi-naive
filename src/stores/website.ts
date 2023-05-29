@@ -1231,8 +1231,8 @@ export const useWebsiteStore = defineStore('website',
       '未推送',
       '已推送',
       '免费过期',
-      '已删种',
-      '站点删种',
+      '下载器已删种',
+      '站点已删种',
       '已存档',
     ]
 
