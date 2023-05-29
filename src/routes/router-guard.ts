@@ -32,7 +32,7 @@ router.beforeEach(async (to, from, next) => {
     }
     // 不在白名单里面就跳转到登录页面
     next({
-      path: '/login',
+      path: loginRoute,
       query: {
         redirect: to.path,
       },
@@ -88,9 +88,9 @@ router.beforeEach(async (to, from, next) => {
             return
         }
         else {
-        // 如果获取用户信息失败，那么我们直接阻止用户跳转并同时跳转到Error页面
+        // 如果获取用户信息失败，那么我们直接阻止用户跳转并同时跳转到登录页面
           next({
-            path: '/error',
+            path: loginRoute,
             query: {
               redirect: to.path,
             },
