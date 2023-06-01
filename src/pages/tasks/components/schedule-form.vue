@@ -46,8 +46,8 @@ const handleChange = async (value: string) => {
     'schedule.tasks.auto_get_rss': 'brush_rss',
     'schedule.tasks.auto_get_torrents': 'brush_free',
     'schedule.tasks.auto_push_to_downloader': 'brush_free',
-    'schedule.tasks.auto_sign_in': 'sign_in',
-    'schedule.tasks.auto_get_status': 'get_info',
+    // 'schedule.tasks.auto_sign_in': 'sign_in',
+    // 'schedule.tasks.auto_get_status': 'get_info',
     'schedule.tasks.auto_remove_brush_task': 'brush_free',
     'schedule.tasks.auto_get_hash_by_category': 'brush_free',
   }
