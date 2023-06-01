@@ -223,37 +223,7 @@ export const useWebsiteStore = defineStore('website',
       torrents: '',
       downloader_id: undefined,
       custom_server: '',
-      remove_torrent_rules: '{\n'
-          + '  "push": {\n'
-          + '    "size": {\n'
-          + '      "min": 1,\n'
-          + '      "max": 30\n'
-          + '    },\n'
-          + '    "published": 1800,\n'
-          + '    "seeders": 3,\n'
-          + '    "sale_expire": 3600,\n'
-          + '  },\n'
-          + '  "remove": {\n'
-          + '    "upload_speed_avg": {\n'
-          + '      "time": 300,\n'
-          + '      "upload_speed": 100\n'
-          + '    },\n'
-          + '    "progress_check": {\n'
-          + '      "0.05": 100,\n'
-          + '      "0.5": 100,\n'
-          + '      "0.8": 100,\n'
-          + '      "0.9": 100\n'
-          + '    },\n'
-          + '    "ratio": {\n'
-          + '      "600": 0.1,\n'
-          + '      "1800": 0.5\n'
-          + '    },\n'
-          + '    "timeout": 3600,\n'
-          + '    "completers": 5,\n'
-          + '    "max_ratio": 3,\n'
-          + '    "num_delete": 5\n'
-          + '  }\n'
-          + '}',
+      remove_torrent_rules: '{"push":{"size":{"min":1,"max":100},"published":1800,"seeders":3,"sale_expire":3600},"remove":{"upload_speed_avg":{"time":600,"upload_speed":2048},"progress_check":{"0.05":2048,"0.5":2048,"0.8":2048,"0.9":2048},"ratio_check":{"600":0.1,"1800":0.5},"num_completer":{"completers":5,"upspeed":2048},"timeout":3600,"max_ratio":3}}',
     }
     const addMySiteFormRules = ref<FormRules>({
       site: [
