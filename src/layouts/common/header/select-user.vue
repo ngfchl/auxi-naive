@@ -7,7 +7,7 @@ withDefaults(defineProps<{
   options?: DropdownOption[]
   onSelect?: (value: string) => void
 }>(), {
-  avatar: '/src/assets/ptools.svg',
+  avatar: '/ptools.svg',
   nickname: 'ptools',
 })
 </script>
@@ -19,7 +19,6 @@ withDefaults(defineProps<{
   >
     <div class="flex items-center cursor-pointer">
       <n-avatar
-        v-if="avatar"
         round
         size="small"
         :src="avatar"
