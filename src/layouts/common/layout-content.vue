@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import MultiTab from '../multi-tab/index.vue'
+
 const attrs = useAttrs()
 </script>
 
@@ -11,7 +12,7 @@ const attrs = useAttrs()
     position="absolute"
   >
     <MultiTab />
-    <div class="px-2 mt-48px">
+    <div class="px-2 mt-55px">
       <router-view />
     </div>
   </n-layout-content>
