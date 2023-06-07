@@ -12,7 +12,12 @@ const { getDownloaderList } = downloaderStore
 const loading = ref(false)
 const handleSaveMySite = async () => {
   loading.value = true
-  await saveMySite()
+  try {
+    await saveMySite()
+  }
+  catch (e) {
+    console.error(e)
+  }
   loading.value = false
 }
 onMounted(async () => {
