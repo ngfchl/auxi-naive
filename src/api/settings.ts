@@ -18,6 +18,10 @@ export const $getSettingsFile: (params: object) => Promise<any> = async (params:
   return await getList<object, string>('config/config', params)
 }
 
+export const $testNotify: (params: object) => Promise<any> = async (params: object) => {
+  return await getList<object, string>('/config/notify/test', params)
+}
+
 export const $saveSettingsFile: (params: object) => Promise<any> = async (params: object) => {
   const {
     msg,

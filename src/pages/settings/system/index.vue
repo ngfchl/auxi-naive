@@ -9,6 +9,7 @@ const {
   saveSettingsFile,
   getSettingsToml,
   setContent,
+  testNotify,
 } = useSettingsStore()
 const editFlag = ref(false)
 const {
@@ -55,6 +56,9 @@ const columns: DataTableColumns<RowData> = [
 
 <template>
   <n-space justify="end">
+    <n-button type="primary" secondaryc @click="testNotify">
+      通知测试
+    </n-button>
     <n-button :type="editFlag ? 'warning' : 'primary'" @click="handleEdit(!editFlag)">
       <span v-text="!editFlag ? '编辑' : '取消'" />
     </n-button>
@@ -74,17 +78,17 @@ const columns: DataTableColumns<RowData> = [
 
 <style scoped>
 .code {
-    color: #F2F6FC;
-    /*background-color: #1f2c39 !important;*/
-    font-size: 16px;
-    font-family: 'Heiti SC';
-    line-height: 20px;
-    word-break: break-word;
-    /*border: 1px solid #eee;*/
-    height: 75vh;
-    width: 98%;
-    border-radius: 5px;
-    overflow-y: scroll;
-    z-index: 999;
+  color: #F2F6FC;
+  /*background-color: #1f2c39 !important;*/
+  font-size: 16px;
+  font-family: 'Heiti SC';
+  line-height: 20px;
+  word-break: break-word;
+  /*border: 1px solid #eee;*/
+  height: 75vh;
+  width: 98%;
+  border-radius: 5px;
+  overflow-y: scroll;
+  z-index: 999;
 }
 </style>
