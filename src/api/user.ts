@@ -48,14 +48,7 @@ export const loginUrl = 'config/login'
  * @param params
  */
 export const userLoginApi = async (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
-  const { code, msg, data } = await usePost<UserAccountLoginParams | UserMobileLoginParams, UserLoginResult>(loginUrl, params)
-  switch (code) {
-    case 0:
-      return data
-    default:
-      message?.warning(msg)
-      return false
-  }
+  return await usePost<UserAccountLoginParams | UserMobileLoginParams, UserLoginResult>(loginUrl, params)
 }
 
 export const userGetInfoUrl = 'config/userinfo'

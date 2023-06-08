@@ -1,11 +1,12 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { userGetInfoApi, userLoginApi } from '~/api/user'
 import type { UserAccountLoginParams, UserInfo, UserMobileLoginParams } from '~/api/user'
-import router from '~/routes'
+import { userGetInfoApi, userLoginApi } from '~/api/user'
 import i18n from '~/locales'
+import router from '~/routes'
 import { dynamicRoutes, rootRouter } from '~/routes/dynamic-routes'
 import { generateMenu } from '~/routes/generate-menu'
 import { generateRoute } from '~/routes/generate-route'
+
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo>()
   const t = i18n.global.t
@@ -35,16 +36,24 @@ export const useUserStore = defineStore('user', () => {
    */
   const userLogin = async (params: UserAccountLoginParams | UserMobileLoginParams): Promise<any> => {
     const res = await userLoginApi(params)
-    if (res) {
+    if (res.code === 0) {
       message?.success(
-        `登录成功！欢迎用户 ${res?.user}，玩得愉快！`,
+        `登录成功！欢迎用户 ${res.data.user}，玩得愉快！`,
         {
           duration: 3000,
           keepAliveOnHover: true,
         },
       )
-      setToken(res.auth_token)
+      setToken(res.data.auth_token)
       return true
+    }
+    else {
+      message?.error(
+        res.msg,
+        {
+          duration: 3000,
+          keepAliveOnHover: true,
+        })
     }
   }
 
