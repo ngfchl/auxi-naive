@@ -6,29 +6,23 @@
   <n-card class="h-371px border border-green">
     <template #header>
       <n-h2 class="text-center">
-        赞助二维码
+        每日福利
       </n-h2>
     </template>
     <n-image-group>
       <n-space justify="center" class="-mt-6 text-13px">
         <n-image
-          width="120"
-          class="b-rounded-5"
-          src="/images/wechat.jpeg"
-          placeholder="二维码图片走丢啦"
-        />
-        <n-image
-          width="120"
-          class="b-rounded-5"
-          src="/images/alipay.jpeg"
-          placeholder="二维码图片走丢啦"
+          class="b-rounded-5 h-240px"
+          src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
+          placeholder=""
         />
         <div>
           <p class="indent">
-            开发电脑超负荷运转，目前温度居高不下，长期维持在100度左右，已经不能正常运行，希望群友们能赞助一下，换台笔记本，加快开发进度
-          </p>
-          <p class="indent">
-            如果直接赞助觉得有点亏，可以找我购买核桃油，自家冷榨核，大人滋补佳品，小孩儿辅食好帮手，炒菜无油烟，快给你们的家人安排上吧
+            <n-image
+              class="b-rounded-1 w-100%"
+              src="https://v2.jinrishici.com/one.svg?font-size=20&spacing=2&color=darkgreen"
+              placeholder=""
+            />
           </p>
         </div>
       </n-space>
