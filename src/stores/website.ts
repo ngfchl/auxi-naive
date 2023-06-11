@@ -834,9 +834,9 @@ export const useWebsiteStore = defineStore('website',
       await refMySiteForm.value?.validate()
       const flag = mySiteForm.value.id === 0 ? await $saveMySite(mySiteForm.value) : await $editMySite(mySiteForm.value)
       if (flag) {
+        dialog?.destroyAll()
         await updateMySiteStatus(mySiteForm.value.id)
         mySiteForm.value = { ...mySite }
-        dialog?.destroyAll()
       }
     }
 
