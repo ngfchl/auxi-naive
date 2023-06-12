@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     NButtonGroup: typeof import('naive-ui')['NButtonGroup']
     NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
+    NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
     NCode: typeof import('naive-ui')['NCode']
     NCol: typeof import('naive-ui')['NCol']
     NCollapse: typeof import('naive-ui')['NCollapse']

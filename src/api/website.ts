@@ -105,6 +105,7 @@ export interface PaginateParams {
   page: number
   limit: number
 }
+
 export interface SiteInfoPage {
   per_page: number
   total: number
@@ -119,6 +120,7 @@ export interface NewestStatus {
   level: UserLevelRule
   next_level: UserLevelRule
 }
+
 export interface SiteHistoryList {
   uploaded_list: number[]
   downloaded_list: number[]
@@ -204,6 +206,30 @@ export interface Torrent {
   'downloader'?: Downloader | null
 }
 
+export interface SearchTorrent {
+  site: number
+  tid: number
+  category: string
+  magnet_url: string
+  detail_url: string
+  poster_url: string
+  title: string
+  subtitle: string
+  sale_status: string
+  sale_expire: string
+  hr: boolean
+  published: string
+  size: number
+  seeders: number
+  leechers: number
+  completers: number
+}
+
+export interface SearchResult {
+  results: SearchTorrent[]
+  warning: string[]
+  error: string[]
+}
 const { message } = useGlobalConfig()
 
 /**
@@ -252,7 +278,10 @@ export const $getMySite: (params: object) => Promise<any> = async (params: objec
  * @param params
  */
 export const $removeMySite = async (params: object) => {
-  const { msg, code } = await useDelete('mysite/mysite', params)
+  const {
+    msg,
+    code,
+  } = await useDelete('mysite/mysite', params)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -268,7 +297,10 @@ export const $removeMySite = async (params: object) => {
  * @param params
  */
 export const $editMySite = async (params: MySite) => {
-  const { msg, code } = await usePut('mysite/mysite', params)
+  const {
+    msg,
+    code,
+  } = await usePut('mysite/mysite', params)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -283,7 +315,10 @@ export const $editMySite = async (params: MySite) => {
  * @param params
  */
 export const $saveMySite = async (params: MySite) => {
-  const { msg, code } = await usePost('mysite/mysite', params)
+  const {
+    msg,
+    code,
+  } = await usePost('mysite/mysite', params)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -300,7 +335,10 @@ export const $saveMySite = async (params: MySite) => {
  */
 export const $signSite = async (site_id: number) => {
   const response = await usePost('mysite/signin', { site_id })
-  const { code, msg } = response
+  const {
+    code,
+    msg,
+  } = response
   switch (code) {
     case 0:
       message?.success(msg)
@@ -313,7 +351,10 @@ export const $signSite = async (site_id: number) => {
 
 export const $signAllSite = async () => {
   const response = await usePost('mysite/sign/do')
-  const { code, msg } = response
+  const {
+    code,
+    msg,
+  } = response
   switch (code) {
     case 0:
       message?.success(msg)
@@ -325,7 +366,11 @@ export const $signAllSite = async () => {
 }
 export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_id: number) => {
   const response = await usePost('mysite/status/get', { site_id })
-  const { code, msg, data } = response
+  const {
+    code,
+    msg,
+    data,
+  } = response
   switch (code) {
     case 0:
       if (msg.length > 0) message?.success(msg)
@@ -349,7 +394,10 @@ export const $refreshSite = async (site_id: number) => {
     const res_info = response.replace(reg, '"∞"')
     response = JSON.parse(res_info)
   }
-  const { code, msg } = response
+  const {
+    code,
+    msg,
+  } = response
   switch (code) {
     case 0:
       message?.success(msg)
@@ -361,7 +409,11 @@ export const $refreshSite = async (site_id: number) => {
 }
 
 export const $refreshAllSite = async () => {
-  const { msg, code, data } = await usePost('mysite/status/do')
+  const {
+    msg,
+    code,
+    data,
+  } = await usePost('mysite/status/do')
   switch (code) {
     case 0:
       message?.success(msg)
@@ -373,7 +425,13 @@ export const $refreshAllSite = async () => {
 }
 
 export const $sortSite = async (site_id: number, sort_id: number) => {
-  const { msg, code } = await usePost('mysite/sort', { site_id, sort_id })
+  const {
+    msg,
+    code,
+  } = await usePost('mysite/sort', {
+    site_id,
+    sort_id,
+  })
   switch (code) {
     case 0:
       message?.success(msg)
@@ -682,4 +740,24 @@ export const $parseSiteHistory = async (siteHistoryList: SiteHistoryList) => {
 
 export const $todayDataList: () => Promise<any> = async () => {
   return await getList<null, TodayData[]>('mysite/status/today')
+}
+
+/**
+ * 新增我的站点
+ * @param params
+ */
+export const $searchTorrent = async (params: { key: string; site_list: number[] }) => {
+  const {
+    msg,
+    code,
+    data,
+  } = await usePost('mysite/search', params)
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return data
+    default:
+      message?.error(msg)
+      return false
+  }
 }

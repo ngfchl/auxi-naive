@@ -27,6 +27,7 @@ import {
   $refreshSite,
   $removeMySite,
   $saveMySite,
+  $searchTorrent,
   $signAllSite,
   $signSite,
   $siteInfoNewList,
@@ -1463,8 +1464,11 @@ export const useWebsiteStore = defineStore('website',
         },
       },
     ])
-
+    const searchTorrent = async (key: string, site_list: number[]) => {
+      return await $searchTorrent({ key, site_list })
+    }
     return {
+      searchTorrent,
       addMySiteFormRules,
       barOption,
       getTorrentList,
