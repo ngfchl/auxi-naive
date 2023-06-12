@@ -236,14 +236,14 @@ export const useWebsiteStore = defineStore('website',
           },
         },
       ],
-      nickname: [
-        {
-          required: true,
-          message: '自定义站点名称，必填',
-          trigger: ['blur', 'input'],
-          min: 1,
-        },
-      ],
+      // nickname: [
+      //   {
+      //     required: true,
+      //     message: '自定义站点名称，必填',
+      //     trigger: ['blur', 'input'],
+      //     min: 1,
+      //   },
+      // ],
       user_id: [
         {
           required: true,
