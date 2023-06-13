@@ -122,7 +122,7 @@ const openDrawer = async () => {
     :trap-focus="false"
   >
     <n-drawer-content :title="`正在搜索：${key}`" closable>
-      <n-space justify="start">
+      <n-space justify="start" class="mt--2">
         <n-input
           v-model:value="key"
           maxlength="64"
@@ -136,7 +136,7 @@ const openDrawer = async () => {
           搜索
         </n-button>
       </n-space>
-      <n-collapse default-expanded-names="1" accordion>
+      <n-collapse default-expanded-names="1" accordion class="mt-2">
         <n-collapse-item title="选择站点" name="1">
           <n-card size="small" hoverable embedded class="mt-1">
             <n-checkbox-group v-model:value="site_list">
