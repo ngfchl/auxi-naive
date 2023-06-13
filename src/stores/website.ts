@@ -222,7 +222,7 @@ export const useWebsiteStore = defineStore('website',
       cookie: '',
       rss: '',
       torrents: '',
-      downloader_id: undefined,
+      downloader: undefined,
       custom_server: '',
       remove_torrent_rules: '{"push":{"size":{"min":1,"max":100},"published":1800,"seeders":3,"sale_expire":3600},"remove":{"upload_speed_avg":{"time":600,"upload_speed":2048},"progress_check":{"0.05":2048,"0.5":2048,"0.8":2048,"0.9":2048},"ratio_check":{"600":0.1,"1800":0.5},"num_completer":{"completers":5,"upspeed":2048},"timeout":3600,"max_ratio":3}}',
     }
@@ -836,6 +836,7 @@ export const useWebsiteStore = defineStore('website',
       const flag = mySiteForm.value.id === 0 ? await $saveMySite(mySiteForm.value) : await $editMySite(mySiteForm.value)
       if (flag) {
         dialog?.destroyAll()
+        await getMySiteList()
         await updateMySiteStatus(mySiteForm.value.id)
         mySiteForm.value = { ...mySite }
       }

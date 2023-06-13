@@ -51,6 +51,7 @@ export interface MySite {
   passkey: string
   rss?: string
   torrents?: string
+  downloader?: number
   downloader_id?: number
   sign_in: boolean
   get_info: boolean
