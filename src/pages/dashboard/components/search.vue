@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import type { SearchResult, SearchTorrent } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
@@ -22,10 +23,13 @@ const {
   searchTorrent,
   getSiteList,
 } = websiteStore
+const downloaderStore = useDownloadStore()
+const { downloaderList } = storeToRefs(downloaderStore)
+const { getDownloaderList } = downloaderStore
 const key = ref('')
 const site_list = ref<number[]>([])
 const results = ref<SearchTorrent[]>([])
-const websites = ref<{ siteName: string; siteId: number; total: number }[]>()
+const websites = ref<{ siteName: string; siteLogo: string; siteId: number; total: number }[]>()
 const active = ref(false)
 const searchResult = ref<SearchResult>({
   results: [],
@@ -40,13 +44,13 @@ const torrentPagination = ref({
   pageSlot: isMobile.value ? 5 : 11,
   simple: isMobile.value,
 })
+
+const websitesDict = siteList.value.reduce((dict, website) => {
+  dict[website.id] = website
+  return dict
+}, {})
 const handleSearch = async () => {
   // searchResult.value = await searchTorrent(key.value, site_list.value)
-
-  const websitesDict = siteList.value.reduce((dict, website) => {
-    dict[website.id] = website
-    return dict
-  }, {})
 
   results.value = searchResult.value.results.map((result: SearchTorrent) => {
     const website = websitesDict[result.site]
@@ -105,15 +109,18 @@ const handleSelect = (key: string | number) => {
 const openDrawer = async () => {
   await getMySiteList()
   await getSiteList()
+  await getDownloaderList()
   active.value = true
 }
 const ws = ref<WebSocket | null>(null)
-const openWsSearch = async () => {
-  if (!ws.value) {
-    // 处理WS相对路径
-    const wsUrl = new URL('/api/ws/search', window.location.href)
-    wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
-    ws.value = new WebSocket(wsUrl.href)
+const openWsSearch = async (callback: { (): void; (): void }) => {
+  // 处理WS相对路径
+  const wsUrl = new URL('/api/ws/search', window.location.href)
+  wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+  ws.value = new WebSocket(wsUrl.href)
+
+  ws.value.onopen = () => {
+    callback() // WebSocket连接成功后执行回调函数
   }
 
   ws.value.onmessage = async (event) => {
@@ -121,6 +128,13 @@ const openWsSearch = async () => {
     if (result.code === 0) {
       Array.prototype.push.apply(searchResult.value.results, result.data.torrents)
       searchResult.value.success.push(result.msg)
+      const website = websitesDict[result.site]
+      websites.value.push({
+        siteId: result.data.site,
+        siteName: website.name,
+        siteLogo: website.logo,
+        total: result.data.torrents.length,
+      })
     }
     else {
       searchResult.value.warning.push(result.msg)
@@ -135,10 +149,16 @@ onUnmounted(() => {
     ws.value.close()
 })
 const sendData = () => {
-  if (!ws.value)
-    openWsSearch()
-
-  if (ws.value) {
+  if (!ws.value) {
+    openWsSearch(() => {
+      // WebSocket连接成功后执行发送操作
+      ws.value?.send(JSON.stringify({
+        key: key.value,
+        site_list: site_list.value,
+      }))
+    })
+  }
+  else {
     ws.value.send(JSON.stringify({
       key: key.value,
       site_list: site_list.value,
@@ -170,10 +190,7 @@ const sendData = () => {
           clearable
           @keyup.enter="sendData"
         />
-        <button @click="sendData">
-          Send Message
-        </button>
-        <n-button type="success" size="small" ghost @click="handleSearch">
+        <n-button type="success" size="small" ghost @click="sendData">
           搜索
         </n-button>
       </n-space>
