@@ -51,6 +51,8 @@ onMounted(async () => {
         <n-input
           v-model:value="mySiteForm.nickname"
           clearable
+          maxlength="8"
+          show-count
           placeholder="自定义站点名称，必填"
           show-word-limit
         />
@@ -167,12 +169,16 @@ onMounted(async () => {
           v-model:value="mySiteForm.user_id" clearable
           placeholder="请输入数字UID，AZ,CZ,EZ,Reel，莫妮卡、普斯特等请填写用户名"
           show-word-limit
+          maxlength="10"
+          show-count
         />
       </n-form-item>
       <n-form-item label="Passkey" path="passkey">
         <n-input
           v-model:value="mySiteForm.passkey" clearable
           placeholder="Passkey"
+          maxlength="32"
+          show-count
           show-word-limit
         />
       </n-form-item>
