@@ -1,21 +1,31 @@
 <script setup lang="ts">
 import type { InputInst } from 'naive-ui'
-import type { SearchResult } from '~/api/website'
+import type { SearchResult, SearchTorrent } from '~/api/website'
+import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
+const {
+  isMobile,
+  isPad,
+  isDesktop,
+} = useQueryBreakPoints()
+const { message } = useGlobalConfig()
 const websiteStore = useWebsiteStore()
 
 const {
-  mySiteList, siteList,
+  mySiteList,
+  siteList,
 } = storeToRefs(websiteStore)
 
 const {
-  getMySiteList, searchTorrent, getSiteList,
+  getMySiteList,
+  searchTorrent,
+  getSiteList,
 } = websiteStore
 const key = ref('')
 const site_list = ref<number[]>([])
-const results = ref([])
+const results = ref<SearchTorrent[]>([])
 const active = ref(false)
 const inputInstRef = ref<InputInst | null>(null)
 const searchResult = ref<SearchResult>({
@@ -23,7 +33,14 @@ const searchResult = ref<SearchResult>({
   warning: [],
   error: [],
 })
-
+const torrentPagination = ref({
+  page: 1,
+  pageSize: isMobile.value ? 20 : 25,
+  showQuickJumper: true,
+  pageSizes: [10, 20, 25, 30, 40],
+  pageSlot: isMobile.value ? 5 : 11,
+  simple: isMobile.value,
+})
 const handleSearch = async () => {
   searchResult.value = await searchTorrent(key.value, site_list.value)
 
@@ -32,7 +49,7 @@ const handleSearch = async () => {
     return dict
   }, {})
 
-  results.value = searchResult.value.results.map((result) => {
+  results.value = searchResult.value.results.map((result: SearchTorrent) => {
     const website = websitesDict[result.site]
     if (website) {
       // 使用 Object.assign 或者展开操作符来创建一个新的对象
@@ -47,6 +64,44 @@ const handleSearch = async () => {
       return result
     }
   })
+}
+
+const showList = computed(() => {
+  const start = (torrentPagination.value.page - 1) * torrentPagination.value.pageSize
+  const end = start + torrentPagination.value.pageSize
+  return results.value.slice(start, end)
+})
+const options = [
+  {
+    label: '直接下载',
+    key: 'download',
+  },
+  {
+    label: '下载到',
+    key: 'to',
+    children: [
+      {
+        label: '下载器1',
+        key: 'downloader1',
+      },
+      {
+        label: '下载器2',
+        key: 'downloader2',
+      },
+      {
+        label: '下载器3',
+        key: 'downloader3',
+      },
+      {
+        label: '下载器4',
+        key: 'downloader4',
+      },
+    ],
+  },
+]
+
+const handleSelect = (key: string | number) => {
+  message?.info(String(key))
 }
 const openDrawer = async () => {
   await getMySiteList()
@@ -81,87 +136,156 @@ const openDrawer = async () => {
           搜索
         </n-button>
       </n-space>
-      <n-card size="small" hoverable embedded class="mt-1">
-        <n-checkbox-group v-model:value="site_list">
-          <n-space item-style="display: flex;" align="center">
-            <n-checkbox v-for="my_site in mySiteList" :key="my_site.id" :value="my_site.id" :label="my_site.nickname" />
+      <n-collapse default-expanded-names="1" accordion>
+        <n-collapse-item title="选择站点" name="1">
+          <n-card size="small" hoverable embedded class="mt-1">
+            <n-checkbox-group v-model:value="site_list">
+              <n-space item-style="display: flex;" align="center">
+                <n-checkbox
+                  v-for="my_site in mySiteList" :key="my_site.id" :value="my_site.id"
+                  :label="my_site.nickname"
+                />
+              </n-space>
+            </n-checkbox-group>
+          </n-card>
+        </n-collapse-item>
+        <n-collapse-item v-if="(searchResult.error.length + searchResult.warning.length) > 0" name="2">
+          <template #header>
+            <n-text type="error">
+              无结果或出错信息
+            </n-text>
+          </template>
+          <n-space vertical>
+            <n-space v-if="searchResult.error.length > 0" vertical>
+              <n-tag
+                v-for="(error, index) in searchResult.error"
+                :key="index" type="error" size="small"
+              >
+                {{ error }}
+              </n-tag>
+            </n-space>
+            <n-space v-if="searchResult.warning.length > 0" vertical>
+              <n-tag
+                v-for="(warning, index) in searchResult.warning"
+                :key="index" type="warning" size="small"
+              >
+                {{ warning }}
+              </n-tag>
+            </n-space>
           </n-space>
-        </n-checkbox-group>
-      </n-card>
+        </n-collapse-item>
+      </n-collapse>
 
+      <n-pagination
+        v-if="results.length > 0"
+        v-model:page="torrentPagination.page"
+        v-model:page-size="torrentPagination.pageSize"
+        class="z-998 mt-1"
+        size="small"
+        :item-count="results.length"
+        show-size-picker
+        :page-sizes="torrentPagination.pageSizes"
+        :page-slot="torrentPagination.pageSlot"
+      >
+        <template #prefix="{ itemCount }">
+          共 {{ itemCount }} 项
+        </template>
+      </n-pagination>
       <n-card size="small" hoverable class="mt-1">
-        <n-card v-for="(torrent, index) in results" :key="index" size="small" hoverable class="mt-1">
+        <n-card v-for="(torrent, index) in showList" :key="index" size="small" hoverable class="mt-1">
           <n-thing>
             <template #avatar>
-              <n-avatar>
-                <n-image
-                  width="100"
-                  :src="torrent.poster_url ? torrent.poster_url : torrent.siteLogo"
-                />
-              </n-avatar>
+              <n-space vertical>
+                <n-badge :value="torrent.siteName" :offset="[-20, 36]" type="info">
+                  <n-avatar
+                    size="large" round :src="torrent.poster_url ? torrent.poster_url : torrent.siteLogo"
+                    fallback-src="/ptools.svg"
+                  />
+                </n-badge>
+              </n-space>
             </template>
             <template #header>
               <n-button
                 text type="primary"
                 target="_blank" size="small" tag="a" :href="torrent.detail_url"
               >
-                <n-ellipsis style="max-width: 240px">
+                <n-ellipsis :style="isMobile ? 'max-width: 240px' : 'max-width: 100%'">
                   {{ torrent.title }}
                 </n-ellipsis>
               </n-button>
             </template>
             <template #header-extra />
             <template #description>
-              <n-button size="tiny" secondary>
-                <n-ellipsis style="max-width: 240px">
-                  {{ torrent.subtitle }}
-                </n-ellipsis>
-              </n-button>
-            </template>
-
-            <template #footer>
-              <n-tag v-if="torrent.sale_status" size="small" type="success">
-                {{ torrent.sale_status }}
-              </n-tag>
-              <n-tag v-if="torrent.sale_expire" size="small" type="success">
-                {{ torrent.sale_expire }}
-              </n-tag>
-              <n-tag size="small" type="warning" secondary>
-                {{ torrent.category }}
-              </n-tag>
-              <n-tag size="small" type="success" secondary>
-                <span v-text="renderSize(torrent.size)" />
-              </n-tag>
-              <n-tag v-if="torrent.hr" type="error" size="small">
-                HR
-              </n-tag>
-            </template>
-            <template #action>
-              <n-space>
-                <n-button size="tiny" type="success" secondary>
-                  <template #icon>
-                    <MenuIcon icon="ArrowUpCircleSharp" />
-                  </template>
-                  {{ torrent.seeders }}
-                </n-button>
-                <n-button size="tiny" type="error" secondary>
-                  <template #icon>
-                    <MenuIcon icon="ArrowDownCircle" />
-                  </template>
-                  {{ torrent.leechers }}
-                </n-button>
-                <n-button size="tiny" type="info" secondary>
-                  <template #icon>
-                    <MenuIcon icon="CheckmarkCircle" />
-                  </template>
-                  {{ torrent.completers }}
-                </n-button>
-                <n-button type="warning" secondary target="_blank" size="tiny" tag="a" :href="torrent.magnet_url">
-                  下载（假的，不能点哟）
-                </n-button>
-                <n-button size="tiny" type="success" secondary>
-                  发布于：<span v-text="torrent.published" />
-                </n-button>
+              <n-space justify="space-between">
+                <n-space justify="start" vertical>
+                  <n-space>
+                    <n-button v-if="torrent.subtitle" size="tiny" secondary>
+                      <n-ellipsis :style="isMobile ? 'max-width: 240px' : 'max-width: 100%'">
+                        {{ torrent.subtitle }}
+                      </n-ellipsis>
+                    </n-button>
+                  </n-space>
+                  <n-space>
+                    <n-tag v-if="torrent.category" size="small" type="primary" secondary>
+                      {{ torrent.category }}
+                    </n-tag>
+                    <n-tag size="small" type="success" ghost>
+                      <span v-text="renderSize(torrent.size)" />
+                    </n-tag>
+                    <n-tooltip v-if="torrent.sale_status" trigger="hover">
+                      <template #trigger>
+                        <n-button size="tiny" color="#8a2be2" secondary>
+                          {{ torrent.sale_status }}
+                        </n-button>
+                      </template>
+                      <span v-if="torrent.sale_expire">
+                        {{ torrent.sale_expire }}
+                      </span>
+                      <span v-else>未知</span>
+                    </n-tooltip>
+                    <n-tag v-if="!torrent.hr" type="error" size="small">
+                      HR
+                    </n-tag>
+                  </n-space>
+                </n-space>
+                <n-space justify="end" vertical>
+                  <n-space justify="end">
+                    <n-button size="tiny" type="info" ghost>
+                      发布于：<span v-text="torrent.published" />
+                    </n-button>
+                  </n-space>
+                  <n-space justify="end">
+                    <n-button size="tiny" type="success" secondary>
+                      <template #icon>
+                        <MenuIcon icon="ArrowUpCircleSharp" />
+                      </template>
+                      {{ torrent.seeders }}
+                    </n-button>
+                    <n-button size="tiny" type="error" secondary>
+                      <template #icon>
+                        <MenuIcon icon="ArrowDownCircle" />
+                      </template>
+                      {{ torrent.leechers }}
+                    </n-button>
+                    <n-button size="tiny" type="info" secondary>
+                      <template #icon>
+                        <MenuIcon icon="CheckmarkCircle" />
+                      </template>
+                      {{ torrent.completers }}
+                    </n-button>
+                    <n-dropdown
+                      placement="bottom-start"
+                      trigger="click"
+                      size="small"
+                      :options="options"
+                      @select="handleSelect"
+                    >
+                      <n-button size="tiny" type="warning" secondary>
+                        下载
+                      </n-button>
+                    </n-dropdown>
+                  </n-space>
+                </n-space>
               </n-space>
             </template>
           </n-thing>

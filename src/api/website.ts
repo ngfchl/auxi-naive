@@ -223,6 +223,8 @@ export interface SearchTorrent {
   seeders: number
   leechers: number
   completers: number
+  siteName?: string
+  siteLogo?: string
 }
 
 export interface SearchResult {
