@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { InputInst } from 'naive-ui'
 import type { SearchResult, SearchTorrent } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
@@ -26,12 +25,12 @@ const {
 const key = ref('')
 const site_list = ref<number[]>([])
 const results = ref<SearchTorrent[]>([])
+const websites = ref<{ siteName: string; siteId: number; total: number }[]>()
 const active = ref(false)
-const inputInstRef = ref<InputInst | null>(null)
 const searchResult = ref<SearchResult>({
   results: [],
   warning: [],
-  error: [],
+  success: [],
 })
 const torrentPagination = ref({
   page: 1,
@@ -42,7 +41,7 @@ const torrentPagination = ref({
   simple: isMobile.value,
 })
 const handleSearch = async () => {
-  searchResult.value = await searchTorrent(key.value, site_list.value)
+  // searchResult.value = await searchTorrent(key.value, site_list.value)
 
   const websitesDict = siteList.value.reduce((dict, website) => {
     dict[website.id] = website
@@ -106,32 +105,70 @@ const handleSelect = (key: string | number) => {
 const openDrawer = async () => {
   await getMySiteList()
   await getSiteList()
-  inputInstRef.value?.focus()
   active.value = true
+}
+const ws = ref<WebSocket | null>(null)
+const openWsSearch = async () => {
+  if (!ws.value)
+    ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
+
+  ws.value.onmessage = async (event) => {
+    const result = JSON.parse(event.data)
+    if (result.code === 0) {
+      Array.prototype.push.apply(searchResult.value.results, result.data.torrents)
+      searchResult.value.success.push(result.msg)
+    }
+    else {
+      searchResult.value.warning.push(result.msg)
+    }
+
+    await handleSearch()
+  }
+}
+
+onUnmounted(() => {
+  if (ws.value)
+    ws.value.close()
+})
+const sendData = () => {
+  if (!ws.value)
+    openWsSearch()
+
+  if (ws.value) {
+    ws.value.send(JSON.stringify({
+      key: key.value,
+      site_list: site_list.value,
+    }))
+  }
 }
 </script>
 
 <template>
   <div>
-    <n-input @focus="openDrawer" />
+    <n-input placeholder="点击开始搜索" @focus="openDrawer" />
   </div>
   <n-drawer
     v-model:show="active"
     placement="top"
     height="100%"
     :trap-focus="false"
+    @focus="openWsSearch"
   >
     <n-drawer-content :title="`正在搜索：${key}`" closable>
       <n-space justify="start" class="mt--2">
         <n-input
           v-model:value="key"
           maxlength="64"
-          placeholder="输入搜索"
+          placeholder="无输入拉取第一页种子"
           size="small"
           show-count
           autofocus
           clearable
+          @keyup.enter="sendData"
         />
+        <button @click="sendData">
+          Send Message
+        </button>
         <n-button type="success" size="small" ghost @click="handleSearch">
           搜索
         </n-button>
@@ -149,19 +186,19 @@ const openDrawer = async () => {
             </n-checkbox-group>
           </n-card>
         </n-collapse-item>
-        <n-collapse-item v-if="(searchResult.error.length + searchResult.warning.length) > 0" name="2">
+        <n-collapse-item v-if="(searchResult.success.length + searchResult.warning.length) > 0" name="2">
           <template #header>
             <n-text type="error">
               无结果或出错信息
             </n-text>
           </template>
           <n-space vertical>
-            <n-space v-if="searchResult.error.length > 0" vertical>
+            <n-space v-if="searchResult.success.length > 0" vertical>
               <n-tag
-                v-for="(error, index) in searchResult.error"
-                :key="index" type="error" size="small"
+                v-for="(success, index) in searchResult.success"
+                :key="index" type="success" size="small"
               >
-                {{ error }}
+                {{ success }}
               </n-tag>
             </n-space>
             <n-space v-if="searchResult.warning.length > 0" vertical>
