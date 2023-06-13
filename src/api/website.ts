@@ -230,7 +230,7 @@ export interface SearchTorrent {
 export interface SearchResult {
   results: SearchTorrent[]
   warning: string[]
-  error: string[]
+  success: string[]
 }
 const { message } = useGlobalConfig()
 
