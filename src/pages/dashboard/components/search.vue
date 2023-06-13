@@ -109,8 +109,12 @@ const openDrawer = async () => {
 }
 const ws = ref<WebSocket | null>(null)
 const openWsSearch = async () => {
-  if (!ws.value)
-    ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
+  if (!ws.value) {
+    // 处理WS相对路径
+    const wsUrl = new URL('/api/ws/search', window.location.href)
+    wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+    ws.value = new WebSocket(wsUrl.href)
+  }
 
   ws.value.onmessage = async (event) => {
     const result = JSON.parse(event.data)
