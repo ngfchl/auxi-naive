@@ -233,6 +233,7 @@ export interface SearchResult {
   warning: string[]
   success: string[]
 }
+
 const { message } = useGlobalConfig()
 
 /**
@@ -759,6 +760,20 @@ export const $searchTorrent = async (params: { key: string; site_list: number[] 
     case 0:
       message?.success(msg)
       return data
+    default:
+      message?.error(msg)
+      return false
+  }
+}
+export const $pushTorrent = async (params: string) => {
+  const {
+    msg,
+    code,
+  } = await useGet(`mysite/push_torrent?${params}`)
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return true
     default:
       message?.error(msg)
       return false
