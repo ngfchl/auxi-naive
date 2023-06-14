@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import Search from './components/search.vue'
 import DownloadItems from '~/pages/dashboard/components/download-items.vue'
 import Downloading from '~/pages/dashboard/components/downloading.vue'
 import Pay from '~/pages/dashboard/components/pay.vue'
@@ -38,7 +37,6 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <Search />
   <n-grid cols="400:1 600:2" y-gap="5" x-gap="5" item-responsive>
     <n-gi>
       <Pay />
