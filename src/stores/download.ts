@@ -18,7 +18,7 @@ import {
   $removeDownloader,
 } from '~/api/download'
 import type { WebSite } from '~/api/website'
-import { $siteList } from '~/api/website'
+import { $pushTorrent, $siteList } from '~/api/website'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 import numberFormat from '~/hooks/numberFormat'
 import renderSize from '~/hooks/renderSize'
@@ -141,6 +141,10 @@ export const useDownloadStore = defineStore('download', () => {
   const getDownloaderList = async () => {
     downloaderList.value = await $getDownloaderList()
   }
+  const pushTorrent = async (params: string) => {
+    await $pushTorrent(params)
+  }
+
   const speedTotal = reactive<DownloadSpeedType>({
     name: '总速度',
     connection_status: false,
@@ -1863,6 +1867,7 @@ export const useDownloadStore = defineStore('download', () => {
     interval,
     onClickOutside,
     openTorrentInfo,
+    pushTorrent,
     qBitTorrentColumns,
     qbHandleOptions,
     refDownloaderForm,
