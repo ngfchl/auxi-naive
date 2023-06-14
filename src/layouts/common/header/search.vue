@@ -32,13 +32,20 @@ const {
 const key = ref('')
 const site_list = ref<number[]>([])
 const results = ref<SearchTorrent[]>([])
-const websites = ref<{ siteName: string; siteLogo: string; siteId: number; total: number }[]>([])
+const websites = ref<{
+  siteName: string | undefined
+  siteLogo: string | undefined
+  siteId: number
+  total: number
+}[]>([])
 const active = ref(false)
-const searchResult = ref<SearchResult>({
+const baseResult = {
   results: [],
   warning: [],
   success: [],
-})
+}
+const searchResult = ref<SearchResult>({ ...baseResult })
+
 const torrentPagination = ref({
   page: 1,
   pageSize: isMobile.value ? 20 : 25,
@@ -96,10 +103,10 @@ const openDrawer = async () => {
 const ws = ref<WebSocket | null>(null)
 const openWsSearch = async (callback: { (): void; (): void }) => {
   // 处理WS相对路径
-  const wsUrl = new URL('/api/ws/search', window.location.href)
-  wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
-  ws.value = new WebSocket(wsUrl.href)
-  // ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
+  // const wsUrl = new URL('/api/ws/search', window.location.href)
+  // wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+  // ws.value = new WebSocket(wsUrl.href)
+  ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
   ws.value.onopen = () => {
     callback() // WebSocket连接成功后执行回调函数
   }
@@ -107,21 +114,17 @@ const openWsSearch = async (callback: { (): void; (): void }) => {
     loading.value = false
   }
   let count = 0
-  const websitesDict = siteList.value.reduce((dict, website) => {
-    dict[website.id] = website
-    return dict
-  }, {})
   ws.value.onmessage = async (event) => {
     const result = JSON.parse(event.data)
     count += 1
     if (result.code === 0) {
       Array.prototype.push.apply(searchResult.value.results, result.data.torrents)
       searchResult.value.success.push(result.msg)
-      const website = websitesDict[result.site]
+      const website = siteList.value.find(item => item.id = result.data.site)
       websites.value.push({
         siteId: result.data.site,
-        siteName: website.name,
-        siteLogo: website.logo,
+        siteName: website?.name,
+        siteLogo: website?.logo,
         total: result.data.torrents.length,
       })
     }
@@ -139,7 +142,11 @@ onUnmounted(() => {
   if (ws.value)
     ws.value.close()
 })
+const cancelSearch = () => {
+  loading.value = false
+}
 const sendData = () => {
+  searchResult.value = { ...baseResult }
   loading.value = true
   if (!ws.value) {
     openWsSearch(() => {
@@ -203,7 +210,10 @@ const sendData = () => {
                 clearable
                 @keyup.enter="sendData"
               />
-              <n-button type="success" size="small" ghost :loading="loading" @click="sendData">
+              <n-button v-if="loading" type="warning" size="small" ghost :loading="loading" @click="cancelSearch">
+                取消
+              </n-button>
+              <n-button type="success" size="small" ghost @click="sendData">
                 搜索
               </n-button>
             </n-space>
