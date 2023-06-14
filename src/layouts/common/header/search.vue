@@ -25,11 +25,14 @@ const {
 } = websiteStore
 const downloaderStore = useDownloadStore()
 const { downloaderList } = storeToRefs(downloaderStore)
-const { getDownloaderList } = downloaderStore
+const {
+  getDownloaderList,
+  pushTorrent,
+} = downloaderStore
 const key = ref('')
 const site_list = ref<number[]>([])
 const results = ref<SearchTorrent[]>([])
-const websites = ref<{ siteName: string; siteLogo: string; siteId: number; total: number }[]>()
+const websites = ref<{ siteName: string; siteLogo: string; siteId: number; total: number }[]>([])
 const active = ref(false)
 const searchResult = ref<SearchResult>({
   results: [],
@@ -45,12 +48,12 @@ const torrentPagination = ref({
   simple: isMobile.value,
 })
 
-const websitesDict = siteList.value.reduce((dict, website) => {
-  dict[website.id] = website
-  return dict
-}, {})
 const handleSearch = async () => {
   // searchResult.value = await searchTorrent(key.value, site_list.value)
+  const websitesDict = siteList.value.reduce((dict, website) => {
+    dict[website.id] = website
+    return dict
+  }, {})
 
   results.value = searchResult.value.results.map((result: SearchTorrent) => {
     const website = websitesDict[result.site]
@@ -74,37 +77,15 @@ const showList = computed(() => {
   const end = start + torrentPagination.value.pageSize
   return results.value.slice(start, end)
 })
-const options = [
-  {
-    label: '直接下载',
-    key: 'download',
-  },
-  {
-    label: '下载到',
-    key: 'to',
-    children: [
-      {
-        label: '下载器1',
-        key: 'downloader1',
-      },
-      {
-        label: '下载器2',
-        key: 'downloader2',
-      },
-      {
-        label: '下载器3',
-        key: 'downloader3',
-      },
-      {
-        label: '下载器4',
-        key: 'downloader4',
-      },
-    ],
-  },
-]
 
-const handleSelect = (key: string | number) => {
-  message?.info(String(key))
+const search_sites = computed(() => {
+  return mySiteList.value.filter(item => item.search_torrents)
+})
+
+const loading = ref(false)
+
+const handleSelect = async (key: string) => {
+  await pushTorrent(key)
 }
 const openDrawer = async () => {
   await getMySiteList()
@@ -115,16 +96,24 @@ const openDrawer = async () => {
 const ws = ref<WebSocket | null>(null)
 const openWsSearch = async (callback: { (): void; (): void }) => {
   // 处理WS相对路径
-  const wsUrl = new URL('/api/ws/search', window.location.href)
-  wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
-  ws.value = new WebSocket(wsUrl.href)
-
+  // const wsUrl = new URL('/api/ws/search', window.location.href)
+  // wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+  // ws.value = new WebSocket(wsUrl.href)
+  ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
   ws.value.onopen = () => {
     callback() // WebSocket连接成功后执行回调函数
   }
-
+  ws.value.onclose = () => {
+    loading.value = false
+  }
+  let count = 0
+  const websitesDict = siteList.value.reduce((dict, website) => {
+    dict[website.id] = website
+    return dict
+  }, {})
   ws.value.onmessage = async (event) => {
     const result = JSON.parse(event.data)
+    count += 1
     if (result.code === 0) {
       Array.prototype.push.apply(searchResult.value.results, result.data.torrents)
       searchResult.value.success.push(result.msg)
@@ -139,6 +128,8 @@ const openWsSearch = async (callback: { (): void; (): void }) => {
     else {
       searchResult.value.warning.push(result.msg)
     }
+    if (count >= search_sites.value.length)
+      loading.value = false
 
     await handleSearch()
   }
@@ -149,6 +140,7 @@ onUnmounted(() => {
     ws.value.close()
 })
 const sendData = () => {
+  loading.value = true
   if (!ws.value) {
     openWsSearch(() => {
       // WebSocket连接成功后执行发送操作
@@ -168,9 +160,12 @@ const sendData = () => {
 </script>
 
 <template>
-  <div>
-    <n-input placeholder="点击开始搜索" @focus="openDrawer" />
-  </div>
+  <!--  <n-input round placeholder="搜索" size="small" class="mb-10px!" @focus="openDrawer"> -->
+  <!--    <template #suffix> -->
+  <!--      <MenuIcon icon="Search" size="22" class="cursor-pointer" /> -->
+  <!--    </template> -->
+  <!--  </n-input> -->
+  <MenuIcon icon="Search" size="22" class="cursor-pointer" @click="openDrawer" />
   <n-drawer
     v-model:show="active"
     placement="top"
@@ -179,28 +174,45 @@ const sendData = () => {
     @focus="openWsSearch"
   >
     <n-drawer-content :title="`正在搜索：${key}`" closable>
-      <n-space justify="start" class="mt--2">
-        <n-input
-          v-model:value="key"
-          maxlength="64"
-          placeholder="无输入拉取第一页种子"
-          size="small"
-          show-count
-          autofocus
-          clearable
-          @keyup.enter="sendData"
-        />
-        <n-button type="success" size="small" ghost @click="sendData">
-          搜索
-        </n-button>
-      </n-space>
-      <n-collapse default-expanded-names="1" accordion class="mt-2">
-        <n-collapse-item title="选择站点" name="1">
+      <!--      <n-space justify="end" class="mt&#45;&#45;2"> -->
+      <!--        <n-input -->
+      <!--          v-model:value="key" -->
+      <!--          maxlength="64" -->
+      <!--          placeholder="无输入拉取第一页种子" -->
+      <!--          size="small" -->
+      <!--          show-count -->
+      <!--          autofocus -->
+      <!--          clearable -->
+      <!--          @keyup.enter="sendData" -->
+      <!--        /> -->
+      <!--        <n-button type="success" size="small" ghost :loading="loading" @click="sendData"> -->
+      <!--          搜索 -->
+      <!--        </n-button> -->
+      <!--      </n-space> -->
+      <n-collapse default-expanded-names="1" accordion class="mt-2" arrow-placement="right">
+        <n-collapse-item name="1" title="选择站点">
+          <template #header-extra>
+            <n-space justify="end" class="mt--2">
+              <n-input
+                v-model:value="key"
+                maxlength="64"
+                placeholder="无输入拉取第一页种子"
+                size="small"
+                show-count
+                autofocus
+                clearable
+                @keyup.enter="sendData"
+              />
+              <n-button type="success" size="small" ghost :loading="loading" @click="sendData">
+                搜索
+              </n-button>
+            </n-space>
+          </template>
           <n-card size="small" hoverable embedded class="mt-1">
             <n-checkbox-group v-model:value="site_list">
               <n-space item-style="display: flex;" align="center">
                 <n-checkbox
-                  v-for="my_site in mySiteList" :key="my_site.id" :value="my_site.id"
+                  v-for="my_site in search_sites" :key="my_site.id" :value="my_site.id"
                   :label="my_site.nickname"
                 />
               </n-space>
@@ -254,7 +266,7 @@ const sendData = () => {
           <n-thing>
             <template #avatar>
               <n-space vertical>
-                <n-badge :value="torrent.siteName" :offset="[-20, 36]" type="info">
+                <n-badge :value="torrent.siteName!" :offset="[-20, 36]" type="info">
                   <n-avatar
                     size="large" round :src="torrent.poster_url ? torrent.poster_url : torrent.siteLogo"
                     fallback-src="/ptools.svg"
@@ -335,7 +347,20 @@ const sendData = () => {
                       placement="bottom-start"
                       trigger="click"
                       size="small"
-                      :options="options"
+                      :options="[
+                        {
+                          label: '直接下载',
+                          key: torrent.magnet_url,
+                        },
+                        {
+                          label: '下载到',
+                          key: 'to',
+                          children: downloaderList.map(item => ({
+                            label: item.name,
+                            key: `downloader_id=${item.id}&site=${torrent.site}&url=${torrent.magnet_url}&category=${torrent.category}`,
+                          })),
+                        },
+                      ]"
                       @select="handleSelect"
                     >
                       <n-button size="tiny" type="warning" secondary>
