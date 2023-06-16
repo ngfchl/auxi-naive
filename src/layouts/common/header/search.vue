@@ -55,28 +55,22 @@ const torrentPagination = ref({
   simple: isMobile.value,
 })
 
-const handleSearch = async () => {
-  // searchResult.value = await searchTorrent(key.value, site_list.value)
-  const websitesDict = siteList.value.reduce((dict, website) => {
-    dict[website.id] = website
-    return dict
-  }, {})
+const handleSearch = async (filters) => {
+  const websitesDict = siteList.value.reduce((dict, website) => ({
+    ...dict,
+    [website.id]: website,
+  }), {})
 
-  results.value = searchResult.value.results.map((result: SearchTorrent) => {
-    const website = websitesDict[result.site]
-    if (website) {
-      // 使用 Object.assign 或者展开操作符来创建一个新的对象
-      return {
-        ...result,
-        siteName: website.name,
-        siteLogo: website.logo,
-      }
-    }
-    else {
-      // 如果没有找到对应的站点，返回原始的 result 对象
-      return result
-    }
-  })
+  results.value = searchResult.value.results
+    .filter(result =>
+      !filters
+          || Object.entries(filters).every(([field, value]) => !value || result[field] === value),
+    )
+    .map(result => ({
+      ...result,
+      siteName: websitesDict[result.site]?.name,
+      siteLogo: websitesDict[result.site]?.logo,
+    }))
 }
 
 const showList = computed(() => {
@@ -90,6 +84,7 @@ const search_sites = computed(() => {
 })
 
 const loading = ref(false)
+const showSiteList = ref(false)
 
 const handleSelect = async (key: string) => {
   await pushTorrent(key)
@@ -103,10 +98,10 @@ const openDrawer = async () => {
 const ws = ref<WebSocket | null>(null)
 const openWsSearch = async (callback: { (): void; (): void }) => {
   // 处理WS相对路径
-  // const wsUrl = new URL('/api/ws/search', window.location.href)
-  // wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
-  // ws.value = new WebSocket(wsUrl.href)
-  ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
+  const wsUrl = new URL('/api/ws/search', window.location.href)
+  wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+  ws.value = new WebSocket(wsUrl.href)
+  // ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
   ws.value.onopen = () => {
     callback() // WebSocket连接成功后执行回调函数
   }
@@ -131,7 +126,7 @@ const openWsSearch = async (callback: { (): void; (): void }) => {
     else {
       searchResult.value.warning.push(result.msg)
     }
-    if (count >= search_sites.value.length)
+    if (count >= site_list.value.length)
       loading.value = false
 
     await handleSearch()
@@ -144,6 +139,10 @@ onUnmounted(() => {
 })
 const cancelSearch = () => {
   loading.value = false
+  if (ws.value) {
+    ws.value.close()
+    ws.value = null
+  }
 }
 const sendData = () => {
   searchResult.value = { ...baseResult }
@@ -181,54 +180,49 @@ const sendData = () => {
     @focus="openWsSearch"
   >
     <n-drawer-content :title="`正在搜索：${key}`" closable>
-      <!--      <n-space justify="end" class="mt&#45;&#45;2"> -->
-      <!--        <n-input -->
-      <!--          v-model:value="key" -->
-      <!--          maxlength="64" -->
-      <!--          placeholder="无输入拉取第一页种子" -->
-      <!--          size="small" -->
-      <!--          show-count -->
-      <!--          autofocus -->
-      <!--          clearable -->
-      <!--          @keyup.enter="sendData" -->
-      <!--        /> -->
-      <!--        <n-button type="success" size="small" ghost :loading="loading" @click="sendData"> -->
-      <!--          搜索 -->
-      <!--        </n-button> -->
-      <!--      </n-space> -->
-      <n-collapse default-expanded-names="1" accordion class="mt-2" arrow-placement="right">
-        <n-collapse-item name="1" title="选择站点">
-          <template #header-extra>
-            <n-space justify="end" class="mt--2">
-              <n-input
-                v-model:value="key"
-                maxlength="64"
-                placeholder="无输入拉取第一页种子"
-                size="small"
-                show-count
-                autofocus
-                clearable
-                @keyup.enter="sendData"
+      <n-space vertical class="mt--2">
+        <n-space justify="space-between">
+          <n-switch v-model:value="showSiteList" size="small" :round="false">
+            <template #checked>
+              站点
+            </template>
+            <template #unchecked>
+              站点
+            </template>
+          </n-switch>
+          <n-space justify="end">
+            <n-input
+              v-model:value="key"
+              :loading="loading"
+              maxlength="64"
+              placeholder="无输入拉取第一页种子"
+              size="tiny"
+              show-count
+              autofocus
+              clearable
+              @keyup.enter="sendData"
+            />
+            <n-button v-if="loading" type="warning" size="small" ghost @click="cancelSearch">
+              取消
+            </n-button>
+            <n-button v-else type="success" size="small" ghost @click="sendData">
+              搜索
+            </n-button>
+          </n-space>
+        </n-space>
+
+        <n-collapse-transition size="small" hoverable embedded class="mt-1" :show="showSiteList">
+          <n-checkbox-group v-model:value="site_list">
+            <n-space item-style="display: flex;" align="center">
+              <n-checkbox
+                v-for="my_site in search_sites" :key="my_site.id" :value="my_site.id"
+                :label="my_site.nickname"
               />
-              <n-button v-if="loading" type="warning" size="small" ghost :loading="loading" @click="cancelSearch">
-                取消
-              </n-button>
-              <n-button type="success" size="small" ghost @click="sendData">
-                搜索
-              </n-button>
             </n-space>
-          </template>
-          <n-card size="small" hoverable embedded class="mt-1">
-            <n-checkbox-group v-model:value="site_list">
-              <n-space item-style="display: flex;" align="center">
-                <n-checkbox
-                  v-for="my_site in search_sites" :key="my_site.id" :value="my_site.id"
-                  :label="my_site.nickname"
-                />
-              </n-space>
-            </n-checkbox-group>
-          </n-card>
-        </n-collapse-item>
+          </n-checkbox-group>
+        </n-collapse-transition>
+      </n-space>
+      <n-collapse default-expanded-names="1" accordion class="mt-2" arrow-placement="right">
         <n-collapse-item v-if="(searchResult.success.length + searchResult.warning.length) > 0" name="2">
           <template #header>
             <n-text type="error">
@@ -255,6 +249,65 @@ const sendData = () => {
           </n-space>
         </n-collapse-item>
       </n-collapse>
+      <!--      <n-collapse default-expanded-names="1" accordion class="mt-2" arrow-placement="right"> -->
+      <!--        <n-collapse-item name="1" title="选择站点"> -->
+      <!--          <template #header-extra> -->
+      <!--            <n-space justify="end" class="mt&#45;&#45;2"> -->
+      <!--              <n-input -->
+      <!--                v-model:value="key" -->
+      <!--                maxlength="64" -->
+      <!--                placeholder="无输入拉取第一页种子" -->
+      <!--                size="small" -->
+      <!--                show-count -->
+      <!--                autofocus -->
+      <!--                clearable -->
+      <!--                @keyup.enter="sendData" -->
+      <!--              /> -->
+      <!--              <n-button v-if="loading" type="warning" size="small" ghost :loading="loading" @click="cancelSearch"> -->
+      <!--                取消 -->
+      <!--              </n-button> -->
+      <!--              <n-button v-else type="success" size="small" ghost @click="sendData"> -->
+      <!--                搜索 -->
+      <!--              </n-button> -->
+      <!--            </n-space> -->
+      <!--          </template> -->
+      <!--          <n-card size="small" hoverable embedded class="mt-1"> -->
+      <!--            <n-checkbox-group v-model:value="site_list"> -->
+      <!--              <n-space item-style="display: flex;" align="center"> -->
+      <!--                <n-checkbox -->
+      <!--                  v-for="my_site in search_sites" :key="my_site.id" :value="my_site.id" -->
+      <!--                  :label="my_site.nickname" -->
+      <!--                /> -->
+      <!--              </n-space> -->
+      <!--            </n-checkbox-group> -->
+      <!--          </n-card> -->
+      <!--        </n-collapse-item> -->
+      <!--        <n-collapse-item v-if="(searchResult.success.length + searchResult.warning.length) > 0" name="2"> -->
+      <!--          <template #header> -->
+      <!--            <n-text type="error"> -->
+      <!--              无结果或出错信息 -->
+      <!--            </n-text> -->
+      <!--          </template> -->
+      <!--          <n-space vertical> -->
+      <!--            <n-space v-if="searchResult.success.length > 0" vertical> -->
+      <!--              <n-tag -->
+      <!--                v-for="(success, index) in searchResult.success" -->
+      <!--                :key="index" type="success" size="small" -->
+      <!--              > -->
+      <!--                {{ success }} -->
+      <!--              </n-tag> -->
+      <!--            </n-space> -->
+      <!--            <n-space v-if="searchResult.warning.length > 0" vertical> -->
+      <!--              <n-tag -->
+      <!--                v-for="(warning, index) in searchResult.warning" -->
+      <!--                :key="index" type="warning" size="small" -->
+      <!--              > -->
+      <!--                {{ warning }} -->
+      <!--              </n-tag> -->
+      <!--            </n-space> -->
+      <!--          </n-space> -->
+      <!--        </n-collapse-item> -->
+      <!--      </n-collapse> -->
 
       <n-pagination
         v-if="results.length > 0"
@@ -271,7 +324,7 @@ const sendData = () => {
           共 {{ itemCount }} 项
         </template>
       </n-pagination>
-      <n-card size="small" hoverable class="mt-1">
+      <n-card v-if="showList.length > 0" size="small" hoverable class="mt-1">
         <n-card v-for="(torrent, index) in showList" :key="index" size="small" hoverable class="mt-1">
           <n-thing>
             <template #avatar>
