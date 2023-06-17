@@ -111,7 +111,16 @@ const handlePreview = (options: { file: UploadFileInfo; fileList: UploadFileInfo
 
 <style scoped>
 .code{
-  color: #F2F6FC;
-  background-color: #1f2c39 !important;
+  background-color: #FAF5F5 !important;
+  font-size: 13px;
+  font-family: 'Heiti SC';
+  line-height: 16px;
+  word-break: break-word;
+  border: 1px solid #eee;
+  height: 80vh;
+  width: 98%;
+  border-radius: 5px;
+  overflow-y: scroll;
+  z-index: 999;
 }
 </style>

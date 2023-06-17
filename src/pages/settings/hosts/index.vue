@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import hljs from 'highlight.js/lib/core'
+
 const settingStore = useSettingsStore()
 const { content } = storeToRefs(settingStore)
 const editFlag = ref(false)
@@ -45,14 +46,13 @@ const handleSave = async () => {
 
 <style scoped>
 .code {
-  color: #F2F6FC;
-  background-color: #1f2c39 !important;
-  font-size: 16px;
+  background-color: #FAF5F5 !important;
+  font-size: 13px;
   font-family: 'Heiti SC';
-  line-height: 20px;
+  line-height: 16px;
   word-break: break-word;
   border: 1px solid #eee;
-  height: 75vh;
+  height: 80vh;
   width: 98%;
   border-radius: 5px;
   overflow-y: scroll;
