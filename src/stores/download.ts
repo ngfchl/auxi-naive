@@ -306,7 +306,7 @@ export const useDownloadStore = defineStore('download', () => {
     })
   }
 
-  const repeatTorrentList = ref([])
+  const repeatTorrentList = ref({})
   const getRepeatTorrentList = async (torrent_hashes = '') => {
     repeatTorrentList.value = await $getRepeatTorrentList({ torrent_hashes })
   }

@@ -1,11 +1,13 @@
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia'
 import numberFormat from '../../../../hooks/numberFormat'
 import renderSize from '../../../../hooks/renderSize'
 import timeFormat from '../../../../hooks/timeFormat'
+import type { Torrent } from '~/api/download'
 import { useQueryBreakPoints } from '~/composables/query-breakpoints'
 import timestampToBeijingTime from '~/hooks/timestampToBeijingTime'
-import type { Torrent } from '~/api/download'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
+
 const props = defineProps<{
   torrent: Torrent
   // eslint-disable-next-line vue/prop-name-casing
@@ -22,9 +24,24 @@ const {
   deleteModal,
   trackerStatus,
   categoryFlag,
+  repeatTorrentList,
 } = storeToRefs(downloadStore)
+const downloaderStore = useDownloadStore()
+const { downloaderList } = storeToRefs(downloaderStore)
+const {
+  getDownloaderList,
+  pushTorrent,
+} = downloaderStore
+const active = ref(false)
+const handleSelect = async (key: string) => {
+  await pushTorrent(key)
+}
 const { isMobile, isPad, isDesktop } = useQueryBreakPoints()
 const columns = ref(3)
+const handleRepeatResult = async () => {
+  await handleRepeat()
+  active.value = true
+}
 watchEffect(() => {
   if (isPad.value)
     columns.value = 2
@@ -129,7 +146,7 @@ watchEffect(() => {
 
           <n-button
             size="tiny" type="primary"
-            @click="handleRepeat"
+            @click="handleRepeatResult"
           >
             <template #icon>
               <MenuIcon icon="Copy" />
@@ -1324,6 +1341,116 @@ watchEffect(() => {
       <template #action />
     </n-thing>
   </n-row>
+  <n-drawer
+    v-model:show="active"
+    placement="top"
+    height="100%"
+    :trap-focus="false"
+  >
+    <n-card v-for="(value, key) in repeatTorrentList" :key="key" size="small" hoverable class="mt-1">
+      <n-card v-for="(torrent, index) in value" :key="index" size="small" hoverable class="mt-1">
+        <n-thing>
+          <!--          <template #avatar> -->
+          <!--            <n-space vertical> -->
+          <!--              <n-badge :value="torrent.siteName!" :offset="[-20, 36]" type="info"> -->
+          <!--                <n-avatar -->
+          <!--                  size="large" round :src="torrent.poster_url ? torrent.poster_url : torrent.siteLogo" -->
+          <!--                  fallback-src="/ptools.svg" -->
+          <!--                /> -->
+          <!--              </n-badge> -->
+          <!--            </n-space> -->
+          <!--          </template> -->
+          <template #header>
+            <n-button
+              text type="primary"
+              target="_blank" size="small" tag="a" :href="torrent.detail_url"
+            >
+              <n-ellipsis :style="isMobile ? 'max-width: 240px' : 'max-width: 100%'">
+                {{ torrent.siteName! }}
+              </n-ellipsis>
+            </n-button>
+          </template>
+          <template #header-extra />
+          <template #description>
+            <n-space justify="space-between">
+              <n-space justify="start" vertical>
+                <n-space>
+                  <n-button v-if="torrent.subtitle" size="tiny" secondary>
+                    <n-ellipsis :style="isMobile ? 'max-width: 240px' : 'max-width: 100%'">
+                      {{ torrent.subtitle }}
+                    </n-ellipsis>
+                  </n-button>
+                </n-space>
+                <n-space>
+                  <n-tag v-if="torrent.category" size="small" type="primary" secondary>
+                    {{ torrent.category }}
+                  </n-tag>
+                  <n-tag size="small" type="success" ghost>
+                    <span v-text="renderSize(torrent.size)" />
+                  </n-tag>
+                  <n-tooltip v-if="torrent.sale_status" trigger="hover">
+                    <template #trigger>
+                      <n-button size="tiny" color="#8a2be2" secondary>
+                        {{ torrent.sale_status }}
+                      </n-button>
+                    </template>
+                    <span v-if="torrent.sale_expire">
+                      {{ torrent.sale_expire }}
+                    </span>
+                    <span v-else>未知</span>
+                  </n-tooltip>
+                  <n-tag v-if="!torrent.hr" type="error" size="small">
+                    HR
+                  </n-tag>
+                </n-space>
+              </n-space>
+              <n-space justify="end" vertical>
+                <n-space justify="end">
+                  <n-button size="tiny" type="info" ghost>
+                    发布于：<span v-text="torrent.published" />
+                  </n-button>
+                </n-space>
+                <n-space justify="end">
+                  <n-button size="tiny" type="success" secondary>
+                    <template #icon>
+                      <MenuIcon icon="ArrowUpCircleSharp" />
+                    </template>
+                    {{ torrent.seeders }}
+                  </n-button>
+                  <n-button size="tiny" type="error" secondary>
+                    <template #icon>
+                      <MenuIcon icon="ArrowDownCircle" />
+                    </template>
+                    {{ torrent.leechers }}
+                  </n-button>
+                  <n-button size="tiny" type="info" secondary>
+                    <template #icon>
+                      <MenuIcon icon="CheckmarkCircle" />
+                    </template>
+                    {{ torrent.completers }}
+                  </n-button>
+                  <n-dropdown
+                    placement="bottom-start"
+                    trigger="click"
+                    size="small"
+                    :options="downloaderList.map(item => ({
+                      label: item.name,
+                      key: `downloader_id=${item.id}&site=${torrent.site}&url=${torrent.magnet_url}&category=${torrent.category}`,
+                    }))"
+                    @select="handleSelect"
+                  >
+                    <n-button size="tiny" type="warning" secondary>
+                      下载到
+                    </n-button>
+                  </n-dropdown>
+                </n-space>
+              </n-space>
+            </n-space>
+          </template>
+        </n-thing>
+      </n-card>
+    </n-card>
+  </n-drawer>
 </template>
 
 <style scoped>

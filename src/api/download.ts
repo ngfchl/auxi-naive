@@ -413,7 +413,7 @@ export const $getTorrentList: (params: object) => Promise<any> = async (params: 
 }
 
 export const $getRepeatTorrentList: (params: object) => Promise<any> = async (params: object) => {
-  return await getList<object, Downloading>('download/repeat_torrent', params)
+  return await getList<object>('download/repeat_torrent', params)
 }
 
 export const $getCategoryList: (downloader_id: number) => Promise<any> = async (downloader_id: number) => {
