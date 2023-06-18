@@ -406,28 +406,24 @@ const sendData = () => {
                       </template>
                       {{ torrent.completers }}
                     </n-button>
+                    <n-button size="tiny" type="info" secondary>
+                      <template #icon>
+                        <MenuIcon icon="CheckmarkCircle" />
+                      </template>
+                      复制链接
+                    </n-button>
                     <n-dropdown
                       placement="bottom-start"
                       trigger="click"
                       size="small"
-                      :options="[
-                        {
-                          label: '直接下载',
-                          key: torrent.magnet_url,
-                        },
-                        {
-                          label: '下载到',
-                          key: 'to',
-                          children: downloaderList.map(item => ({
-                            label: item.name,
-                            key: `downloader_id=${item.id}&site=${torrent.site}&url=${torrent.magnet_url}&category=${torrent.category}`,
-                          })),
-                        },
-                      ]"
+                      :options="downloaderList.map(item => ({
+                        label: item.name,
+                        key: `downloader_id=${item.id}&site=${torrent.site}&url=${torrent.magnet_url}&category=${torrent.category}`,
+                      }))"
                       @select="handleSelect"
                     >
                       <n-button size="tiny" type="warning" secondary>
-                        下载
+                        下载到
                       </n-button>
                     </n-dropdown>
                   </n-space>
