@@ -99,7 +99,7 @@ const handleTable = () => {
 <template>
   <n-space justify="start" class="z-998 absolute">
     <n-button
-      size="small"
+      size="tiny"
       secondary
       type="warning"
       @click="handleTable"
@@ -108,7 +108,7 @@ const handleTable = () => {
     </n-button>
     <n-button
       type="warning"
-      size="small"
+      size="tiny"
       class="flex items-center"
       @click="initData()"
     >
@@ -118,7 +118,7 @@ const handleTable = () => {
       </n-icon>
     </n-button>
     <n-button
-      size="small"
+      size="tiny"
       type="success"
       @click="editMysite(0)"
     >
@@ -126,7 +126,7 @@ const handleTable = () => {
     </n-button>
     <n-input
       v-model:value="searchKey"
-      size="small"
+      size="tiny"
       :input-props="{ autocomplete: 'off' }"
       clearable
       placeholder="名称昵称网址等"
