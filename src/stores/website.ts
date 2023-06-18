@@ -55,6 +55,12 @@ export const useWebsiteStore = defineStore('website',
     const drawerTitle = ref('详情')
     const page = ref(1)
     const pageSize = ref(8)
+    const handlePageSize = (value: number) => {
+      pageSize.value = value
+    }
+    const handlePage = (value: number) => {
+      page.value = value
+    }
     const columns = ref<DataTableColumns<WebSite>>([
       {
         title: 'id',
@@ -1469,13 +1475,8 @@ export const useWebsiteStore = defineStore('website',
       return await $searchTorrent({ key, site_list })
     }
     return {
-      searchTorrent,
       addMySiteFormRules,
       barOption,
-      getTorrentList,
-      getDownloaderList,
-      torrentColumns,
-      torrentList,
       closeEditForm,
       columns,
       currentSite,
@@ -1484,17 +1485,21 @@ export const useWebsiteStore = defineStore('website',
       drawerTitle,
       eDrawer,
       editMysite,
+      getDownloaderList,
       getMySiteList,
       getPerDayData,
       getSignList,
       getSiteList,
       getTodayDataList,
+      getTorrentList,
       getTotalData,
+      handlePage,
+      handlePageSize,
+      handleUpdateSorter,
       initData,
       initSomeData,
       mySite,
       mySiteColumns,
-      handleUpdateSorter,
       mySiteForm,
       mySiteList,
       page,
@@ -1508,6 +1513,7 @@ export const useWebsiteStore = defineStore('website',
       removeMySite,
       saveMySite,
       searchKey,
+      searchTorrent,
       showAddMySite,
       showList,
       signAllSite,
@@ -1526,6 +1532,8 @@ export const useWebsiteStore = defineStore('website',
       todayDataList,
       todayDownloadedDataList,
       todayUploadedDataList,
+      torrentColumns,
+      torrentList,
       totalData,
       updateMySiteStatus,
     }
