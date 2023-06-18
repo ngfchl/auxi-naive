@@ -205,7 +205,7 @@ const handleTable = () => {
                     round
                     :src="site.logo"
                     class="w-14px mr-1" alt=""
-                    fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
+                    fallback-src="/ptools.svg"
                   />
                 </n-badge>
                 <n-button
@@ -681,7 +681,7 @@ const handleTable = () => {
                   <n-image
                     :src="site.logo"
                     class="w-14px mr-1" alt=""
-                    fallback-src="https://gitee.com/ngfchl/auxi-naive/raw/master/public/ptools.svg"
+                    fallback-src="/ptools.svg"
                   />
                 </template>
                 {{ my_site.nickname ? my_site.nickname : site.name }}
