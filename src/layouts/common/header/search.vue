@@ -99,7 +99,8 @@ const ws = ref<WebSocket | null>(null)
 const openWsSearch = async (callback: { (): void; (): void }) => {
   // 处理WS相对路径
   const wsUrl = new URL('/api/ws/search', window.location.href)
-  wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+  // wsUrl.protocol = wsUrl.protocol.replace('http', 'ws')
+  wsUrl.protocol = 'ws:'
   ws.value = new WebSocket(wsUrl.href)
   // ws.value = new WebSocket('ws://127.0.0.1:8000/api/ws/search')
   ws.value.onopen = () => {
