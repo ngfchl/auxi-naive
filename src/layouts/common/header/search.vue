@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useClipboard as useClipboards } from '@v-c/utils'
 import { storeToRefs } from 'pinia'
 import type { SearchResult, SearchTorrent } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
 import renderSize from '~/hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
+const { copy } = useClipboards()
 const {
   isMobile,
   isPad,
@@ -130,7 +132,7 @@ const openWsSearch = async (callback: { (): void; (): void }) => {
     if (count >= site_list.value.length)
       loading.value = false
 
-    await handleSearch()
+    await handleSearch(null)
   }
 }
 
@@ -407,9 +409,22 @@ const sendData = () => {
                       </template>
                       {{ torrent.completers }}
                     </n-button>
-                    <n-button size="tiny" type="info" secondary>
+                    <n-button
+                      text
+                      tag="a"
+                      :href="torrent.magnet_url"
+                      target="_blank"
+                      type="primary"
+                      size="tiny"
+                    >
                       <template #icon>
-                        <MenuIcon icon="CheckmarkCircle" />
+                        <MenuIcon icon="DownloadOutline" />
+                      </template>
+                      下载种子
+                    </n-button>
+                    <n-button size="tiny" type="info" secondary @click="copy(torrent.magnet_url)">
+                      <template #icon>
+                        <MenuIcon icon="CopyOutline" />
                       </template>
                       复制链接
                     </n-button>
