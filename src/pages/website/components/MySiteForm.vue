@@ -169,7 +169,7 @@ onMounted(async () => {
           v-model:value="mySiteForm.user_id" clearable
           placeholder="请输入数字UID，AZ,CZ,EZ,Reel，莫妮卡、普斯特等请填写用户名"
           show-word-limit
-          maxlength="10"
+          maxlength="16"
           show-count
         />
       </n-form-item>
