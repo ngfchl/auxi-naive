@@ -12,7 +12,7 @@ export default {
   'pages.download.title': '下载管理',
   'pages.download.downloader.title': '下载器',
   'pages.download.repeat.title': '辅种任务',
-  'pages.download.brush.title': '刷流任务',
+  'pages.download.brush.title': '下载管理',
   'pages.tasks.title': '计划任务',
   'pages.settings.title': '系统设置',
   'pages.settings.system.title': '系统配置',
