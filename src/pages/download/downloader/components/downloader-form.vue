@@ -97,6 +97,16 @@ const {
         </template>
       </n-switch>
     </n-form-item>
+    <n-form-item label="辅种开关" path="brush" label-placement="left" required inline>
+      <n-switch v-model:value="downloaderForm.repeat" :round="false">
+        <template #checked>
+          辅种开
+        </template>
+        <template #unchecked>
+          辅种关
+        </template>
+      </n-switch>
+    </n-form-item>
     <n-form-item label="刷流专用" path="brush" label-placement="left" required inline>
       <n-switch v-model:value="downloaderForm.brush" :round="false">
         <template #checked>

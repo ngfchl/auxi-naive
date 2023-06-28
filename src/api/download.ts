@@ -21,6 +21,7 @@ export interface Downloader {
   category: string
   enable?: boolean
   brush?: boolean
+  repeat?: boolean
   package_files?: boolean
   delete_one_file?: boolean
   count_torrents?: number

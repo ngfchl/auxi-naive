@@ -32,7 +32,7 @@ const taskBySite = [
 ]
 const taskByDownloader = [
   'schedule.tasks.auto_torrents_package_files',
-  'schedule.tasks.auto_repeat_torrent',
+  // 'schedule.tasks.auto_repeat_torrent',
 ]
 const showSiteList = ref<MySite[]>([])
 

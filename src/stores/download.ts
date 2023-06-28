@@ -29,7 +29,10 @@ import torrent from '~/pages/download/brush/components/torrent.vue'
 import DownloaderForm from '~/pages/download/downloader/components/downloader-form.vue'
 
 export const useDownloadStore = defineStore('download', () => {
-  const { dialog, message } = useGlobalConfig()
+  const {
+    dialog,
+    message,
+  } = useGlobalConfig()
   const speedList = ref<DownloadSpeedType[]>([])
   const downloaderList = ref<Downloader[]>([])
   const timer = ref()
@@ -165,6 +168,7 @@ export const useDownloadStore = defineStore('download', () => {
     category: 'Qb',
     enable: true,
     brush: false,
+    repeat: false,
     package_files: false,
     delete_one_file: false,
     count_torrents: 30,
@@ -312,7 +316,10 @@ export const useDownloadStore = defineStore('download', () => {
   }
 
   const addTorrent = async (downloader_id: number, new_torrent: NewTorrent) => {
-    return await $addTorrent({ downloader_id, new_torrent })
+    return await $addTorrent({
+      downloader_id,
+      new_torrent,
+    })
   }
   const interval = ref<number>(5)
   const timeout = ref<number>(10)
@@ -776,6 +783,7 @@ export const useDownloadStore = defineStore('download', () => {
     // 初始化表格
     if (!isNaN(value))
       await handleDefaultDownloader(value)
+
     await clearTimer()
     downloadLoading.value = true
     downloadingTableRef.value!.clearSorter()
