@@ -53,18 +53,12 @@ const {
   handlePage,
   handlePageSize,
 } = websiteStore
-
-/**
- * 挂载时初始化数据
- */
-onMounted(async () => {
-  await initData()
-})
 const {
   isMobile,
   isPad,
   isDesktop,
 } = useQueryBreakPoints()
+const tableRef = ref(true)
 const slots = ref(3)
 watchEffect(() => {
   if (isPad.value)
@@ -75,6 +69,15 @@ watchEffect(() => {
   if (isMobile.value)
     slots.value = 5
 })
+
+/**
+ * 挂载时初始化数据
+ */
+onMounted(async () => {
+  await initData()
+  tableRef.value = isMobile.value
+})
+
 const list = computed(() => {
   const start = (page.value - 1) * pageSize.value
   const end = start + pageSize.value
@@ -83,7 +86,6 @@ const list = computed(() => {
 const handleUpdate = async (my_site: MySite) => {
   await sortMySite(my_site)
 }
-const tableRef = ref(true)
 const handleTable = () => {
   tableRef.value = !tableRef.value
   if (!tableRef.value) {
