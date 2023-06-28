@@ -470,16 +470,16 @@ const handleTable = () => {
                 <span class="items-center justify-end">
                   <n-button-group>
                     <n-button size="tiny" :bordered="false">
-                      <span style="color: green" title="做种数量">
-                        {{ status.seed }}
-                      </span>
+                      <span style="color: indianred" title="正在下载" v-text="status.leech" />
                     </n-button>
                     <n-button size="tiny" :bordered="false">
                       <template #icon>
                         <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
                       </template>
                       &nbsp;
-                      <span style="color: indianred" title="正在下载" v-text="status.leech" />
+                      <span style="color: green" title="做种数量">
+                        {{ status.seed }}
+                      </span>
                     </n-button>
                   </n-button-group>
                 </span>
@@ -488,9 +488,10 @@ const handleTable = () => {
                   <n-button-group>
                     <n-button size="tiny" :bordered="false">
                       <span
-                        style="color: green" title="上传量"
-                        v-text="renderSize(status.uploaded)"
+                        style="color: indianred" title="下载量"
+                        v-text="renderSize(status.downloaded)"
                       />
+
                     </n-button>
                     <n-button size="tiny" :bordered="false">
                       <template #icon>
@@ -498,8 +499,8 @@ const handleTable = () => {
                       </template>
                       &nbsp;
                       <span
-                        style="color: indianred" title="下载量"
-                        v-text="renderSize(status.downloaded)"
+                        style="color: green" title="上传量"
+                        v-text="renderSize(status.uploaded)"
                       />
                     </n-button>
                   </n-button-group>
@@ -782,6 +783,7 @@ const handleTable = () => {
                         {{ renderSize(renderBit(next_level.downloaded) * next_level.ratio) }}
                       </n-text>
                     </td>
+                    downloaded
                   </tr>
                   <tr v-if="next_level && renderBit(next_level.downloaded) > status.downloaded">
                     <th>下载量：</th>
@@ -982,15 +984,15 @@ const handleTable = () => {
                 <span class="flex items-center justify-end">
                   <n-button-group>
                     <n-button size="tiny" :bordered="false">
-                      <span style="color: green" title="做种数量">
-                        {{ status.seed }}
-                      </span>
+                      <span style="color: indianred" title="正在下载" v-text="status.leech" />
                     </n-button>
                     <n-button size="tiny" :bordered="false">
                       <template #icon>
                         <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
                       </template>
-                      <span style="color: indianred" title="正在下载" v-text="status.leech" />
+                      <span style="color: green" title="做种数量">
+                        {{ status.seed }}
+                      </span>
                     </n-button>
                   </n-button-group>
                 </span>
@@ -999,17 +1001,18 @@ const handleTable = () => {
                   <n-button-group>
                     <n-button size="tiny" :bordered="false">
                       <span
-                        style="color: green" title="上传量"
-                        v-text="renderSize(status.uploaded)"
+                        style="color: indianred" title="下载量"
+                        v-text="renderSize(status.downloaded)"
                       />
+
                     </n-button>
                     <n-button size="tiny" :bordered="false">
                       <template #icon>
                         <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
                       </template>
                       <span
-                        style="color: indianred" title="下载量"
-                        v-text="renderSize(status.downloaded)"
+                        style="color: green" title="上传量"
+                        v-text="renderSize(status.uploaded)"
                       />
                     </n-button>
                   </n-button-group>
