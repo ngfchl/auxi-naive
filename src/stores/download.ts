@@ -1729,6 +1729,44 @@ export const useDownloadStore = defineStore('download', () => {
       },
     },
     {
+      title: '辅种开关',
+      key: 'repeat',
+      minWidth: 80,
+      width: 100,
+      align: 'center',
+      render(row: Downloader) {
+        return h(
+          NSwitch,
+          {
+            'size': 'small',
+            'round': false,
+            'checked-value': true,
+            'unchecked-value': false,
+            'value': row.repeat,
+            'onUpdate:value': async (value) => {
+              const downloader = await $getDownloader({ downloader_id: row.id })
+              downloader.repeat = value
+              const flag = await $editDownloader(downloader)
+              if (flag) await getDownloaderList()
+            },
+          },
+          {
+            'checked': () => '开启',
+            'unchecked': () => '关闭',
+            'checked-icon': () => '✅',
+            'unchecked-icon': () => h(
+              MenuIcon,
+              {
+                icon: 'CloseSharp',
+                color: 'red',
+                size: 16,
+              },
+            ),
+          },
+        )
+      },
+    },
+    {
       title: '拆包下载',
       key: 'package_files',
       minWidth: 80,
