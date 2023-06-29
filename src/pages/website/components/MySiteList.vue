@@ -69,14 +69,16 @@ watchEffect(() => {
   if (isMobile.value)
     slots.value = 5
 })
-
-/**
- * 挂载时初始化数据
- */
-onMounted(async () => {
-  await initData()
-  tableRef.value = isMobile.value
-})
+const handleTable = (value: boolean) => {
+  tableRef.value = value
+  if (!tableRef.value) {
+    handlePage(1)
+    handlePageSize(1000)
+  }
+  else {
+    handlePageSize(8)
+  }
+}
 
 const list = computed(() => {
   const start = (page.value - 1) * pageSize.value
@@ -86,16 +88,13 @@ const list = computed(() => {
 const handleUpdate = async (my_site: MySite) => {
   await sortMySite(my_site)
 }
-const handleTable = () => {
-  tableRef.value = !tableRef.value
-  if (!tableRef.value) {
-    handlePage(1)
-    handlePageSize(1000)
-  }
-  else {
-    handlePageSize(8)
-  }
-}
+/**
+ * 挂载时初始化数据
+ */
+onMounted(async () => {
+  await initData()
+  handleTable(isMobile.value)
+})
 </script>
 
 <template>
@@ -104,7 +103,7 @@ const handleTable = () => {
       size="tiny"
       secondary
       type="warning"
-      @click="handleTable"
+      @click="handleTable(!tableRef)"
     >
       切换{{ tableRef ? '表格' : '卡片' }}
     </n-button>
