@@ -44,7 +44,7 @@ import { railStyle } from '~/utils/baseStyle'
 
 export const useWebsiteStore = defineStore('website',
   () => {
-    const { dialog } = useGlobalConfig()
+    const { dialog, loadingBar } = useGlobalConfig()
     /**
          * 搜索字符串
          */
@@ -796,13 +796,15 @@ export const useWebsiteStore = defineStore('website',
          * @param site_id
          */
     const updateMySiteStatus = async (site_id: number) => {
+      loadingBar?.start()
       const index = siteStatusList.value.findIndex((status: NewestStatus) => {
         return status.my_site.id === site_id
       })
-
       const item = await $getNewestStatus(site_id)
       siteStatusList.value.splice(index, 1, item)
+      // siteStatusList.value = await $siteStatusNewestList()
       await siteSearch()
+      loadingBar?.finish()
     }
     const getMySiteList = async () => {
       mySiteList.value = await $mySiteList()
@@ -852,12 +854,16 @@ export const useWebsiteStore = defineStore('website',
          * 签到
          */
     const signSite = async (site_id: number) => {
+      loadingBar?.start()
       const flag = await $signSite(site_id)
       if (flag)
         await updateMySiteStatus(site_id)
+      loadingBar?.finish()
     }
     const signAllSite = async () => {
+      loadingBar?.start()
       await $signAllSite()
+      loadingBar?.finish()
     }
     const getSite = (site_id: number) => {
       return siteStatusList.value.find((item) => {
@@ -897,19 +903,24 @@ export const useWebsiteStore = defineStore('website',
          * 更新站点数据
          */
     const refreshSite = async (site_id: number) => {
+      loadingBar?.start()
       const data = await $refreshSite(site_id)
       if (data) await updateMySiteStatus(site_id)
+      loadingBar?.finish()
     }
     const refreshAllSite = async () => {
+      loadingBar?.start()
       spinShow.value = true
       await $refreshAllSite()
       spinShow.value = false
+      loadingBar?.finish()
     }
 
     /**
          * 更新站点数据
          */
     const siteEChart = async (site_id: number, days = -7) => {
+      loadingBar?.start()
       const res = await $getHistoryList({
         site_id,
         days,
@@ -920,13 +931,16 @@ export const useWebsiteStore = defineStore('website',
       currentSite.value = site_id
       sign_today.value = false
       eDrawer.value = true
+      loadingBar?.finish()
     }
 
     /**
          *
          */
     const initSomeData = () => {
+      loadingBar?.start()
       siteHistory.value.length = 0
+      loadingBar?.finish()
     }
     /**
          * 关闭编辑窗口并刷新数据
