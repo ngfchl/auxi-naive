@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 defineProps<{
   read?: boolean
-  avatar?: string
+  current?: boolean
   title?: string
   timer?: string
   desc?: string
@@ -11,25 +11,20 @@ defineProps<{
 <template>
   <n-list-item :class="read ? 'op-40' : ''">
     <n-thing>
-      <template v-if="avatar" #avatar>
-        <n-avatar round :src="avatar" />
-      </template>
       <template v-if="title" #header>
-        <span class="text-16px">
-          {{ title }}
+        <span class="text-12px text-#778899">
+          <span v-if="current">✅当前版本：</span>{{ title }}
         </span>
       </template>
       <template #description>
-        <template v-if="desc">
-          <span class="text-12px">
+        <n-space v-if="desc" justify="space-between">
+          <span class="text-8px text-#008000">
             {{ desc }}
           </span>
-        </template>
-        <template v-if="timer">
-          <div class="text-14px">
+          <span class="text-8px text-#808000">
             {{ timer }}
-          </div>
-        </template>
+          </span>
+        </n-space>
       </template>
     </n-thing>
   </n-list-item>
