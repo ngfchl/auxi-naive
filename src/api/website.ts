@@ -1,7 +1,6 @@
 import numberFormat from '@/hooks/numberFormat'
 import renderSize from '@/hooks/renderSize'
 import type { Downloader } from '~/api/download'
-import { useGlobalConfig } from '~/composables/gobal-config'
 import { getList } from '~/hooks/getList'
 
 export interface WebSite {
@@ -234,8 +233,6 @@ export interface SearchResult {
   success: string[]
 }
 
-const { message } = useGlobalConfig()
-
 /**
  * 获取我的站点列表
  */
@@ -282,6 +279,8 @@ export const $getMySite: (params: object) => Promise<any> = async (params: objec
  * @param params
  */
 export const $removeMySite = async (params: object) => {
+  const { message } = useGlobalConfig()
+
   const {
     msg,
     code,
@@ -301,6 +300,7 @@ export const $removeMySite = async (params: object) => {
  * @param params
  */
 export const $editMySite = async (params: MySite) => {
+  const { message } = useGlobalConfig()
   const {
     msg,
     code,
@@ -319,6 +319,7 @@ export const $editMySite = async (params: MySite) => {
  * @param params
  */
 export const $saveMySite = async (params: MySite) => {
+  const { message } = useGlobalConfig()
   const {
     msg,
     code,
@@ -338,6 +339,7 @@ export const $saveMySite = async (params: MySite) => {
  * @param site_id
  */
 export const $signSite = async (site_id: number) => {
+  const { message } = useGlobalConfig()
   const response = await usePost('mysite/signin', { site_id })
   const {
     code,
@@ -354,6 +356,7 @@ export const $signSite = async (site_id: number) => {
 }
 
 export const $signAllSite = async () => {
+  const { message } = useGlobalConfig()
   const response = await usePost('mysite/sign/do')
   const {
     code,
@@ -369,6 +372,7 @@ export const $signAllSite = async () => {
   }
 }
 export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_id: number) => {
+  const { message } = useGlobalConfig()
   const response = await usePost('mysite/status/get', { site_id })
   const {
     code,
@@ -389,6 +393,7 @@ export const $getNewestStatus: (site_id: number) => Promise<any> = async (site_i
  * @param site_id
  */
 export const $refreshSite = async (site_id: number) => {
+  const { message } = useGlobalConfig()
   let response = await usePost('mysite/status', { site_id })
   if (typeof response === 'string') {
     // 正则表达式查找替换所有无穷大字符
@@ -413,6 +418,7 @@ export const $refreshSite = async (site_id: number) => {
 }
 
 export const $refreshAllSite = async () => {
+  const { message } = useGlobalConfig()
   const {
     msg,
     code,
@@ -429,6 +435,7 @@ export const $refreshAllSite = async () => {
 }
 
 export const $sortSite = async (site_id: number, sort_id: number) => {
+  const { message } = useGlobalConfig()
   const {
     msg,
     code,
@@ -751,6 +758,7 @@ export const $todayDataList: () => Promise<any> = async () => {
  * @param params
  */
 export const $searchTorrent = async (params: { key: string; site_list: number[] }) => {
+  const { message } = useGlobalConfig()
   const {
     msg,
     code,
@@ -766,6 +774,7 @@ export const $searchTorrent = async (params: { key: string; site_list: number[] 
   }
 }
 export const $pushTorrent = async (params: string) => {
+  const { message } = useGlobalConfig()
   const {
     msg,
     code,
