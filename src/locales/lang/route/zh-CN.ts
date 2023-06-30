@@ -23,4 +23,6 @@ export default {
   'pages.tools.shell.title': '终端',
   'pages.tools.logs.title': '日志',
   'pages.tools.import.title': '导入',
+  'pages.help.docs.title': '文档',
+  'pages.help.title': '帮助',
 }

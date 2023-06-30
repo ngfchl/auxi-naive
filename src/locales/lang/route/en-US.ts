@@ -23,4 +23,6 @@ export default {
   'pages.tools.shell.title': 'Shell',
   'pages.tools.logs.title': 'Logs',
   'pages.tools.import.title': 'Import',
+  'pages.help.docs.title': 'Docs',
+  'pages.help.title': 'Help',
 }

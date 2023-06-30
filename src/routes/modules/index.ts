@@ -1,9 +1,10 @@
 import dashboard from './dashboard'
-import website from './website'
-import tools from './tools'
 import download from './download'
+import help from './help'
 import settings from './settings'
 import tasks from './tasks'
+import tools from './tools'
+import website from './website'
 
 const Home = () => import('~/pages/index.vue')
 
@@ -15,4 +16,5 @@ export default {
   ...download,
   ...settings,
   ...tasks,
+  ...help,
 }

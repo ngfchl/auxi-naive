@@ -268,6 +268,27 @@ export const generateRoute = async () => {
       icon: 'LogInSharp',
       keepAlive: true,
     },
+    {
+      id: 99,
+      pid: null,
+      path: '/help',
+      name: 'help',
+      component: 'RouteView',
+      redirect: '/help',
+      title: 'pages.help.title',
+      icon: 'HelpCircleSharp',
+      keepAlive: true,
+    },
+    {
+      id: 100,
+      pid: 99,
+      path: '/help/docs',
+      name: 'docs',
+      component: 'Docs',
+      title: 'pages.help.docs.title',
+      icon: 'Document',
+      keepAlive: true,
+    },
   ]
   if (data) {
     const routes = generator(data)
