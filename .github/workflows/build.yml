@@ -1,0 +1,39 @@
+name: Build ptools frontend
+
+on:
+    workflow_dispatch:
+
+jobs:
+  ptools:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+
+      -
+        name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - 
+        name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6.32.9
+
+      -
+        name: Build Web
+        run: |
+          pnpm install
+          pnpm build
+          ls -al
+          ls -al dist
+
+      - name: Deploy to dist branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: dist
