@@ -1,7 +1,7 @@
 name: Build ptools frontend
 
 on:
-	push:
+  push:
     branches:
       - master
 
