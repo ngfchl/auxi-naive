@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import {
-  CardSharp, Cloudy, ColorWandOutline, ColorWandSharp, MailUnreadSharp, ShareSharp, SwapVerticalSharp,
+  CardSharp,
+  Cloudy,
+  ColorWandOutline,
+  ColorWandSharp,
+  MailUnreadSharp,
+  ShareSharp,
+  SwapVerticalSharp,
 } from '@vicons/ionicons5'
-import renderSize from '../../../hooks/renderSize'
 import numberFormat from '../../../hooks/numberFormat'
+import renderSize from '../../../hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
 const websiteStore = useWebsiteStore()
@@ -78,21 +84,23 @@ onBeforeMount(async () => {
         <div class="flex items-center justify-between">
           <span style="font-weight: bold;color: #3b5769;line-height: 36px">实时数据：</span>
           <span style="text-align: right;" class="items-center">
-
+            <span
+              style="color: indianred" title="下载数量"
+              v-text="totalData.leech"
+            />
+            <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
             <span style="color: green" title="做种数量">
               {{ totalData.seed }}
             </span>
-            <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
-            <span style="color: indianred" title="正在下载" v-text="totalData.leech" />
             <n-divider />
-            <span
-              style="color: green" title="上传量"
-              v-text="renderSize(totalData.uploaded)"
-            />
-            <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
             <span
               style="color: indianred" title="下载量"
               v-text="renderSize(totalData.downloaded)"
+            />
+            <n-icon class="ml-1 mr-1"><SwapVerticalSharp /></n-icon>
+            <span
+              style="color: green" title="上传量"
+              v-text="renderSize(totalData.uploaded)"
             />
           </span>
         </div>
