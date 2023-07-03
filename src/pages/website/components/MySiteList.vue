@@ -406,7 +406,7 @@ onMounted(async () => {
                   </table>
                 </n-popover>
                 <n-button strong secondary size="tiny" ghost>
-                  🔥 {{ calculateWeeksAndDays(ptYear) }}
+                  🔥 {{ calculateWeeksAndDays(my_site.joined) }}
                 </n-button>
               </n-space>
             </td>
@@ -1059,7 +1059,7 @@ onMounted(async () => {
           <n-divider />
           <n-space v-if="status.updated" class="text-8px text-right text-#3b5769" justify="space-between">
             <n-button strong secondary size="tiny" ghost>
-              🔥 {{ calculateWeeksAndDays(ptYear) }}
+              🔥 {{ calculateWeeksAndDays(my_site.joined) }}
             </n-button>
 
             {{ status.updated }}
