@@ -4,8 +4,8 @@ import { $getSettingsFile, $getSettingsToml, $saveSettingsFile, $testNotify } fr
 
 export const useSettingsStore = defineStore('settings', () => {
   const treeData = ref<ParentNode>({
-    index: 'root',
-    name: 'Root',
+    name: 'root',
+    value: 'Root',
     children: [],
   })
 
@@ -19,8 +19,8 @@ export const useSettingsStore = defineStore('settings', () => {
     parentNode.children.length = 0
     for (const key in data) {
       const node = {
-        index: key,
-        name: typeof data[key] === 'object' ? '' : data[key],
+        name: key,
+        value: typeof data[key] === 'object' ? '' : data[key],
         children: [],
       }
       parentNode.children.push(node as ParentNode)

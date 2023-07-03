@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { DataTableColumns } from 'naive-ui'
+import { NButton, NSwitch } from 'naive-ui'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useSettingsStore } from '~/stores/settings'
+import { railStyle } from '~/utils/baseStyle'
 
 const { message } = useGlobalConfig()
 const {
@@ -38,33 +41,67 @@ const handleSave = async () => {
   editFlag.value = false
   await getSettingsToml()
 }
-const rowKey = (row: RowData) => row.index
+const rowKey = (row: RowData) => row.name
 const columns: DataTableColumns<RowData> = [
-  {
-    type: 'selection',
-  },
+  // {
+  //   type: 'selection',
+  // },
   {
     title: '配置项名称',
-    key: 'index',
+    key: 'name',
   },
   {
     title: '值',
-    key: 'name',
+    key: 'value',
+    render(row) {
+      switch (typeof row.value) {
+        case 'boolean':
+          return h(
+            NSwitch,
+            {
+              'size': 'small',
+              'round': false,
+              'value': row.value,
+              'rail-style': railStyle,
+              // 'disabled': true,
+              'onUpdate:value': async (value) => {
+                // console.log(row.name)
+                message?.info(`${row.name} 当前状态为：${value ? '关闭' : '开启'}`)
+              },
+            },
+            {
+              'checked': () => row.value,
+              'unchecked': () => row.value,
+              'checked-icon': () => '✅',
+              'unchecked-icon': () => h(
+                MenuIcon,
+                {
+                  icon: 'CloseSharp',
+                  color: 'red',
+                  size: 16,
+                },
+              ),
+            },
+          )
+        default:
+          return row.value
+      }
+    },
   },
 ]
 </script>
 
 <template>
   <n-space justify="end">
-    <n-button type="primary" secondaryc @click="testNotify">
+    <NButton type="primary" secondaryc @click="testNotify">
       通知测试
-    </n-button>
-    <n-button :type="editFlag ? 'warning' : 'primary'" @click="handleEdit(!editFlag)">
+    </NButton>
+    <NButton :type="editFlag ? 'warning' : 'primary'" @click="handleEdit(!editFlag)">
       <span v-text="!editFlag ? '编辑' : '取消'" />
-    </n-button>
-    <n-button v-if="editFlag" type="success" @click="handleSave">
+    </NButton>
+    <NButton v-if="editFlag" type="success" @click="handleSave">
       保存
-    </n-button>
+    </NButton>
   </n-space>
   <n-input v-if="editFlag" v-model:value="content" class="code mt-2" type="textarea" placeholder="" />
   <n-data-table

@@ -1,8 +1,8 @@
 import { getList } from '~/hooks/getList'
 
 export interface ParentNode {
-  index: string
   name: string
+  value: string
   children: ParentNode[]
 }
 
