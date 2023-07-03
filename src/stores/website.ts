@@ -38,6 +38,7 @@ import {
   $torrentList,
 } from '~/api/website'
 import { useGlobalConfig } from '~/composables/gobal-config'
+import { calculateWeeksAndDays } from '~/hooks/calculateWeeksAndDays'
 import renderSize from '~/hooks/renderSize'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { railStyle } from '~/utils/baseStyle'
@@ -55,6 +56,7 @@ export const useWebsiteStore = defineStore('website',
     const drawerTitle = ref('详情')
     const page = ref(1)
     const pageSize = ref(8)
+    const ptYear = ref<number>(0)
     const handlePageSize = (value: number) => {
       pageSize.value = value
     }
@@ -223,7 +225,7 @@ export const useWebsiteStore = defineStore('website',
       hr_discern: false,
       search_torrents: false,
       user_id: '',
-      joined: '2023-01-01 12:00:00',
+      joined: 0,
       user_agent: window.navigator.userAgent,
       cookie: '',
       rss: '',
@@ -396,9 +398,9 @@ export const useWebsiteStore = defineStore('website',
         title: {
           text: `⬆${renderSize(todayDataList.value!.total_upload)} ⬇${renderSize(todayDataList.value!.total_download)}`,
           top: 15,
-          left: 'center',
+          // left: 'center',
           textStyle: {
-            fontSize: 18,
+            fontSize: 16,
             color: 'orangered',
           },
         },
@@ -683,6 +685,8 @@ export const useWebsiteStore = defineStore('website',
         totalData.value.invitation += s.invitation
         totalData.value.mail += s.mail
         const mysite: MySite = siteStatus.my_site
+        if (mysite.joined > ptYear.value) ptYear.value = mysite.joined
+
         totalUploadedDataList.value.push({
           name: mysite.nickname,
           value: s.uploaded,
@@ -696,11 +700,18 @@ export const useWebsiteStore = defineStore('website',
       pieTotalOption.value = {
         title: {
           text: `⬆${renderSize(totalData.value.uploaded)} ⬇${renderSize(totalData.value.downloaded)}`,
-          top: 5,
-          left: 'center',
+          subtext: `🌐 共${siteStatusList.value.length}个站点\n☁️ 做种${renderSize(totalData.value.seed_volume)}\n🔥 P龄${calculateWeeksAndDays(ptYear.value)}`,
+          top: 2,
+          // left: 'center',
           textStyle: {
-            fontSize: 18,
+            fontSize: 16,
             color: 'orangered',
+          },
+          subtextStyle: {
+            fontSize: 15,
+            color: 'orange',
+            align: 'bottom',
+            lineHeight: 20,
           },
         },
         bottom: 0,
@@ -1521,6 +1532,7 @@ export const useWebsiteStore = defineStore('website',
       perDayData,
       pieOption,
       pieTotalOption,
+      ptYear,
       refMySiteForm,
       refreshAllSite,
       refreshSite,

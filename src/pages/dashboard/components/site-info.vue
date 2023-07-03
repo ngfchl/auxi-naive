@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import {
-  CardSharp,
-  Cloudy,
-  ColorWandOutline,
-  ColorWandSharp,
-  MailUnreadSharp,
-  ShareSharp,
-  SwapVerticalSharp,
-} from '@vicons/ionicons5'
+import { CardSharp, Cloudy, ColorWandOutline, MailUnreadSharp, ShareSharp, SwapVerticalSharp } from '@vicons/ionicons5'
 import numberFormat from '../../../hooks/numberFormat'
 import renderSize from '../../../hooks/renderSize'
+import { calculateWeeksAndDays } from '~/hooks/calculateWeeksAndDays'
 import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 
 const websiteStore = useWebsiteStore()
 const {
-  totalData, siteInfoFlag,
+  totalData, siteInfoFlag, ptYear,
 } = storeToRefs(websiteStore)
 const loading = ref(false)
 const {
@@ -118,17 +111,17 @@ onBeforeMount(async () => {
               <span v-if="totalData.my_score !== 0" v-text="` / ${numberFormat(totalData.my_score)}`" />
             </span>
             <n-divider />
-            <n-icon>
-              <ColorWandSharp />
-            </n-icon>
-            <i
+            <span
               style="color: coral"
-              title="时魔" v-text="totalData.bonus_hour.toFixed(2)"
-            />
+              title="时魔"
+            >🕓 {{ totalData.bonus_hour.toFixed(2) }}</span>
           </div>
         </div>
         <n-divider />
-        <span style="font-weight: bold;color: #3b5769;">P龄：</span>
+        <n-space justify="space-between">
+          <span style="font-weight: bold;color: #3b5769;">P龄：</span>
+          <span style="color: orange">🔥 {{ calculateWeeksAndDays(ptYear) }}</span>
+        </n-space>
         <n-divider />
         <p>
           <span style="font-weight: bold;color: #3b5769;">最后更新时间：</span>

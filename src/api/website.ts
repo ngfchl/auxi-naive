@@ -61,7 +61,7 @@ export interface MySite {
   repeat_torrents: boolean
   package_file: boolean
   user_id: string
-  joined: string
+  joined: number
   user_agent: string
   cookie: string
   custom_server: string
