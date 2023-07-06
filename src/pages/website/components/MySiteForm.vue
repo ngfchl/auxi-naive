@@ -161,6 +161,20 @@ onMounted(async () => {
               <MenuIcon icon="CloseSharp" size="18" color="darkred" />
             </template>
           </n-switch>
+          <n-switch v-model:value="mySiteForm.mirror_switch" :round="false" border label="">
+            <template #checked>
+              镜像
+            </template>
+            <template #unchecked>
+              镜像
+            </template>
+            <template #checked-icon>
+              <MenuIcon icon="Checkbox" size="24" color="green" />
+            </template>
+            <template #unchecked-icon>
+              <MenuIcon icon="CloseSharp" size="18" color="darkred" />
+            </template>
+          </n-switch>
         </n-space>
       </n-form-item>
 
@@ -196,6 +210,11 @@ onMounted(async () => {
           v-model:value="mySiteForm.user_agent" :autosize="{ minRows: 2, maxRows: 6 }"
           autocomplete="off"
           type="textarea"
+        />
+      </n-form-item>
+      <n-form-item label="镜像网站" path="mirror" required>
+        <n-input
+          v-model:value="mySiteForm.mirror" autocomplete="off"
         />
       </n-form-item>
       <n-form-item label="删种规则" path="remove_torrent_rules" required>

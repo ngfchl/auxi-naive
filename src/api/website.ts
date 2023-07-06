@@ -60,8 +60,10 @@ export interface MySite {
   search_torrents: boolean
   repeat_torrents: boolean
   package_file: boolean
+  mirror_switch: boolean
   user_id: string
   joined: number
+  mirror?: string
   user_agent: string
   cookie: string
   custom_server: string
