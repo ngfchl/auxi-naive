@@ -53,6 +53,9 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '值',
     key: 'value',
+    ellipsis: {
+      tooltip: true,
+    },
     render(row) {
       switch (typeof row.value) {
         case 'boolean':
