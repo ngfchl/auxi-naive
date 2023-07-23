@@ -25,6 +25,7 @@ onMounted(async () => {
 })
 
 let c = ''
+
 /**
  * 未修改内容的话取消编辑回复原样
  * @param value
@@ -42,10 +43,25 @@ const handleSave = async () => {
   await getSettingsToml()
 }
 const rowKey = (row: RowData) => row.name
+const rowProps = (row) => {
+  return {
+    onDblclick: async (e: MouseEvent) => {
+      message?.info(row)
+    },
+    // onClick: async (e: MouseEvent) => {
+    //   if (checkedRowKeys.value.includes(row.hash)) {
+    //     const index = checkedRowKeys.value.findIndex((key: string) => key === row.hash)
+    //     handleCheckRows(checkedRowKeys.value.splice(index, 1))
+    //   }
+    //   else { checkedRowKeys.value.push(row.hash) }
+    // },
+  }
+}
 const columns: DataTableColumns<RowData> = [
-  // {
-  //   type: 'selection',
-  // },
+  {
+    type: 'selection',
+    multiple: false,
+  },
   {
     title: '配置项名称',
     key: 'name',
@@ -53,6 +69,9 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '值',
     key: 'value',
+    ellipsis: {
+      tooltip: true,
+    },
     render(row) {
       switch (typeof row.value) {
         case 'boolean':
@@ -109,6 +128,7 @@ const columns: DataTableColumns<RowData> = [
     :columns="columns"
     :data="treeData.children"
     :row-key="rowKey"
+    :row-props="rowProps"
     default-expand-all
   />
 </template>
