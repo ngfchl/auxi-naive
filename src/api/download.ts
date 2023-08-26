@@ -29,6 +29,7 @@ export interface Downloader {
   package_percent?: number
   reserved_space?: number
 }
+
 export interface Peer {
   client: string
   connection: string
@@ -46,12 +47,13 @@ export interface Peer {
   up_speed: number
   uploaded: number
 }
+
 export interface Tracker {
   'tier': number
 
   /**
-   * QB
-   */
+     * QB
+     */
   'url'?: string
   'msg'?: string
   'status'?: number
@@ -60,8 +62,8 @@ export interface Tracker {
   'num_peers'?: number
   'num_seeds'?: number
   /**
-   * Tr
-   */
+     * Tr
+     */
   'id'?: number
   'scrape'?: string
   'announce'?: string
@@ -88,6 +90,7 @@ export interface Tracker {
   'scrapeState'?: number
   'seederCount'?: number
 }
+
 export interface TransmissionFile {
   'bytesCompleted': number
   'length': number
@@ -99,10 +102,11 @@ export interface TransmissionFileState {
   'length': number
   'wanted': boolean
 }
+
 export interface Torrent {
   /**
-   * 公共字段
-   */
+     * 公共字段
+     */
   // 名称
   name: string
   // hash ,Tr的是id
@@ -114,8 +118,8 @@ export interface Torrent {
   // host
   host: string
   /**
-   * Tr 字段
-    */
+     * Tr 字段
+     */
   // 下载路径
   id?: number
   downloadDir?: string
@@ -192,8 +196,8 @@ export interface Torrent {
   webseeds?: []
   webseedsSendingToUs?: number
   /**
-   * Qb字段
-   */
+     * Qb字段
+     */
   // 添加事件
   added_on?: number
   // 剩余要下载的大小
@@ -388,7 +392,6 @@ export interface Downloading {
   server_state?: ServerState
   torrents: Torrent[]
 }
-const { message } = useGlobalConfig()
 
 export const downloadSpeedUrl = 'download/downloaders/speed'
 /**
@@ -422,7 +425,12 @@ export const $getCategoryList: (downloader_id: number) => Promise<any> = async (
 }
 
 export const $removeBrush: (downloader_id: number) => Promise<any> = async (downloader_id: number) => {
-  const { msg, code } = await useGet<object>('download/brush_remove', { downloader_id })
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await useGet<object>('download/brush_remove', { downloader_id })
   switch (code) {
     case 0:
       message?.success(msg)
@@ -433,7 +441,12 @@ export const $removeBrush: (downloader_id: number) => Promise<any> = async (down
   }
 }
 export const $controlTorrent: (params: object) => Promise<any> = async (params) => {
-  const { msg, code } = await usePost('download/control', params)
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await usePost('download/control', params)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -445,7 +458,12 @@ export const $controlTorrent: (params: object) => Promise<any> = async (params) 
 }
 
 export const $addTorrent: (params: object) => Promise<any> = async (params) => {
-  const { msg, code } = await usePost('download/add_torrent', params)
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await usePost('download/add_torrent', params)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -459,7 +477,12 @@ export const $getTorrentProp: (params: object) => Promise<any> = async (params: 
   return await getList<object, Downloading>('download/downloaders/torrent/props', params)
 }
 export const $addDownloader = async (downloader: Downloader) => {
-  const { msg, code } = await usePost('download/downloader', downloader)
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await usePost('download/downloader', downloader)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -471,7 +494,12 @@ export const $addDownloader = async (downloader: Downloader) => {
 }
 
 export const $editDownloader = async (downloader: Downloader) => {
-  const { msg, code } = await usePut('download/downloader', downloader)
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await usePut('download/downloader', downloader)
   switch (code) {
     case 0:
       message?.success(msg)
@@ -483,7 +511,29 @@ export const $editDownloader = async (downloader: Downloader) => {
 }
 
 export const $removeDownloader = async (params: object) => {
-  const { msg, code } = await useDelete('download/downloader', params)
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await useDelete('download/downloader', params)
+  switch (code) {
+    case 0:
+      message?.success(msg)
+      return true
+    default:
+      message?.error(msg)
+      return false
+  }
+}
+
+export const $testDownloader = async (params: object) => {
+  const { message } = useGlobalConfig()
+
+  const {
+    msg,
+    code,
+  } = await useGet('download/downloader/test', params)
   switch (code) {
     case 0:
       message?.success(msg)

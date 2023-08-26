@@ -16,6 +16,7 @@ import {
   $getTorrentProp,
   $removeBrush,
   $removeDownloader,
+  $testDownloader,
 } from '~/api/download'
 import type { WebSite } from '~/api/website'
 import { $pushTorrent, $siteList } from '~/api/website'
@@ -822,6 +823,9 @@ export const useDownloadStore = defineStore('download', () => {
       '',
       deleteFiles.value,
     )
+  }
+  const testDownloader = async (downloader_id: number) => {
+    await $testDownloader({ downloader_id })
   }
   const qBitTorrentColumns = ref<DataTableColumns<Torrent>>([
     {
@@ -1843,6 +1847,24 @@ export const useDownloadStore = defineStore('download', () => {
       },
     },
     {
+      key: 'test',
+      title: '测试',
+      minWidth: 80,
+      width: 100,
+      align: 'center',
+      render(row: Downloader) {
+        return h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            onClick: () => testDownloader(row.id),
+          },
+          { default: () => '测试' },
+        )
+      },
+    },
+    {
       key: 'actions',
       title: '操作',
       minWidth: 80,
@@ -1853,6 +1875,7 @@ export const useDownloadStore = defineStore('download', () => {
           NButton,
           {
             size: 'small',
+            type: 'warning',
             onClick: () => editDownloader(row.id),
           },
           { default: () => '编辑' },
