@@ -51,7 +51,7 @@ onMounted(async () => {
         <n-input
           v-model:value="mySiteForm.nickname"
           clearable
-          maxlength="8"
+          maxlength="16"
           show-count
           placeholder="自定义站点名称，必填"
           show-word-limit
