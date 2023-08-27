@@ -70,8 +70,8 @@ const handleSearch = async (filters) => {
     )
     .map(result => ({
       ...result,
-      siteName: websitesDict[result.site]?.name,
-      siteLogo: websitesDict[result.site]?.logo,
+      siteName: websitesDict[result.site_id]?.name,
+      siteLogo: websitesDict[result.site_id]?.logo,
     }))
 }
 
@@ -434,7 +434,7 @@ const sendData = () => {
                       size="small"
                       :options="downloaderList.map(item => ({
                         label: item.name,
-                        key: `downloader_id=${item.id}&site=${torrent.site}&url=${torrent.magnet_url}&category=${torrent.category}`,
+                        key: `downloader_id=${item.id}&site=${torrent.site_id}&url=${torrent.magnet_url}&category=${torrent.category}`,
                       }))"
                       @select="handleSelect"
                     >
