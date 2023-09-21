@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Accessibility, LockClosed } from '@vicons/ionicons5'
+import MenuIcon from '~/layouts/side-menu/menu-icon.vue'
 import { useAccountLogin } from '~/pages/login/composables/account-login'
 
 const { rules, formRef, userLogin, loading, model } = useAccountLogin()
@@ -14,14 +14,14 @@ const onLogin = async () => {
     <n-form-item-row path="username">
       <n-input v-model:value="model.username" :placeholder="$t('login.username.placeholder')">
         <template #suffix>
-          <n-icon :component="Accessibility" />
+          <MenuIcon icon="Accessibility" />
         </template>
       </n-input>
     </n-form-item-row>
     <n-form-item-row path="password">
       <n-input v-model:value="model.password" type="password" :placeholder="$t('login.password.placeholder')" show-password-on="mousedown">
         <template #suffix>
-          <n-icon :component="LockClosed" />
+          <MenuIcon icon="LockClosed" />
         </template>
       </n-input>
     </n-form-item-row>
