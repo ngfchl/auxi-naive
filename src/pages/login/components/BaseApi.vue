@@ -31,9 +31,11 @@ const clearLocalStorage = () => {
 }
 onMounted(() => {
   const baseUrl = localStorage.getItem('baseApi')
-  if (!baseUrl)
+  if (!baseUrl) {
     baseApi.value = `${location.origin}/`
-  else baseApi.value = baseUrl
+    saveApi()
+  }
+  else { baseApi.value = baseUrl }
   if (!baseApi.value || baseApi.value.length < 10 || !baseApi.value.startsWith('http')) {
     message?.error('请输入正确的 API 地址！！')
     editFlag.value = true
