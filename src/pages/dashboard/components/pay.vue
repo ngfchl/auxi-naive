@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -7,6 +7,14 @@
     <template #header>
       <n-h2 class="text-center">
         每日福利
+        <n-button
+          text
+          target="_blank"
+          type="primary"
+          @click="userStore.logout"
+        >
+          退出
+        </n-button>
       </n-h2>
     </template>
     <n-image-group>
