@@ -318,7 +318,7 @@ onMounted(async () => {
                         </n-text>
                         /
                         <n-text type="error">
-                          {{ numberFormat(next_level.my_bonus) }}
+                          {{ numberFormat(next_level.bonus) }}
                         </n-text>
                       </td>
                     </tr>
@@ -332,7 +332,7 @@ onMounted(async () => {
                         </n-text>
                         /
                         <n-text type="error">
-                          {{ numberFormat(next_level.my_score) }}
+                          {{ numberFormat(next_level.score) }}
                         </n-text>
                       </td>
                     </tr>

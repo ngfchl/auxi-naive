@@ -7,7 +7,7 @@ withDefaults(defineProps<{
   options?: DropdownOption[]
   onSelect?: (value: string) => void
 }>(), {
-  avatar: '/ptools.svg',
+  avatar: './images/ptools.svg',
   nickname: 'ptools',
 })
 </script>

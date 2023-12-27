@@ -62,7 +62,7 @@ withDefaults(defineProps<{
           <span class="flex justify-center items-center mt-1">
             <n-image
               width="13"
-              :src="speed.category === 'Qb' ? '/images/qb32.png' : '/images/tr.png'"
+              :src="speed.category === 'Qb' ? './images/qb32.png' : './images/tr.png'"
               preview-disabled
             />
             {{ speed.name }}

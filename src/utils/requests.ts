@@ -5,8 +5,10 @@ import { useGlobalConfig } from '~/composables/gobal-config'
 import i18n from '~/locales'
 import router from '~/routes'
 
+const baseApi: string | null = localStorage.getItem('baseApi')
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_APP_BASE_API || '/',
+  // baseURL: import.meta.env.VITE_APP_BASE_API || '/',
+  baseURL: baseApi ? `${baseApi}/api/` : '/api/',
   timeout: 120000,
 })
 const requestHandler = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig<any> | any> => {
@@ -22,11 +24,13 @@ const requestHandler = async (config: AxiosRequestConfig): Promise<AxiosRequestC
   }
   return config
 }
+
 export interface ResponseBody<T = any> {
   code: number
   data?: T
   msg: string
 }
+
 const err_status: number[] = [
   401, 403,
 ]
@@ -39,7 +43,11 @@ const errorHandler = (error: AxiosError): Promise<any> => {
 
   // 判断是否存在response
   if (error.response) {
-    const { data, status, statusText } = error.response as AxiosResponse<any>
+    const {
+      data,
+      status,
+      statusText,
+    } = error.response as AxiosResponse<any>
     if (err_status.includes(status)) {
       // 重新登录
       notification?.error({
@@ -54,8 +62,8 @@ const errorHandler = (error: AxiosError): Promise<any> => {
         },
       }).then(() => {
         /**
-         * 这里处理清空用户信息和token的逻辑，后续扩展
-         */
+                 * 这里处理清空用户信息和token的逻辑，后续扩展
+                 */
         token.value = null
       })
     }
@@ -84,9 +92,19 @@ const errorHandler = (error: AxiosError): Promise<any> => {
   }
   return Promise.reject(error)
 }
+if (!baseApi || baseApi.length < 10 || !baseApi.startsWith('http')) {
+  router.replace({
+    path: '/login',
+    query: {
+      redirect: router?.currentRoute.value?.path,
+    },
+  }).then(() => {})
+}
+else {
+  instance.interceptors.request.use(requestHandler)
+  instance.interceptors.response.use(responseHandler, errorHandler)
+}
 
-instance.interceptors.request.use(requestHandler)
-instance.interceptors.response.use(responseHandler, errorHandler)
 const useGet = <P = any, R = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise<ResponseBody<R>> => {
   return instance.request({
     url,
@@ -96,7 +114,7 @@ const useGet = <P = any, R = any>(url: string, params?: P, config?: AxiosRequest
   })
 }
 
-const usePost = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestConfig): Promise< ResponseBody<R>> => {
+const usePost = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestConfig): Promise<ResponseBody<R>> => {
   return instance.request({
     url,
     method: 'POST',
@@ -105,7 +123,7 @@ const usePost = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestC
   })
 }
 
-const usePut = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestConfig): Promise< ResponseBody<R>> => {
+const usePut = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestConfig): Promise<ResponseBody<R>> => {
   return instance.request({
     url,
     method: 'PUT',
@@ -114,7 +132,7 @@ const usePut = <P = any, R = any>(url: string, data?: P, config?: AxiosRequestCo
   })
 }
 
-const useDelete = <P = any, R = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise< ResponseBody<R>> => {
+const useDelete = <P = any, R = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise<ResponseBody<R>> => {
   return instance.request({
     url,
     method: 'DELETE',
