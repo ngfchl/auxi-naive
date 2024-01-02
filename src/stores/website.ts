@@ -810,13 +810,16 @@ export const useWebsiteStore = defineStore('website',
          */
     const updateMySiteStatus = async (site_id: number) => {
       loadingBar?.start()
-      const index = siteStatusList.value.findIndex((status: NewestStatus) => {
-        return status.my_site.id === site_id
-      })
+      // const index = siteStatusList.value.findIndex((status: NewestStatus) => {
+      //   return status.my_site.id === site_id
+      // })
       const item = await $getNewestStatus(site_id)
-      siteStatusList.value.splice(index, 1, item)
+      if (!item) {
+        siteStatusList.value = await $siteStatusNewestList()
+        await siteSearch()
+      }
+      // siteStatusList.value.splice(index, 1, item)
       // siteStatusList.value = await $siteStatusNewestList()
-      await siteSearch()
       loadingBar?.finish()
     }
     const getMySiteList = async () => {
@@ -1488,12 +1491,18 @@ export const useWebsiteStore = defineStore('website',
         width: 125,
         align: 'center',
         sorter: (row1: { downloader: number }, row2: { downloader: number }) => {
-          if (row1.downloader && row2.downloader) { return row1.downloader - row2.downloader }
-          else if (row1.downloader || row2.downloader) {
-            if (row1.downloader) return 1
-            else return -1
+          if (row1.downloader && row2.downloader) {
+            return row1.downloader - row2.downloader
           }
-          else { return -1 }
+          else if (row1.downloader || row2.downloader) {
+            if (row1.downloader)
+              return 1
+            else
+              return -1
+          }
+          else {
+            return -1
+          }
         },
         render(row: Torrent) {
           if (row.downloader) {
