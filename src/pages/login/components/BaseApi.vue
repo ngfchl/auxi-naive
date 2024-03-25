@@ -7,7 +7,8 @@ const { message } = useGlobalConfig()
 const editFlag = ref<Boolean>(true)
 const baseApi = ref<string>('')
 const saveApi = () => {
-  if (baseApi.value.startsWith('http') && baseApi.value.endsWith('/api/')) { /* empty */ }
+  if (baseApi.value.startsWith('http') && baseApi.value.endsWith('/api/')) { /* empty */
+  }
   else if (baseApi.value.length === 0) {
     localStorage.removeItem('baseApi')
   }
@@ -16,8 +17,8 @@ const saveApi = () => {
       message?.error('请输入正确的 API 地址！！')
       return
     }
-    if (!baseApi.value.endsWith('/'))
-      baseApi.value = `${baseApi.value}/`
+    if (baseApi.value.endsWith('/'))
+      baseApi.value = baseApi.value.substring(0, baseApi.value.length - 1)
 
     localStorage.setItem('baseApi', baseApi.value)
     editFlag.value = false
@@ -35,7 +36,9 @@ onMounted(() => {
     baseApi.value = `${location.origin}/`
     saveApi()
   }
-  else { baseApi.value = baseUrl }
+  else {
+    baseApi.value = baseUrl
+  }
   if (!baseApi.value || baseApi.value.length < 10 || !baseApi.value.startsWith('http')) {
     message?.error('请输入正确的 API 地址！！')
     editFlag.value = true
