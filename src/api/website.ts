@@ -48,6 +48,7 @@ export interface MySite {
   site?: number
   nickname: string
   passkey: string
+  api_key?: string
   rss?: string
   torrents?: string
   downloader?: number

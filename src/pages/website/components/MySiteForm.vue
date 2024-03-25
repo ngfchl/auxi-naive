@@ -196,6 +196,15 @@ onMounted(async () => {
           show-word-limit
         />
       </n-form-item>
+      <n-form-item label="ApiKey" path="api_key">
+        <n-input
+          v-model:value="mySiteForm.api_key" clearable
+          placeholder="ApiKey"
+          maxlength="64"
+          show-count
+          show-word-limit
+        />
+      </n-form-item>
       <n-form-item label="Cookies" path="cookie">
         <n-input
           v-model:value="mySiteForm.cookie"
@@ -214,7 +223,7 @@ onMounted(async () => {
       </n-form-item>
       <n-form-item label="镜像网站" path="mirror" required>
         <n-input
-          v-model:value="mySiteForm.mirror" autocomplete="off"
+          v-model:value="mySiteForm.mirror" autocomplete="on" placeholder="网站镜像地址，'http://'或'https://'开头，'/'结尾"
         />
       </n-form-item>
       <n-form-item label="删种规则" path="remove_torrent_rules" required>
@@ -252,7 +261,7 @@ onMounted(async () => {
       <n-form-item label="代理服务器" path="custom_server" required>
         <n-input
           v-model:value="mySiteForm.custom_server"
-          placeholder="请输入代理服务器地址，部分站点需要" autocomplete="off"
+          placeholder="请输入代理服务器地址，部分站点需要" autocomplete="on"
         />
       </n-form-item>
     </n-form>
